@@ -14,6 +14,9 @@ namespace IoTEdge.FieldGateway.Function
         [JsonProperty("hostname")]
         public string Hostname { get; set; }
 
+        [JsonProperty("deviceId")]
+        public string DeviceId { get; set; }
+
         [JsonProperty("securityToken")]
         public string SecurityToken { get; set; }
 

@@ -24,3 +24,12 @@ docker build -t iotedge-vrtu ./IoTEdge.VirtualRtu-Out
 docker build -t iotedge-vrtu-fieldgateway ./IoTEdge.VirtualRtu.FieldGateway-Out
 docker build -t iotedge-vrtu-webapp ./IoTEdge.VirtualRtu.WebApp-Out
 
+docker tag iotedge-vrtu skunklab/iotedge-vrtu
+docker tag iotedge-vrtu-fieldgateway skunklab/iotedge-vrtu-fieldgateway
+docker tag iotedge-vrtu-webapp skunklab/iotedge-vrtu-webapp
+
+docker push skunklab/iotedge-vrtu
+docker push skunklab/iotedge-vrtu-fieldgateway
+docker push skunklab/iotedge-vrtu-webapp
+
+

@@ -161,6 +161,7 @@ namespace IoTEdge.FieldGateway.Function
             EdgeGatewayConfiguration edgeConfig = new EdgeGatewayConfiguration()
             {
                 Hostname = entity.Hostname,
+                DeviceId = entity.DeviceId,
                 ModBusContainer = entity.ModbusContainer,
                 ModBusPort = entity.ModbusPort,
                 ModBusPath = entity.ModbusPath,
@@ -179,8 +180,8 @@ namespace IoTEdge.FieldGateway.Function
         private static string GetEdgeSecurityToken(LussEntity entity)
         {
             List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim(config.NameClaimType, entity.DeviceId));
-            claims.Add(new Claim(config.RoleClaimType, entity.VirtualRtuId));
+            claims.Add(new Claim(config.NameClaimType, entity.DeviceId.ToLowerInvariant()));
+            claims.Add(new Claim(config.RoleClaimType, entity.VirtualRtuId.ToLowerInvariant()));
 
             JsonWebToken jwt = new JsonWebToken(config.SymmetricKey, claims, Convert.ToDouble(config.LifetimeMinutes), config.Issuer, config.Audience);
             return jwt.ToString();
@@ -215,10 +216,10 @@ namespace IoTEdge.FieldGateway.Function
 
         public static AuthorizationPolicy CreateCaplPolicy(LussEntity entity, bool edgeDevice)
         {
-            string nameClaimValue = edgeDevice ? entity.DeviceId : entity.VirtualRtuId;
-            string roleClaimValue = edgeDevice ? entity.VirtualRtuId : "manage";
+            string nameClaimValue = edgeDevice ? entity.DeviceId.ToLowerInvariant() : entity.VirtualRtuId.ToLowerInvariant();
+            string roleClaimValue = edgeDevice ? entity.VirtualRtuId.ToLowerInvariant() : "manage";
 
-            string policyId = edgeDevice ? String.Format($"http://{entity.Hostname}/policy/{entity.VirtualRtuId}/{entity.DeviceId}") : String.Format($"http://{entity.Hostname}/policy/{entity.VirtualRtuId}");
+            string policyId = edgeDevice ? String.Format($"http://{entity.Hostname.ToLowerInvariant()}/policy/{entity.VirtualRtuId.ToLowerInvariant()}/{entity.DeviceId.ToLowerInvariant()}") : String.Format($"http://{entity.Hostname.ToLowerInvariant()}/policy/{entity.VirtualRtuId.ToLowerInvariant()}");
                        
             Match nameMatch = new Match(LiteralMatchExpression.MatchUri, config.NameClaimType, true);
             Match roleMatch = new Match(LiteralMatchExpression.MatchUri, config.RoleClaimType, true);
@@ -276,8 +277,8 @@ namespace IoTEdge.FieldGateway.Function
 
         private static string GetEventUriString(LussEntity entity, bool inbound)
         {
-            return inbound ? String.Format($"http://{entity.Hostname}/{entity.VirtualRtuId}/{entity.UnitId}") :
-                                                    String.Format($"http://{entity.Hostname}/{entity.VirtualRtuId}/{entity.DeviceId}");
+            return inbound ? String.Format($"http://{entity.Hostname.ToLowerInvariant()}/{entity.VirtualRtuId.ToLowerInvariant()}/{entity.UnitId}") :
+                                                    String.Format($"http://{entity.Hostname.ToLowerInvariant()}/{entity.VirtualRtuId.ToLowerInvariant()}/{entity.DeviceId.ToLowerInvariant()}");
         }
 
         private static EventMetadata GetEventMetadata(string resourceUriString, string publishPolicyIdUriString, string subscribePolicyIdUriString, ushort unitId, bool inboundRtu)

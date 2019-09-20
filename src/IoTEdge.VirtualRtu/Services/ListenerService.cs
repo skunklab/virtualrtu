@@ -1,5 +1,9 @@
 ﻿using IoTEdge.VirtualRtu.Adapters;
 using IoTEdge.VirtualRtu.Configuration;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector;
+using Microsoft.ApplicationInsights.Extensibility.PerfCounterCollector.QuickPulse;
 using SkunkLab.Channels;
 using System;
 using System.Collections.Generic;
@@ -26,6 +30,8 @@ namespace IoTEdge.VirtualRtu.Services
         private Dictionary<string, CancellationTokenSource> sources;
         public event EventHandler<ListenerErrorEventArgs> OnError;
         private TcpListener listener;
+        private TelemetryClient telemetryClient;       
+        private PerformanceCollectorModule pmodule;
 
         public async Task RunAsync()
         {
@@ -43,10 +49,29 @@ namespace IoTEdge.VirtualRtu.Services
                     tcpClient.NoDelay = true;
                     tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                     CancellationTokenSource cts = new CancellationTokenSource();
-                    IChannel channel = ChannelFactory.Create(false, tcpClient, 1024, 1024 * 100, cts.Token);
+                    
                     RtuMap map = await RtuMap.LoadAsync(config.StorageConnectionString, config.ContainerName, config.Filename);
                     
-                    VirtualRtuAdapter adapter = new VirtualRtuAdapter(map, channel);                    
+                    if(map == null)
+                    {
+                        tcpClient.Close();
+                        continue;
+                    }
+
+
+                    if(telemetryClient == null && !string.IsNullOrEmpty(config.AppInsightsKey))
+                    {
+                        TelemetryConfiguration tc = new TelemetryConfiguration(config.AppInsightsKey);
+                        telemetryClient = new TelemetryClient(tc);
+                        string machName = String.Format($"VRTU-{System.Environment.MachineName}");
+                        telemetryClient.Context.GlobalProperties[machName] = map.Name;
+                        TelemetryConfiguration.Active.DisableTelemetry = true;                        
+                        pmodule = new PerformanceCollectorModule();
+                        pmodule.Initialize(tc);
+                    }
+
+                    IChannel channel = ChannelFactory.Create(false, tcpClient, 1024, 1024 * 100, cts.Token);
+                    VirtualRtuAdapter adapter = new VirtualRtuAdapter(map, channel, config.PiraeusHostname, config.AppInsightsKey);                    
                     
                     adapter.OnError += Adapter_OnError;
                     adapter.OnClose += Adapter_OnClose;
@@ -89,7 +114,7 @@ namespace IoTEdge.VirtualRtu.Services
             return null;
         }
         private void Adapter_OnClose(object sender, AdapterCloseEventArgs e)
-        {
+        {           
             RemoveCancelToken(e.AdapterId, false);
             RemoveAdapter(e.AdapterId);
         }

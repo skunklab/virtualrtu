@@ -1,4 +1,5 @@
 ﻿
+using IoTEdge.VirtualRtu.Configuration;
 using IoTEdge.VirtualRtu.FieldGateway.Communications;
 using IoTEdge.VirtualRtu.FieldGateway.Configuration;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,19 @@ namespace IoTEdge.VirtualRtu.FieldGateway
             GatewayConfigurationSource source = new GatewayConfigurationSource();
             builder.Add(source);
             return builder;
+        }
+
+        public static IServiceCollection AddConfiguration(this IServiceCollection services)
+        {
+            IConfigurationBuilder builder = new ConfigurationBuilder();
+            IConfigurationRoot root = builder.Build();
+
+            EdgeGatewayConfiguration config = new EdgeGatewayConfiguration();
+            ConfigurationBinder.Bind(root, config);
+
+            services.AddSingleton<EdgeGatewayConfiguration>(config);
+
+            return services;
         }
         //public static IServiceCollection AddConfiguration(this IServiceCollection services)
         //{

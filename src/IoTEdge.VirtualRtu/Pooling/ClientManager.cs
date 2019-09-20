@@ -47,7 +47,7 @@ namespace IoTEdge.VirtualRtu.Pooling
         private static ClientManager instance;
 
         string GetSecurityToken(IEnumerable<Claim> claims)
-        {
+        {            
             //Normally a security token would be obtained externally
             //For the sample we are going to build a token that can
             //be authn'd and authz'd for this sample

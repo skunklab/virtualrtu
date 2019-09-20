@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="SkunkLab.Storage" Version="1.1.0" />
+    <PackageReference Include="SkunkLab.Storage" Version="1.2.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.2" />
   </ItemGroup>
 

@@ -12,6 +12,7 @@ namespace IoTEdge.VirtualRtu.FieldGateway
 {
     public class Startup
     {
+       
         public IConfiguration Configuration { get; }
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -23,6 +24,7 @@ namespace IoTEdge.VirtualRtu.FieldGateway
             EdgeGatewayConfiguration config = new EdgeGatewayConfiguration();
             ConfigurationBinder.Bind(root, config);
             
+
             CommunicationDirector.Create(config);  //create the singleton instance
 
             if (env.IsDevelopment())
@@ -43,6 +45,9 @@ namespace IoTEdge.VirtualRtu.FieldGateway
 
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddConfiguration();
+
             services.AddMvc(o =>
             {
                 o.InputFormatters.Insert(0, new BinaryInputFormatter());

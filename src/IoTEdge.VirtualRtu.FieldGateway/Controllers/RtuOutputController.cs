@@ -43,6 +43,7 @@ namespace IoTEdge.VirtualRtu.FieldGateway.Controllers
         {
             try
             {
+                Console.WriteLine("Received message MBPA");
                 await director.SendRtuOutputAsync(value);
                 return new HttpResponseMessage(HttpStatusCode.OK);
             }

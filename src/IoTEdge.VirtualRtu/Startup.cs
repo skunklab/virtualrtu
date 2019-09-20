@@ -1,12 +1,9 @@
 ﻿using IoTEdge.VirtualRtu.Configuration;
 using IoTEdge.VirtualRtu.Pooling;
 using IoTEdge.VirtualRtu.Services;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SkunkLab.Security.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -16,11 +13,9 @@ namespace IoTEdge.VirtualRtu
     public class Startup
     {
         private VirtualRtuConfiguration config;
-        //private ConnectionPool pool;
         private ClientManager clientManager;
 
         public IConfiguration Configuration { get; }
-        //public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         public void Configure()
         {
             try
@@ -42,12 +37,7 @@ namespace IoTEdge.VirtualRtu
 
             string endpoint = string.Format($"wss://{config.PiraeusHostname}/ws/api/connect");
             IEnumerable<Claim> claims = config.GetClaimset();
-            //string name = "vrtu";
-            //string role = "vrtu";
             ClientManager.Configure(endpoint, claims, config);
-
-
-            //CreateConnectionPool();
         }
 
         public void ConfigureServices(IServiceCollection services)

@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.2",
-    "signature": "74f4cd7426bd50da064f5797f26e52d34e162c13"
+    "signature": "6038abdb708201ffb009f2fc66241b98ae90b2a9"
   },
   "compilationOptions": {
     "defines": [
@@ -189,19 +189,20 @@
           "lib/netcoreapp2.1/Pipelines.Sockets.Unofficial.dll": {}
         }
       },
-      "SkunkLab.Storage/1.1.0": {
+      "SkunkLab.Storage/1.2.0": {
         "dependencies": {
           "Microsoft.Azure.KeyVault": "3.0.0",
           "Microsoft.Azure.KeyVault.Core": "3.0.0",
           "Microsoft.IdentityModel.Clients.ActiveDirectory": "4.5.0",
+          "NETStandard.Library": "2.0.3",
           "StackExchange.Redis.Extensions.Binary": "4.0.5",
           "System.ServiceModel.Primitives": "4.5.3",
           "WindowsAzure.Storage": "9.3.2"
         },
         "runtime": {
           "lib/netcoreapp2.2/SkunkLab.Storage.dll": {
-            "assemblyVersion": "1.0.1.0",
-            "fileVersion": "1.0.1.0"
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.2.0.0"
           }
         },
         "compile": {
@@ -394,7 +395,7 @@
       "IoTEdge.VirtualRtu.Configuration/1.0.0": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.1",
-          "SkunkLab.Storage": "1.1.0",
+          "SkunkLab.Storage": "1.2.0",
           "WindowsAzure.Storage": "9.3.2"
         },
         "runtime": {
@@ -3663,12 +3664,12 @@
       "path": "pipelines.sockets.unofficial/1.0.7",
       "hashPath": "pipelines.sockets.unofficial.1.0.7.nupkg.sha512"
     },
-    "SkunkLab.Storage/1.1.0": {
+    "SkunkLab.Storage/1.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-pAntU15q9hJKPpYclf7EQk/2rP/BzI+w3Yw/BTUYApISY/TtAiC3z0GpkLK317ykD8AjTm7faMqwYEjRUXoMDA==",
-      "path": "skunklab.storage/1.1.0",
-      "hashPath": "skunklab.storage.1.1.0.nupkg.sha512"
+      "sha512": "sha512-Jy1RyBCDBxypVoaq+/SNqpLdxqVX+WTyMQ36vFKuqknvVnSGyMSupLqceyCKuEq528onvXtacFV692uvDctvpw==",
+      "path": "skunklab.storage/1.2.0",
+      "hashPath": "skunklab.storage.1.2.0.nupkg.sha512"
     },
     "StackExchange.Redis/2.0.513": {
       "type": "package",

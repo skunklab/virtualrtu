@@ -11,6 +11,9 @@ namespace IoTEdge.VirtualRtu.Configuration
         {
         }
 
+        [JsonProperty("appInsightsKey")]
+        public string AppInsightsKey { get; set; }
+
         [JsonProperty("claimTypes")]
         public string ClaimTypes { get; set; }
 

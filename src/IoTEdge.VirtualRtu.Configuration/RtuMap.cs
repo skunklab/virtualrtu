@@ -30,7 +30,7 @@ namespace IoTEdge.VirtualRtu.Configuration
         }
 
         public static async Task<RtuMap> LoadAsync(string connectionString, string containerName, string filename)
-        {            
+        {
             try
             {
                 BlobStorage storage = BlobStorage.CreateSingleton(connectionString);
@@ -38,12 +38,14 @@ namespace IoTEdge.VirtualRtu.Configuration
                 string jsonString = Encoding.UTF8.GetString(blobBytes);
                 return JsonConvert.DeserializeObject<RtuMap>(jsonString);
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Fault loading RTU Map in VRTU - {ex.Message}");
-                throw ex;
-            }            
+            catch { }
+
+            return null;
         }
+
+        //Name of the Virtual RTU
+        [JsonProperty]
+        public string Name { get; set; }        
 
         [JsonProperty("map")]
         public Dictionary<ushort, RtuPiSystem> Map { get; set; }
