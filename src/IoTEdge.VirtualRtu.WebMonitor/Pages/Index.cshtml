@@ -1,0 +1,46 @@
+﻿@page
+@model IoTEdge.VirtualRtu.WebMonitor.Pages.IndexModel
+
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<!-- Required Stylesheets -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
+
+<!-- Required Javascript -->
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/bootstrap-treeview.js"></script>
+
+<div id="tree"></div>
+
+<script>
+    
+     var data = JSON.parse("[{\"text\":\"myvrtutest\",\"href\":\"#myvrtutest\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#myvrtutest-device1\"}]}]");
+
+    function getTree() {
+        // Some logic to retrieve, or generate tree structure
+        return data;
+    }
+
+    function getNode(id) {
+        alert(id);
+    }
+
+    $('#tree').treeview({
+        data: getTree(), onNodeSelected: function (event, data) {
+            
+            var line = data.href;            
+            line = "myvrtutest-device1";
+            if (line.indexOf("-") > 0) {
+                window.location.assign("/index2?device=" + line);
+            }
+            
+            
+    }
+    });
+
+   
+
+    
+</script>

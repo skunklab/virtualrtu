@@ -1,0 +1,6 @@
+﻿FROM mcr.microsoft.com/dotnet/core/runtime:3.0 AS runtime
+WORKDIR /app
+
+
+ENTRYPOINT ["dotnet", "VirtualRtu.Module.dll"]
+COPY . /app

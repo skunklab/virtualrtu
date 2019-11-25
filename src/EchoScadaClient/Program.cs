@@ -1,6 +1,4 @@
-﻿
-using IoTEdge.VirtualRtu.Configuration;
-using Microsoft.IdentityModel.JsonWebTokens;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SkunkLab.Channels;
 
@@ -8,10 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Security.Claims;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using VirtualRtu.Communications.Modbus;
 
 namespace EchoScadaClient
 {
@@ -21,43 +18,42 @@ namespace EchoScadaClient
         public static bool ican;
         static void Main(string[] args)
         {
-            //string jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2t1bmtsYWIuaW8vbmFtZSI6ImRldmljZTEiLCJodHRwOi8vc2t1bmtsYWIuaW8vcm9sZSI6ImRlbW92cnR1IiwibmJmIjoxNTYzMzE4NDIwLCJleHAiOjE1OTQ4NTQ0MjAsImlhdCI6MTU2MzMxODQyMCwiaXNzIjoiaHR0cDovL3NrdW5rbGFiLmlvLyIsImF1ZCI6Imh0dHA6Ly9za3Vua2xhYi5pby8ifQ.KgVm8g2dWp_IlBbMlFNvojPQo594BmE-3VCAh9Nwnso";
-
-            //string jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2t1bmtsYWIuaW8vbmFtZSI6ImRldmljZTciLCJodHRwOi8vc2t1bmtsYWIuaW8vcm9sZSI6ImRlbW92cnR1IiwibmJmIjoxNTYwMTg2OTQ3LCJleHAiOjE1OTE3MjI5NDcsImlhdCI6MTU2MDE4Njk0NywiaXNzIjoiaHR0cDovL3NrdW5rbGFiLmlvLyIsImF1ZCI6Imh0dHA6Ly9za3Vua2xhYi5pby8ifQ.JgvXZfn36XQ9CQPzt_7DNLVlJCX-_g6zmG3wc6TFHWk";
-            //string jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2t1bmtsYWIuaW8vbmFtZSI6InZydHUiLCJodHRwOi8vc2t1bmtsYWIuaW8vcm9sZSI6Im1hbmFnZSIsIm5iZiI6MTU2MDE4ODI1NywiZXhwIjoxNTkxNzI0MjU3LCJpYXQiOjE1NjAxODgyNTcsImlzcyI6Imh0dHA6Ly9za3Vua2xhYi5pby8iLCJhdWQiOiJodHRwOi8vc2t1bmtsYWIuaW8vIn0.Vkx3MLxymnlf_xlFN0l8Yt_PoqwtsugnEtRmmqOApDE";
-            //string jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2t1bmtsYWIuaW8vbmFtZSI6ImRlbW92cnR1LWRldmljZTEiLCJuYmYiOjE1NjAyNTQ1OTcsImV4cCI6MTU5MTc5MDU5NywiaWF0IjoxNTYwMjU0NTk3LCJpc3MiOiJodHRwOi8vc2t1bmtsYWIuaW8vIiwiYXVkIjoiaHR0cDovL3NrdW5rbGFiLmlvLyJ9.mlYROEu9jlq_bAs7M894al8hcM_9ebGd4Cmy9Tfi1ws";
-            //string jwtString = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2t1bmtsYWIuaW8vbmFtZSI6ImRlbW92cnR1LWRldmljZTEiLCJuYmYiOjE1NjAyNjM0MDcsImV4cCI6MTU5MTc5OTQwNywiaWF0IjoxNTYwMjYzNDA3LCJpc3MiOiJodHRwOi8vc2t1bmtsYWIuaW8vIiwiYXVkIjoiaHR0cDovL3NrdW5rbGFiLmlvLyJ9.K_RtV9d7tZ1qSbyy4PHZVmGcC4Uq3D4EjrL7BWY3Sg0";
-            //JsonWebToken jwt = new JsonWebToken(jwtString);
-            //string key = "//////////////////////////////////////////8=";
-            //List<Claim> list = new List<Claim>();
-            //list.Add(new Claim("http://skunklab.io/name", "device1"));
-            //list.Add(new Claim("http://skunklab.io/role", "demovrtu"));
-            //SkunkLab.Security.Tokens.JsonWebToken j = new SkunkLab.Security.Tokens.JsonWebToken(key, list, 525600.0, "http://skunklab.io/", "http://skunklab.io/");
-            //string jtoken = j.ToString();
-
-            
-
-
-
-            Console.WriteLine("----Test SCADA Echo Client-----");
+            Console.WriteLine("8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8");
+            Console.WriteLine("8      8    \" 8    8 8    8 8    8");
+            Console.WriteLine("8eeeee 8e     8eeee8 8e   8 8eeee8 ");
+            Console.WriteLine("    88 88     88   8 88   8 88   8");
+            Console.WriteLine("e   88 88   e 88   8 88   8 88   8 ");
+            Console.WriteLine("8eee88 88eee8 88   8 88eee8 88   8");
+            Console.WriteLine("");
+            Console.WriteLine("eeee e     eeee e  eeeee eeeee ");
+            Console.WriteLine("8  8 8     8    8  8   8   8");
+            Console.WriteLine("8e   8e    8eee 8e 8e  8   8e");
+            Console.WriteLine("88   88    88   88 88  8   88");
+            Console.WriteLine("88e8 88eee 88ee 88 88  8   88 ");
+            Console.WriteLine("");
+           
             Console.WriteLine("press any key to continue");
             Console.ReadKey();
 
-            //Console.WriteLine("Enter VRTU IP address or hostname ? ");
+            string publicIP = "168.62.59.20";
+            Console.Write("Enter for default IP (127.0.0.1)? ");
+            string inputIpAddress = Console.ReadLine();
+            if(!string.IsNullOrEmpty(inputIpAddress))
+            {
+                publicIP = inputIpAddress;
+            }
+            else
+            {
+                publicIP = "127.0.0.1";
+            }
 
-            //string publicIP = GetIPAddressString(System.Net.Dns.GetHostName());
-            //string publicIP = "192.168.168.54";
-            //13.82.175.48
-
-            string publicIP = "168.62.59.20"; //Schneider (latest)
-            //string publicIP = "40.85.191.244";  //Schneider
 
             Random ran = new Random();
             byte[] buffer = new byte[100];
             ran.NextBytes(buffer);
             MbapHeader header = new MbapHeader()
             {
-                UnitId = 2,
+                UnitId = 1,
                 ProtocolId = 1,
                 TransactionId = 1,
                 Length = 6
@@ -99,7 +95,6 @@ namespace EchoScadaClient
             //channel.SendAsync(output).GetAwaiter();
 
             bool test = true;
-            byte dummy = 99;
             while(test)
             {
                 Console.Write("Send a message [y/n] ? ");

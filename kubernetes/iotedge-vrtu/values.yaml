@@ -4,9 +4,9 @@ loglevel: "Warning"
 
 image1:
   ## Image location, NOT including the tag
-  repository: skunklab/iotedge-vrtu
+  repository: skunklab/virtualrtu-gateway
   ## Image tag
-  tag: latest 
+  tag: v3.0 
   pullPolicy: IfNotPresent
   
 

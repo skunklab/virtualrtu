@@ -1,0 +1,51 @@
+﻿@page
+@model IoTEdge.VirtualRtu.WebMonitor.Pages.Index2Model
+@{
+    string vrtu = @Model.VirtualRtu;
+    string device = @Model.Device;
+    string modbus = @Model.Modbus;
+    string fieldgateway = @Model.Gateway;    
+}
+
+<link href="~/bootstrap4-glyphicons/css/bootstrap-glyphicons.min.css" rel="stylesheet" type="text/css" />
+
+<div id="accordion">
+    <div class="card">
+        <div class="card-header" id="heading-1">
+            <span id="@vrtu-app-logspan" class="glyphicon glyphicon-ok-circle" style="float:right;padding-right:10px;" onclick="toggleApp('@vrtu')"></span>
+            <span id="@vrtu-logspan" class="glyphicon glyphicon-play" style="float:right;padding-right:20px;" onclick="toggle('@vrtu')"></span>
+            <div class="mb-0">
+                <a role="button" data-toggle="collapse" href="#@device" aria-expanded="true" aria-controls="collapse-1">
+                    Virtual RTU (@vrtu)
+                </a>
+                <div id="@vrtu">
+
+                </div>
+            </div>
+        </div>
+        <div id="@device" class="collapse" data-parent="#accordion" aria-labelledby="heading-1">
+            <div class="card-body">
+                <div id="accordion-1">
+                    <div class="card">
+                        <div class="card-header" id="heading-1-1">
+                            <span id="@vrtu-@device-app-logspan" class="glyphicon glyphicon-ok-circle" style="float:right;padding-right:10px;" onclick="toggleApp('@vrtu-@device')"></span>
+                            <span id="@vrtu-@device-logspan" class="glyphicon glyphicon-play" style="float:right;padding-right:20px;" onclick="toggle('@vrtu-@device')"></span>
+                            <div class="mb-0">
+                                <a class="collapsed" role="button" data-toggle="collapse" href="#collapse-1-1-1" aria-expanded="false" aria-controls="collapse-1-1-1">
+                                    Device (@device)
+                                </a>
+                                <div id="@vrtu-@device" class="mb-sm-0">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+
+</div>
+<script src="~/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/monitor.js"></script>
