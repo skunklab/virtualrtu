@@ -19,5 +19,5 @@ steps:
   displayName: Build
   inputs:
     command: build
-    projects: './src/**/*.csproj'
+    projects: '**/src/**/*.csproj'
     arguments: '--configuration Release' # Update this to match your need
