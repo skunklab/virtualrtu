@@ -19,5 +19,5 @@ steps:
   displayName: Build
   inputs:
     command: build
-    projects: '**/**/src/VirtualRtu.Module/VirtualRtu.Module.csproj'
+    projects: '**/VirtualRtu.Module.csproj'
     arguments: '--configuration Release' # Update this to match your need
