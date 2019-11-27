@@ -1,10 +1,10 @@
 replicaCount: 1
-loggerTypes: "Console;Debug"
+loggerTypes: "Console"
 loglevel: "Warning"
 
 image1:
   ## Image location, NOT including the tag
-  repository: skunklab/virtualrtu-gateway
+  repository: skunklab/virtualrtu-fieldgateway
   ## Image tag
   tag: v3.0 
   pullPolicy: IfNotPresent

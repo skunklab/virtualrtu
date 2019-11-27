@@ -65,6 +65,8 @@ function New-VrtuDeploy()
                 kubectl config unset $condition1
                 kubectl config unset $condition2
             }
+            
+            $env:AZURE_HTTP_USER_AGENT='pid-332e88b9-31d3-5070-af65-de3780ad5c8b'
 
             $step = 1
             #Set the subscription 
@@ -143,7 +145,7 @@ function New-VrtuDeploy()
             Write-Host "-- Step $step - Deploying helm chart for vrtu" -ForegroundColor Green
 	        $lifetimeMinutes = '\"'+ $lifetimeMinutes + '\"'
 
-            helm install ./iotedge-vrtu --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$lifetimeMinutes --set symmetricKey=$symmetricKey --set piraeusHostname=$piraeusHostname --set storageConnectionString=$storageConnectionString --set containerName=$containerName --set filename=$filename
+            helm install ./virtualrtu --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$lifetimeMinutes --set symmetricKey=$symmetricKey --set piraeusHostname=$piraeusHostname --set storageConnectionString=$storageConnectionString --set containerName=$containerName --set filename=$filename
             $step++
 
             #kubectl expose deployment virtualrtu-iotedge-vrtu-vrtu --type=LoadBalancer --name=vrtu-service --namespace kube-system

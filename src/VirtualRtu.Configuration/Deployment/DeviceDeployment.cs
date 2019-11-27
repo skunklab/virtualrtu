@@ -41,7 +41,7 @@ namespace VirtualRtu.Configuration.Deployment
             device = await manager.AddDeviceAsync(device);
             var config = JsonConvert.DeserializeObject<ConfigurationContent>(template);
             await manager.ApplyConfigurationContentOnDeviceAsync(deviceId, config);
-
+            
             return device;
         }
 

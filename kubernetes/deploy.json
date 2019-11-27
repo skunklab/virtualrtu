@@ -1,21 +1,21 @@
 {
-  "subscriptionNameOrId": "",
-  "resourceGroupName": "",
-  "dnsName": "",
-  "location": "",
-  "piraeusHostname": "",
-  "storageConnectionString": "",
-  "symmetricKey": "",
-  "clusterName": "vrtucluster",
-  "issuer": "http://skunklab.io/",
-  "audience": "http://skunklab.io/",
-  "lifetimeMinutes": 525600,
-  "claimTypes": "http://skunklab.io/name;http://skunklab.io/role",
-  "claimValues": "demovrtu;manage",    
-  "containerName": "maps",
-  "filename": "rtumap.json",  
-  "appId": null,
-  "pwd": null,    
-  "nodeCount": 1,
-  "vmSize": "Standard_D2s_v3"  
+  "deviceId": "device1",
+  "virtualRtuId": "vrtudemo",
+  "storageConnectionString": null,
+  "iotHubConnectionString": null,
+  "base64Template": null,
+  "expiryMinutes": 60,
+  "module": {
+    "moduleId": "fieldgateway",
+    "loggingLevel": "Debug",
+    "instrumentationKey": "",
+    "slaves": [
+      {
+        "UnitId": 1,
+        "IPAddress": "127.0.0.1",
+        "Port": 503,
+        "Alias": 0
+      }
+    ]
+  }
 }
