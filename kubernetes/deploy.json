@@ -1,6 +1,6 @@
 {
   "deviceId": "device1",
-  "virtualRtuId": "vrtudemo",
+  "virtualRtuId": "",
   "storageConnectionString": null,
   "iotHubConnectionString": null,
   "base64Template": null,

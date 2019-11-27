@@ -50,7 +50,7 @@
     $deployConfig | ConvertTo-Json -depth 100 | Out-File $path5    
 
     $path6 = "../src/VirtualRtu.Module/Properties/launchSettings.json"
-    $lsConfig = Get-Content -Raw -Path $path5 | ConvertFrom-Json
-    $lsConfig.profiles.VirtualRtu.Module.environmentVariables.MODULE_CONNECTIONSTRING = ""
+    $lsConfig = Get-Content -Raw -Path $path6 | ConvertFrom-Json
+    $lsConfig.profiles.'VirtualRtu.Module'.environmentVariables.MODULE_CONNECTIONSTRING = ""
     $lsConfig | ConvertTo-Json -depth 100 | Out-File $path6
 }
