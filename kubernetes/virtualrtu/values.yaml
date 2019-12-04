@@ -4,7 +4,7 @@ loglevel: "Warning"
 
 image1:
   ## Image location, NOT including the tag
-  repository: skunklab/virtualrtu-fieldgateway
+  repository: skunklab/virtualrtu-gateway
   ## Image tag
   tag: v3.0 
   pullPolicy: IfNotPresent

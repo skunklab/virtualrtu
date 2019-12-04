@@ -50,9 +50,9 @@ namespace VirtualRtu.Configuration.Vrtu
         [JsonProperty("map")]
         public Dictionary<byte, RtuPiSystem> Map { get; set; }
 
-        public void Add(byte unitId, string rtuInputEvent, string rtuOutputEvent)
+        public void Add(byte unitId, string rtuInputEvent, string rtuOutputEvent, List<Constraint> contraints = null)
         {
-            RtuPiSystem pisystem = new RtuPiSystem(unitId, rtuInputEvent, rtuOutputEvent);
+            RtuPiSystem pisystem = new RtuPiSystem(unitId, rtuInputEvent, rtuOutputEvent, contraints);
             if (Map.ContainsKey(unitId))
             {
                 Map[unitId] = pisystem;

@@ -85,11 +85,15 @@ namespace VirtualRtu.Configuration.Function
                 if(map.HasItem(slave.UnitId))
                 {
                     map.Remove(slave.UnitId);
-                }
+                }                
 
                 string requestUriString = UriGenerator.GetRtuPiSystem(entity.Hostname, entity.VirtualRtuId, entity.DeviceId, slave.UnitId, true);
                 string responseUriString = UriGenerator.GetRtuPiSystem(entity.Hostname, entity.VirtualRtuId, entity.DeviceId, slave.UnitId, false);
-                map.Add(slave.UnitId, requestUriString, responseUriString);
+                
+                if (slave.Constraints != null && slave.Constraints.Count == 0)
+                    slave.Constraints = null;
+
+                map.Add(slave.UnitId, requestUriString, responseUriString, slave.Constraints);
             }
 
             await map.UpdateAsync(connectionString, container, filename);

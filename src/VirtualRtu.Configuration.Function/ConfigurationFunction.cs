@@ -70,6 +70,9 @@ namespace VirtualRtu.Configuration.Function
                 ProvisionModel model = new ProvisionModel(luss, config, log);
                 ModuleConfig moduleConfig = await model.ProvisionAsync();
 
+                foreach (var slave in moduleConfig.Slaves)
+                    slave.RemoveConstraints();
+                
                 return (ActionResult)new OkObjectResult(moduleConfig);
             }
             catch (Exception ex)

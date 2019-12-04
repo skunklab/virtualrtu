@@ -117,6 +117,9 @@ namespace VirtualRtu.Communications.Pipelines
             try
             {
                 MbapHeader header = MbapHeader.Decode(message);
+                if (header == null)
+                    return;
+
                 Slave slave = config.Slaves.Where((s) => s.UnitId == header.UnitId).FirstOrDefault();
                 byte? alias = slave?.Alias.Value;
 
@@ -165,6 +168,10 @@ namespace VirtualRtu.Communications.Pipelines
         private void Output_OnReceive(object sender, ChannelReceivedEventArgs e)
         {
             byte[] message = e.Message;
+
+            if (message.Length < 7)
+                return; 
+
             byte[] msg = null;
             foreach (var filter in OutputFilters)
             {

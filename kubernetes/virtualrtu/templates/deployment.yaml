@@ -79,4 +79,10 @@ spec:
                 name: {{ template "fullname" . }}
                 key: filename       
           ports:
-          - containerPort: 502            
+          - containerPort: 502
+          readinessProbe:
+            tcpSocket:
+              port: 502            
+          livenessProbe:
+            tcpSocket:
+              port: 502                     

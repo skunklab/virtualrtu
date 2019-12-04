@@ -68,9 +68,7 @@ namespace EchoScadaClient
             Buffer.BlockCopy(array, 0, output, 0, array.Length);
             Buffer.BlockCopy(buffer, 0, output, array.Length, buffer.Length);
 
-            //byte[] o2  = Convert.FromBase64String("AAMAAAAGAQNPGwAK");
-            //byte[] o2 = Convert.FromBase64String("AAUAAAAGAQNPGwAK");
-            //byte[] o2 = Convert.FromBase64String("AAUAAAAGAgNPGwAK");
+            
             byte[] o2 = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
             MbapHeader mh = MbapHeader.Decode(o2);
 

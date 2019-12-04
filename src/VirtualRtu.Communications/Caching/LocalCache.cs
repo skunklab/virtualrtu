@@ -8,9 +8,10 @@ namespace VirtualRtu.Communications.Caching
         public LocalCache(string name)
         {
             this.name = name;
-            cache = MemoryCache.Default;
+            cache = MemoryCache.Default;            
         }
 
+        public event System.EventHandler<CacheItemExpiredEventArgs> OnExpired;
         private string name;
         private MemoryCache cache;
 
@@ -46,12 +47,12 @@ namespace VirtualRtu.Communications.Caching
         }
 
 
-        private static CacheItemPolicy GetCachePolicy(double expirySeconds)
+        private CacheItemPolicy GetCachePolicy(double expirySeconds)
         {
             return new CacheItemPolicy()
             {
-                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(expirySeconds)
-
+                AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(expirySeconds),
+                RemovedCallback = OnRemovedFromCache
             };
         }
 
@@ -59,6 +60,15 @@ namespace VirtualRtu.Communications.Caching
         private string CreateNamedKey(string key)
         {
             return $"{name}:key={key}";
+        }
+
+        private void OnRemovedFromCache(CacheEntryRemovedArguments args)
+        {
+            if (args.RemovedReason == CacheEntryRemovedReason.Expired)
+            {
+                string key = args.CacheItem.Key.Replace($"{name}:key=", "");
+                OnExpired?.Invoke(this, new CacheItemExpiredEventArgs(name, key, args.CacheItem.Value));
+            }
         }
 
     }

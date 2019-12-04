@@ -48,6 +48,7 @@ namespace VirtualRtu.Communications.Tcp
                     tcpClient.LingerState = new LingerOption(true, 0);
                     tcpClient.NoDelay = true;
                     tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    
                     CancellationTokenSource cts = new CancellationTokenSource();
                     logger?.LogDebug("SCADA client connection acquired.");
 
@@ -110,11 +111,14 @@ namespace VirtualRtu.Communications.Tcp
         }
 
         private void Pipeline_OnPipelineError(object sender, PipelineErrorEventArgs e)
-        {
-            logger?.LogError(e.Error, "Pipe error.");
-            logger?.LogWarning("Disposing pipeline.");
+        {            
+            if(e.Error != null)
+            {
+                logger?.LogError(e.Error, "Pipe error.");
+                logger?.LogWarning("Disposing pipeline.");
+            }
 
-            if(pipelines.ContainsKey(e.Id))
+            if (pipelines.ContainsKey(e.Id))
             {
                 Pipeline pipeline = pipelines[e.Id];
                 pipelines.Remove(e.Id);

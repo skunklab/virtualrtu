@@ -4,8 +4,9 @@ using SkunkLab.Channels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VirtualRtu.Communications.Diagnostics;
+using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Configuration;
+using VirtualRtu.Configuration.Vrtu;
 
 namespace VirtualRtu.Communications.Pipelines
 {
@@ -26,6 +27,7 @@ namespace VirtualRtu.Communications.Pipelines
             OutputChannel = output;
             InputFilters = inputFiters;
             OutputFilters = outputFilters;
+            map = RtuMap.LoadAsync(config.StorageConnectionString, config.Container, config.Filename).GetAwaiter().GetResult();
         }
         #endregion
 
@@ -36,6 +38,7 @@ namespace VirtualRtu.Communications.Pipelines
         private int outputCount;
         private bool outputDisposed;
         private bool disposed;
+        private RtuMap map;
         #endregion
 
         #region public properties
@@ -103,7 +106,28 @@ namespace VirtualRtu.Communications.Pipelines
             InputChannel.ReceiveAsync().GetAwaiter();
         }
         private void Input_OnReceive(object sender, ChannelReceivedEventArgs e)
-        {
+        {            
+
+            MbapHeader header = MbapHeader.Decode(e.Message);
+            if (header == null)
+            {
+                logger?.LogWarning("MBAP Header returned null");                
+                return;  //assume keep alive
+            }
+            if(!map.HasItem(header.UnitId))
+            {
+                byte[] errorMsg = ModbusErrorMessage.Create(e.Message, ErrorCode.GatewayPathsNotAvailable);
+                this.InputChannel.SendAsync(errorMsg).GetAwaiter();
+                return;
+            }
+            
+            if(!map.GetItem(header.UnitId).Authorize(e.Message))
+            {
+                byte[] errorMsg = ModbusErrorMessage.Create(e.Message, ErrorCode.IllegalAddress);
+                this.InputChannel.SendAsync(errorMsg).GetAwaiter();
+                return;
+            }
+
             byte[] message = e.Message;
             byte[] msg = null;
 
@@ -137,8 +161,9 @@ namespace VirtualRtu.Communications.Pipelines
 
         }
         private void Input_OnClose(object sender, ChannelCloseEventArgs e)
-        {
+        {            
             logger?.LogWarning("Input channel closed.");
+            OnPipelineError?.Invoke(this, new PipelineErrorEventArgs(this.Id));
         }
         #endregion
 
@@ -150,6 +175,9 @@ namespace VirtualRtu.Communications.Pipelines
         private void Output_OnReceive(object sender, ChannelReceivedEventArgs e)
         {
             byte[] message = e.Message;
+            
+
+
             byte[] msg = null;
             foreach(var filter in OutputFilters)
             {

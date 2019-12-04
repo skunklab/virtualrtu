@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace VirtualRtu.Configuration.Vrtu
 {
@@ -18,11 +19,19 @@ namespace VirtualRtu.Configuration.Vrtu
             RtuOutputEvent = rtuOutputEvent;
         }
 
-        public RtuPiSystem(int unitId, string rtuInputEvent, string rtuOutputEvent)
+        //public RtuPiSystem(int unitId, string rtuInputEvent, string rtuOutputEvent)
+        //{
+        //    UnitId = unitId;
+        //    RtuInputEvent = rtuInputEvent;
+        //    RtuOutputEvent = rtuOutputEvent;
+        //}
+
+        public RtuPiSystem(int unitId, string rtuInputEvent, string rtuOutputEvent, List<Constraint> constraints = null)
         {
             UnitId = unitId;
             RtuInputEvent = rtuInputEvent;
-            RtuOutputEvent = rtuOutputEvent;
+            RtuOutputEvent = rtuOutputEvent;            
+            Constraints = constraints;
         }
 
         [JsonProperty("rtuInput")]
@@ -33,5 +42,26 @@ namespace VirtualRtu.Configuration.Vrtu
 
         [JsonProperty("unitId")]
         public int UnitId { get; set; }
+
+        [JsonProperty("constraints")]
+        public List<Constraint> Constraints { get; set; }
+
+        public bool Authorize(byte[] message)
+        {
+            if (Constraints == null || Constraints.Count == 0)
+                return true;
+
+            ModbusTcpMessage msg = ModbusTcpMessage.Create(message);
+            
+            foreach (var constraint in Constraints)
+            {   if (constraint.FunctionType == msg.Function)
+                {
+                    if (!constraint.Apply(msg))
+                        return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using VirtualRtu.Configuration.Vrtu;
 
 namespace VirtualRtu.Configuration
 {
@@ -32,5 +33,13 @@ namespace VirtualRtu.Configuration
 
         [JsonProperty("alias")]
         public byte? Alias { get; set; }
+
+        [JsonProperty("constraints")]
+        public List<Constraint> Constraints { get; set; }
+
+        public void RemoveConstraints()
+        {
+            Constraints = null;
+        }
     }
 }

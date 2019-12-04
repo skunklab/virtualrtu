@@ -16,7 +16,7 @@
 
 <script>
     
-     var data = JSON.parse("[{\"text\":\"myvrtutest\",\"href\":\"#myvrtutest\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#myvrtutest-device1\"}]}]");
+     var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
 
     function getTree() {
         // Some logic to retrieve, or generate tree structure
@@ -31,7 +31,7 @@
         data: getTree(), onNodeSelected: function (event, data) {
             
             var line = data.href;            
-            line = "myvrtutest-device1";
+            line = "testvrtu-device1";
             if (line.indexOf("-") > 0) {
                 window.location.assign("/index2?device=" + line);
             }

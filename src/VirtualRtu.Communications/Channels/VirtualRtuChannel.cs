@@ -28,16 +28,19 @@ namespace VirtualRtu.Communications.Channels
         {
             this.config = config;
             map = RtuMap.LoadAsync(config.StorageConnectionString, config.Container, config.Filename).GetAwaiter().GetResult();
-            mapper = new MbapMapper(Guid.NewGuid().ToString());
+            //mapper = new MbapMapper(Guid.NewGuid().ToString());
             this.logger = logger;
             subscriptions = new HashSet<byte>();
-            cache = new LocalCache(Guid.NewGuid().ToString());
+            name = Guid.NewGuid().ToString(); 
+            cache = new LocalCache(name);
+            cache.OnExpired += Cache_OnExpired;
 
             securityToken = GetSecurityToken(config);
             endpointUrl = new Uri($"wss://{config.Hostname}/ws/api/connect");            
             
-        }
-        #endregion        
+        }       
+        
+        #endregion
 
         #region Public Events
         public event System.EventHandler<ChannelReceivedEventArgs> OnReceive;
@@ -67,6 +70,7 @@ namespace VirtualRtu.Communications.Channels
         #endregion
 
         #region Private Fields
+        private string name;
         private int retryCount;
         private bool disposed;
         private PiraeusMqttClient client;
@@ -75,7 +79,7 @@ namespace VirtualRtu.Communications.Channels
         private string securityToken;
         private Uri endpointUrl;
         private HashSet<byte> subscriptions;
-        private MbapMapper mapper;
+        //private MbapMapper mapper;
         private ILogger logger;
         private ExponentialBackoff retryPolicy;
         private LocalCache cache;
@@ -158,7 +162,7 @@ namespace VirtualRtu.Communications.Channels
                         subscriptions.Add(header.UnitId);
                     }
 
-                    cache.Add(GetCacheKey(header), header.TransactionId, 20.0);
+                    cache.Add(GetCacheKey(header), new Tuple<ushort, byte[]>(header.TransactionId, message), 20.0);                   
                     string pisystem = map.GetItem(header.UnitId).RtuInputEvent;
                     await client.PublishAsync(QualityOfServiceLevelType.AtMostOnce, pisystem, "application/octet-stream", message);
                     logger?.LogDebug($"VRTU published to {pisystem}");
@@ -242,8 +246,16 @@ namespace VirtualRtu.Communications.Channels
         }
 
         #endregion
-        
+
         #region Private Methods
+        private void Cache_OnExpired(object sender, CacheItemExpiredEventArgs e)
+        {
+            Tuple<ushort, byte[]> tuple = (Tuple<ushort, byte[]>)e.Value;
+            byte[] errorMsg = ModbusErrorMessage.Create(tuple.Item2, ErrorCode.DeviceFailedToRespond);
+            OnReceive?.Invoke(this, new ChannelReceivedEventArgs(channel.Id, errorMsg));
+
+        }
+
         private void ModbusMessageReceived(string resource, string contentType, byte[] message)
         {
             try
