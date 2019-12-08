@@ -41,8 +41,8 @@ docker build -t virtualrtu-fieldgateway:v3.0 ./VirtualRtu.Module
 docker tag virtualrtu-gateway:v3.0 skunklab/virtualrtu-gateway:v3.0
 docker tag virtualrtu-fieldgateway:v3.0 skunklab/virtualrtu-fieldgateway:v3.0
 
-docker push skunklab/virtualrtu-gateway:v3.0
-docker push skunklab/virtualrtu-fieldgateway:v3.0
+::docker push skunklab/virtualrtu-gateway:v3.0
+::docker push skunklab/virtualrtu-fieldgateway:v3.0
 
 ECHO "done"
 EXIT /B %ERRORLEVEL%

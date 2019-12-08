@@ -1,6 +1,6 @@
 ﻿function New-LocalDebugSetup()  
 {	
-    param ([string]$File, [string]$IoTHubName, [string]$AppInsightsName)
+    param ([string]$File)
     
     $config = Get-Content -Raw -Path $File | ConvertFrom-Json
 
@@ -37,59 +37,9 @@
 
     Write-Host "Parameters read from piraeus file"
 
-    #create the application insights
-    $jsonString = az monitor app-insights component show --app $appInsightsName -g $resourceGroupName
-    Write-Host "" -ForegroundColor White
-    if($LASTEXITCODE -ne 0)
-    {
-        Write-Host "Creating App Insights"
-        $jsonString = az monitor app-insights component create -a $appInsightsName -l $location -k $kind -g $resourceGroupName --application-type $kind         
-    }
-    else
-    {
-        Write-Host "App Insights exists"
-    }
-
-    $appInsightsJsonObj = ConvertFrom-Json -InputObject "$jsonString"
-    $host.ui.RawUI.ForegroundColor = 'White'
-
-    #get the instrumentation key
-    $instrumentationKey = $appInsightsJsonObj.instrumentationKey
-    Write-Host "" -ForegroundColor White
-    Write-Host "Application Insights deployed"
-
-    #create the IoT Hub
-    $hubJsonString = az iot hub show-connection-string --name $iotHubName
-    $host.ui.RawUI.ForegroundColor = 'White'
-
-    if($LASTEXITCODE -ne 0)
-    {
-        Write-Host "IoT Hub not exists.  Try to create a free IoT Hub"
-        az iot hub create --name $iotHubName --resource-group $resourceGroupName --sku F1
-        Write-Host "" -ForegroundColor White
-        if($LASTEXITCODE -ne 0)
-        {
-			Write-Host "Cannot create a free IoT Hub (F1) because it is already used." -ForegroundColor Yellow
-            $newS1Sku = Read-Host "Would you like to create an S1 SKU ($25/month) [y/n] ? "
-			if($newS1Sku.ToLowerInvariant() -eq "y")
-			{
-				az iot hub create --name $iotHubName --resource-group $resourceGroupName --sku S1
-            }
-            else
-            {
-				Write-Host("Existing script") -ForegroundColor Yellow
-				return
-            }
-        }
-        
-        $hubJsonString = az iot hub show-connection-string --name $iotHubName
-    }
-
-    $hubObj = ConvertFrom-Json -InputObject "$hubJsonString"
-    $host.ui.RawUI.ForegroundColor = 'White'
-
-    #get the connection string for iot hub
-    $iotHubConnectionString = $hubObj.connectionString
+    
+    $instrumentationKey = $config.instrumentationKey
+    $iotHubConnectionString = $config.iotHubConnectionString
     
     Write-Host "" -ForegroundColor White
     Write-Host "IoT Hub deployed"

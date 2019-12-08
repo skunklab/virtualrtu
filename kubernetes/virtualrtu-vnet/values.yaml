@@ -1,6 +1,6 @@
 replicaCount: 1
 loggerTypes: "Console"
-#loglevel: "Warning"
+loglevel: "Warning"
 
 image1:
   ## Image location, NOT including the tag

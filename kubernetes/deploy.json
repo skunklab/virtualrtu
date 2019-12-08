@@ -11,10 +11,10 @@
     "instrumentationKey": "",
     "slaves": [
       {
-        "UnitId": 1,
-        "IPAddress": "127.0.0.1",
-        "Port": 503,
-        "Alias": 0
+        "unitId": 1,
+        "ipAddress": "127.0.0.1",
+        "port": 503,
+        "alias": 0
       }
     ]
   }

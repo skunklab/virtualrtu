@@ -1,7 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:  
-  name: vrtu  
+  name: vrtu
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
   labels:
     app: vrtu
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

@@ -23,6 +23,11 @@ function New-VrtuDeploy()
 			$claimTypes = $config.claimTypes
 			$claimValues = $config.claimValues
 			$vmSize = $config.vmSize
+			$virtualRtuId = $config.virtualRtuId
+			
+			$instrumentationKey= $config.instrumentationKey
+			$logLevel = $config.logLevel
+			
 			
 
             #Remove previous deployments from kubectl
@@ -146,7 +151,7 @@ function New-VrtuDeploy()
 			
 			
 			
-            helm install ./virtualrtu --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$lifetimeMinutes --set symmetricKey=$symmetricKey --set piraeusHostname=$piraeusHostname --set storageConnectionString="$storageConnectionString" --set containerName=$containerName --set filename=$filename
+            helm install ./virtualrtu --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$lifetimeMinutes --set symmetricKey=$symmetricKey --set hostname=$piraeusHostname --set storageConnectionString="$storageConnectionString" --set container=$containerName --set filename=$filename --set virtualRtuId=$virtualRtuId --set instrumentationKey=$instrumentationKey --set logLevel=$logLevel
             $step++
 
             #kubectl expose deployment virtualrtu-iotedge-vrtu-vrtu --type=LoadBalancer --name=vrtu-service --namespace kube-system

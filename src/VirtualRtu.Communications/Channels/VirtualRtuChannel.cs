@@ -264,6 +264,7 @@ namespace VirtualRtu.Communications.Channels
                 string key = GetCacheKey(header);
                 if (cache.Contains(key))
                 {
+                    cache.Remove(key);
                     OnReceive?.Invoke(this, new ChannelReceivedEventArgs(channel.Id, message));
                     logger?.LogDebug("Output channel received message.");
                     diag?.PublishOutput(header).GetAwaiter();

@@ -97,7 +97,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ template "fullname" . }}
-                key: instrumentationKey      
+                key: instrumentationKey           
           ports:
           - containerPort: 502
           readinessProbe:
