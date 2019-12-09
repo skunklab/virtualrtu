@@ -1,9 +1,10 @@
----
+
 Development Guide for Virtual RTU
----
+===
+
 
 Steps
-=====
+---
 
 The following steps are required to get the Virtual RTU working in debug mode on
 your local machine.
@@ -136,3 +137,7 @@ Step 4- Deploying a Device to the IoT Hub
     configure itself and the solution is ready to use. Using the “Echo Client”
     console application you should be able to send and receive messages.
 
+---
+Other
+--
+Learn out applying [constraints](docs/constraints.md) to Modbus messages to filter interactions between clients and an RTU.
