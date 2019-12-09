@@ -72,6 +72,7 @@ Step 3- Creating the VRTU configuration file
 | \-VirtualRtuId    | Lowercase name of the VRTU. Use “testvrtu” for the sample.                                                 |
 | \-ClusterName     | The AKS cluster name for the vrtu. If omitted “vrtucluster” is used.                                       |
 | \-StorageAcctName | Name of a new Azure Storage Account used by the VRTU.                                                      |
+| \-IoTHubName      | Name of a new IoT Hub used by the VRTU.                                                                    |
 | \-InFile          | This is the path to the configuration file created in the Step 2.                                          |
 | \-OutFile         | The name of the configuration file to be output in the current “Kubernetes” folder. Use “vrtu-config.json” |
 
@@ -80,10 +81,8 @@ Step 3- Creating the VRTU configuration file
 
 7.  Type “*New-LocalDebugSetup*” with the following parameters
 
-| \-File            | This will be the configuration file created in Step 2.5, i.e., “vrtu-config.json” |
+| \-File            | This will be the configuration file created in Step 3.5, i.e., “vrtu-config.json” |
 |-------------------|-----------------------------------------------------------------------------------|
-| \-IoTHubName      | Name of an IoTHub to be created.                                                  |
-| \-AppInsightsName | Name of Application Insights instance to be created.                              |
 
 The command will configure the solution and produce and output file in the
 “kubernetes” folder in the form “*mm-dd-yyyyThh-mm-ss.json*” that can be used to
@@ -125,7 +124,7 @@ Step 4- Deploying a Device to the IoT Hub
         “ModuleId=fieldgateway;” to the connection string. It should now look
         like (below) copy it to the clipboard.
 
-        HostName=randombirdhub.azure-devices.net;DeviceId=device1;ModuleId=fieldgateway;SharedAccessKey=WgeWdRz2glOsSqF9h5dY6oeiP8H2EreTtYn85kmlIuo=
+        HostName=randombirdhub.azure-devices.net;DeviceId=device1;**ModuleId=fieldgateway**;SharedAccessKey=WgeWdRz2glOsSqF9h5dY6oeiP8H2EreTtYn85kmlIuo=
 
     5.  In Visual Studio right-click the *VirtualRtu.Module* project and select
         “*properties*” from the menu. Navigate to the Environment Variable
