@@ -87,7 +87,9 @@ namespace AzureIoT.Deployment.Function
                 }
                 else if (funcType.ToLowerInvariant() == "update")
                 {
-                    await UpdateTableAsync(config, dconfig);
+                    string luss = await UpdateTableAsync(config, dconfig);
+                    Device device = await deployment.GetDevice(dconfig.DeviceId);
+                    await UpdateModuleAsync(device, dconfig.Container.ModuleId, luss, config.ServiceUrl, deployment);
                     return new OkResult();
                 }
                 else

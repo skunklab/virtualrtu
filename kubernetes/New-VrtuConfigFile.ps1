@@ -2,6 +2,12 @@
 {	
     param ([string]$Dns, [string]$VirtualRtuId, [string]$ClusterName, [string]$StorageAcctName, [string]$IoTHubName, [string]$InFile, [string]$OutFile)
     
+    if($Dns.Length -eq 0)
+    {
+		Write-Host "Dns name is omitted...exiting script" -ForegroundColor Yellow
+		return
+    }
+    
     if($ClusterName.Length -eq 0)
     {
         $ClusterName = "vrtucluster"
@@ -16,8 +22,9 @@
 	$apiCode = $apiTokens.Split(";")[0]	
     
     $aiKey = GetInstrumentationKey "$Dns-vtrus" $config.resourceGroupName $config.location
+    Write-Host "Instrumenetation Key $aiKey"
     $connectionString = GetIoTHubConnectionString $IoTHubName $config.resourceGroupName
-    Write-Host "the cs -- $connectionString" -ForegroundColor Yellow
+    
     
     $output = [PSCustomObject]@{
     subscriptionNameOrId = $config.subscriptionNameOrId
@@ -67,10 +74,10 @@ function GetInstrumentationKey()
     $appKey = NewRandomKey(8)
     $jsonKeyString = az monitor app-insights api-key create --api-key $appKey -g testdeploy -a $appName
     $keyObj = ConvertFrom-Json -InputObject "$jsonKeyString"
-    $instrumentationKey = $keyObj.apiKey	
+    $iKey = $keyObj.apiKey	
 	$host.ui.RawUI.ForegroundColor = 'Gray'
 	Write-Host "App Insights created" -ForegroundColor Green
-    return $instrumentationKey
+    return $iKey
 }
 
 function NewRandomKey()	   

@@ -86,7 +86,7 @@ namespace EchoScadaClient
             channel.OpenAsync().GetAwaiter();
             while(!ican)
             {
-                Task t = Task.Delay(5000);
+                Task t = Task.Delay(2000);
                 Task.WaitAll(t);
             }
             
@@ -100,11 +100,21 @@ namespace EchoScadaClient
                 string decision = Console.ReadLine();
                 if(decision.ToLowerInvariant() == "y")
                 {
-                    byte[] payload = Convert.FromBase64String("AAEAAAAGAQNPGwAK");                   
+                    byte[] payload = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
+                    MbapHeader header2 = MbapHeader.Decode(payload);
+                    //header.UnitId = 3;
+                    //byte[] headerBytes = header.Encode();
+                    //byte[] buffer2 = new byte[payload.Length];
+                    //Buffer.BlockCopy(headerBytes, 0, buffer2, 0, headerBytes.Length);
+                    //Buffer.BlockCopy(payload, headerBytes.Length, buffer2, headerBytes.Length, payload.Length - headerBytes.Length);
+                    //Buffer.BlockCopy(headerBytes, buffer2, 0, headerBytes.Length);
+                    //Buffer.BlockCopy(payload, headerBytes.Length, headerBytes.Length, payload.Length - headerBytes.Length);
+
                     //dummy++;
                     //payload[1] = dummy;
 
-                    string bc = BitConverter.ToString(payload);
+                    //string bc = BitConverter.ToString(payload);
+                    //channel.SendAsync(buffer2).GetAwaiter();
                     channel.SendAsync(payload).GetAwaiter();
                     //channel.SendAsync(output).GetAwaiter();
                     Console.WriteLine($"Sent message length {output.Length}");

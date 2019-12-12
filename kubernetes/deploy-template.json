@@ -5,7 +5,7 @@
                 "modules": {
                     "fieldgateway": {
                         "settings": {
-                            "image": "skunklab/virtualrtu-fieldgateway",
+                            "image": "skunklab/virtualrtu-fieldgateway:v3.0",
                             "createOptions": "{\"ExposedPorts\":{\"8888/tcp\":{}},\"HostConfig\":{\"Binds\":[\"data:/app/data\"],\"PortBindings\":{\"8877/tcp\":[{\"HostPort\":\"8888\"}]}}}"
                         },
                         "type": "docker",
