@@ -4,7 +4,37 @@
     
     if($Dns.Length -eq 0)
     {
-		Write-Host "Dns name is omitted...exiting script" -ForegroundColor Yellow
+		Write-Host "Parameter -Dns name is omitted...terminating script" -ForegroundColor Yellow
+		return
+    }
+    
+    if($VirtualRtuId.Length -eq 0)
+    {
+		Write-Host "Parameter -VirtualRtuId is omitted...terminating script" -ForegroundColor Yellow
+		return
+    }
+    
+    if($StorageAcctName.Length -eq 0)
+    {
+		Write-Host "Parameter -StorageAcctName is omitted...terminating script" -ForegroundColor Yellow
+		return
+    }
+    
+    if($IoTHubName.Length -eq 0)
+    {
+		Write-Host "Parameter -IoTHubName is omitted...terminating script" -ForegroundColor Yellow
+		return
+    }
+    
+    if($InFile.Length -eq 0)
+    {
+		Write-Host "Parameter -InFile is omitted...terminating script" -ForegroundColor Yellow
+		return
+    }
+    
+    if($OutFile.Length -eq 0)
+    {
+		Write-Host "Parameter -OutFile is omitted...terminating script" -ForegroundColor Yellow
 		return
     }
     
@@ -20,6 +50,14 @@
     $filename = $VirtualRtuId + ".json"
 	$apiTokens = $config.apiSecurityCodes
 	$apiCode = $apiTokens.Split(";")[0]	
+    
+    az extension show -n azure-cli-iot-ext
+    
+    if($LASTEXITCODE -ne 0)
+    {
+		Write-Host "-- Step $step - Add Azure CLI extension for IoT Hub" -ForegroundColor Green
+		az extension add -n azure-cli-iot-ext -y
+    }    
     
     $aiKey = GetInstrumentationKey "$Dns-vtrus" $config.resourceGroupName $config.location
     Write-Host "Instrumenetation Key $aiKey"
