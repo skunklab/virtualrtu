@@ -1,0 +1,21 @@
+{
+  "deviceId": "device2",
+  "virtualRtuId": "testvrtu",
+  "storageConnectionString": null,
+  "iotHubConnectionString": null,
+  "base64Template": null,
+  "expiryMinutes": 525600,
+  "module": {
+    "moduleId": "fieldgateway",
+    "loggingLevel": "Debug",
+    "instrumentationKey": "1c8fffa2-c37a-41c5-9f5a-f2a408c02317",
+    "slaves": [
+      {
+        "unitId": 2,
+        "ipAddress": "127.0.0.1",
+        "port": 503,
+        "alias": 2
+      }
+    ]
+  }
+}

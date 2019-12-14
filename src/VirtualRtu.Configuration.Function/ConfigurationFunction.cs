@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Build.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
@@ -17,8 +18,10 @@ namespace VirtualRtu.Configuration.Function
         [FunctionName("ConfigurationFunction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
-            ILogger log, ExecutionContext context)
+            ExecutionContext context)
         {
+
+            ILogger log = null;
             config = new FunctionConfig();
 
             if (File.Exists(String.Format($"{context.FunctionAppDirectory}/secrets.json")))

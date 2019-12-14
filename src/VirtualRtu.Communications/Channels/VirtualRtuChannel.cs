@@ -28,7 +28,7 @@ namespace VirtualRtu.Communications.Channels
         {
             this.config = config;
             map = RtuMap.LoadAsync(config.StorageConnectionString, config.Container, config.Filename).GetAwaiter().GetResult();
-            //mapper = new MbapMapper(Guid.NewGuid().ToString());
+          
             this.logger = logger;
             subscriptions = new HashSet<byte>();
             name = Guid.NewGuid().ToString(); 
@@ -79,7 +79,6 @@ namespace VirtualRtu.Communications.Channels
         private string securityToken;
         private Uri endpointUrl;
         private HashSet<byte> subscriptions;
-        //private MbapMapper mapper;
         private ILogger logger;
         private ExponentialBackoff retryPolicy;
         private LocalCache cache;

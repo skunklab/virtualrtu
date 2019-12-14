@@ -103,7 +103,7 @@ namespace VirtualRtu.Communications.Channels
                 if (code != ConnectAckCode.ConnectionAccepted)
                 {
                     logger?.LogWarning($"Module client connect return code = '{code}'.");
-                    OnError.Invoke(this, new ChannelErrorEventArgs(channel.Id, new Exception($"Module channel failed to open with code = {code}")));
+                    OnError?.Invoke(this, new ChannelErrorEventArgs(channel.Id, new Exception($"Module channel failed to open with code = {code}")));
                 }
                 else
                 {   

@@ -66,8 +66,8 @@ namespace VirtualRtu.Configuration.Function
             }
             catch (Exception ex)
             {
-                log.LogInformation($"Failed to provision field gateway with luss '{luss}'.");
-                log.LogError(ex.Message);
+                log?.LogInformation($"Failed to provision field gateway with luss '{luss}'.");
+                log?.LogError(ex.Message);
                 throw ex;
             }
 

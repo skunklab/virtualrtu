@@ -38,7 +38,7 @@ namespace VirtualRtu.Module
         public async Task StartAsync(CancellationToken cancellationToken)
         {
 #if DEBUG
-            await Task.Delay(10000);
+            await Task.Delay(5000);
 #endif
             await adapter.StartAsync();
             

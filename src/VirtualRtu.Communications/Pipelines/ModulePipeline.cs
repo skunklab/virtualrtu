@@ -69,7 +69,7 @@ namespace VirtualRtu.Communications.Pipelines
             if (!OutputChannel.IsConnected)
             {
                 OutputChannel.OpenAsync().GetAwaiter();
-                OutputChannel.ReceiveAsync().GetAwaiter();
+                //OutputChannel.ReceiveAsync().GetAwaiter();
             }
         }
         protected void Disposing(bool dispose)

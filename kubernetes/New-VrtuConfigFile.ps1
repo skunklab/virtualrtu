@@ -59,9 +59,15 @@
 		az extension add -n azure-cli-iot-ext -y
     }    
     
-    $aiKey = GetInstrumentationKey "$Dns-vtrus" $config.resourceGroupName $config.location
+    $resourceGroupName = $config.resourceGroupName
+    $location = $config.location
+    
+    Write-Host "RG = $resourceGroupName"
+    Write-Host "Loc = $location"
+    
+    $aiKey = GetInstrumentationKey "$Dns-vtrus" $resourceGroupName $location
     Write-Host "Instrumenetation Key $aiKey"
-    $connectionString = GetIoTHubConnectionString $IoTHubName $config.resourceGroupName
+    $connectionString = GetIoTHubConnectionString $IoTHubName $resourceGroupName
     
     
     $output = [PSCustomObject]@{
@@ -110,7 +116,7 @@ function GetInstrumentationKey()
     }
 
     $appKey = NewRandomKey(8)
-    $jsonKeyString = az monitor app-insights api-key create --api-key $appKey -g testdeploy -a $appName
+    $jsonKeyString = az monitor app-insights api-key create --api-key $appKey -g rg -a $appName
     $keyObj = ConvertFrom-Json -InputObject "$jsonKeyString"
     $iKey = $keyObj.apiKey	
 	$host.ui.RawUI.ForegroundColor = 'Gray'

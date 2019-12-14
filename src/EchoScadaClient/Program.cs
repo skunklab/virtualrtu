@@ -25,17 +25,30 @@ namespace EchoScadaClient
             Console.WriteLine("e   88 88   e 88   8 88   8 88   8 ");
             Console.WriteLine("8eee88 88eee8 88   8 88eee8 88   8");
             Console.WriteLine("");
-            Console.WriteLine("eeee e     eeee e  eeeee eeeee ");
-            Console.WriteLine("8  8 8     8    8  8   8   8");
-            Console.WriteLine("8e   8e    8eee 8e 8e  8   8e");
-            Console.WriteLine("88   88    88   88 88  8   88");
-            Console.WriteLine("88e8 88eee 88ee 88 88  8   88 ");
+            Console.WriteLine("8\"\"\"\"8");
+            Console.WriteLine("8    \" e     e  eeee eeeee eeeee ");
+            Console.WriteLine("8e     8     8  8    8   8   8");
+            Console.WriteLine("88     8e    8e 8eee 8e  8   8e");
+            Console.WriteLine("88   e 88    88 88   88  8   88");
+            Console.WriteLine("88eee8 88eee 88 88ee 88  8   88");
             Console.WriteLine("");
-           
+
+
+            
+
+
+
+
+
+
+
+
             Console.WriteLine("press any key to continue");
             Console.ReadKey();
 
-            string publicIP = "168.62.59.20";
+            //string publicIP = "168.62.59.20";
+            string publicIP = "20.185.9.100";
+
             Console.Write("Enter for default IP (127.0.0.1)? ");
             string inputIpAddress = Console.ReadLine();
             if(!string.IsNullOrEmpty(inputIpAddress))
@@ -53,7 +66,7 @@ namespace EchoScadaClient
             ran.NextBytes(buffer);
             MbapHeader header = new MbapHeader()
             {
-                UnitId = 1,
+                UnitId = 2,
                 ProtocolId = 1,
                 TransactionId = 1,
                 Length = 6
@@ -67,7 +80,6 @@ namespace EchoScadaClient
             byte[] output = new byte[buffer.Length + array.Length];
             Buffer.BlockCopy(array, 0, output, 0, array.Length);
             Buffer.BlockCopy(buffer, 0, output, array.Length, buffer.Length);
-
             
             byte[] o2 = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
             MbapHeader mh = MbapHeader.Decode(o2);
@@ -101,15 +113,13 @@ namespace EchoScadaClient
                 if(decision.ToLowerInvariant() == "y")
                 {
                     byte[] payload = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
-                    MbapHeader header2 = MbapHeader.Decode(payload);
-                    //header.UnitId = 3;
-                    //byte[] headerBytes = header.Encode();
+                    //MbapHeader header2 = MbapHeader.Decode(payload);
+                    //header2.UnitId = 2;
+                    //byte[] headerBytes = header2.Encode();
                     //byte[] buffer2 = new byte[payload.Length];
                     //Buffer.BlockCopy(headerBytes, 0, buffer2, 0, headerBytes.Length);
                     //Buffer.BlockCopy(payload, headerBytes.Length, buffer2, headerBytes.Length, payload.Length - headerBytes.Length);
-                    //Buffer.BlockCopy(headerBytes, buffer2, 0, headerBytes.Length);
-                    //Buffer.BlockCopy(payload, headerBytes.Length, headerBytes.Length, payload.Length - headerBytes.Length);
-
+                   
                     //dummy++;
                     //payload[1] = dummy;
 

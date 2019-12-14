@@ -21,8 +21,9 @@ namespace AzureIoT.Deployment.Function
         [FunctionName("DeploymentFunction")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
-            ILogger log, ExecutionContext context)
+           ExecutionContext context)
         {
+            ILogger log = null;
             IConfigurationRoot root = null;
             LocalConfig config = new LocalConfig();
 
@@ -67,7 +68,7 @@ namespace AzureIoT.Deployment.Function
             }
             catch (Exception ex)
             {
-                log.LogError(ex.Message);
+                log?.LogError(ex.Message);
             }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -99,7 +100,7 @@ namespace AzureIoT.Deployment.Function
             }
             catch (Exception ex)
             {
-                log.LogError(ex.Message);
+                log?.LogError(ex.Message);
                 return new BadRequestObjectResult("Failed to provision.");
             }
         }

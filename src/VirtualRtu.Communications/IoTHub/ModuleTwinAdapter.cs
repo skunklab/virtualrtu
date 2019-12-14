@@ -82,9 +82,16 @@ namespace VirtualRtu.Communications.IoTHub
             {
                 string requestUrl = null;
 #if DEBUG
-                requestUrl = String.Format($"{serviceUrl}?luss={luss}");
+                if (serviceUrl.ToLowerInvariant().Contains("localhost"))
+                {
+                    requestUrl = $"{serviceUrl}?luss={luss}";
+                }
+                else
+                {
+                    requestUrl = $"{serviceUrl}&luss={luss}";
+                }
 #else
-                requestUrl = String.Format($"{serviceUrl}&luss={luss}");
+                requestUrl = $"{serviceUrl}&luss={luss}";
 #endif
 
                 HttpClient httpClient = new HttpClient();
