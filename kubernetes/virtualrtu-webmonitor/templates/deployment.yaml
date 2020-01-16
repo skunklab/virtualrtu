@@ -1,0 +1,95 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}-monitor
+  labels:
+    app: {{ template "fullname" . }}-monitor
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+    component:  monitor
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app:  monitor
+      component:  monitor
+  template:
+    metadata:
+      labels:
+        app:  monitor
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+        component:  monitor
+    spec:      
+      containers:
+        - name:  monitor     
+          image: {{ .Values.image1.repository }}:{{ .Values.image1.tag }}
+          imagePullPolicy: {{ .Values.image1.pullPolicy }}
+          env:
+          - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+            value: {{ .Values.forward | quote }}
+          - name: WM_Hostname            
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: hostname  
+          - name: WM_TableName            
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: tableName 
+          - name: WM_SymmetricKey          
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: symmetricKey  
+          - name: WM_StorageConnectionString        
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: storageConnectionString   
+          - name: WM_TenantId        
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: tenantId 
+          - name: WM_ClientId       
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: clientId           
+          - name: WM_Domain    
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: domain          
+          - name: WM_LogLevel
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: logLevel 
+          - name: APPINSIGHTS_INSTRUMENTATIONKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: instrumentationKey                 
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 1
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2

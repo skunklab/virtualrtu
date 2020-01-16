@@ -96,6 +96,7 @@
     instrumentationKey = $aiKey
     iotHubConnectionString = $connectionString
     }   
+    
     $output | ConvertTo-Json -depth 100 | Out-File $OutFile
     
     Write-Host "Done :-)" -ForegroundColor Cyan

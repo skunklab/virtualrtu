@@ -21,11 +21,6 @@ namespace VirtualRtu.Configuration.Deployment
         [JsonProperty("moduleId")]
         public string ModuleId { get; set; }
 
-
-        [JsonProperty("slaves")]
-        public List<Slave> Slaves { get; set; }
-
-
         [JsonProperty("loggingLevel")]
         [JsonConverter(typeof(StringEnumConverter))]
         public LogLevel LoggingLevel { get; set; }
@@ -33,7 +28,8 @@ namespace VirtualRtu.Configuration.Deployment
         [JsonProperty("instrumentationKey")]
         public string InstrumentationKey { get; set; }
 
-
+        [JsonProperty("slaves")]
+        public List<Slave> Slaves { get; set; }
 
     }
 }

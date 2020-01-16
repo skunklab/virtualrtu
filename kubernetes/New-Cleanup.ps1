@@ -1,4 +1,4 @@
-﻿function New-Cleanup() 
+﻿function New-VrtuCleanup
 {
 #cleanup script for source check in
 

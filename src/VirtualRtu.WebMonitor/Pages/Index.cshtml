@@ -1,0 +1,57 @@
+﻿@page
+@model VirtualRtu.WebMonitor.Pages.IndexModel
+@{
+    string treeData = @Model.Data;
+
+}
+
+
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<!-- Required Stylesheets -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
+
+<!-- Required Javascript -->
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/bootstrap-treeview.js"></script>
+
+<div id="tree"></div>
+
+<script>
+
+     //var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
+
+    
+    var data = @Html.Raw(Model.Data);
+
+    //var data = JSON.parse(json);
+
+    function getTree() {
+        // Some logic to retrieve, or generate tree structure
+        return data;
+    }
+
+    function getNode(id) {
+        alert(id);
+    }
+
+    $('#tree').treeview({
+        data: getTree(), onNodeSelected: function (event, data) {
+
+            var line = String(data.href).replace("#","");
+            
+            //line = "testvrtu-device1";
+            if (line.indexOf("-") > 0) {
+                window.location.assign("/monitor?device=" + line);
+            }
+
+
+    }
+    });
+
+
+
+
+</script>

@@ -1,6 +1,7 @@
 ﻿using IoTEdge.VirtualRtu.WebMonitor.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace IoTEdge.VirtualRtu.WebMonitor.Hubs
@@ -11,30 +12,52 @@ namespace IoTEdge.VirtualRtu.WebMonitor.Hubs
         {
             this.config = config;
             this.logStream = logStream;
+            moduleSubcriptions = new HashSet<string>();
+            appSubscriptions = new HashSet<string>();
         }
 
        
         private MonitorConfig config;
         private ILogStream logStream;
+        private HashSet<string> moduleSubcriptions;
+        private HashSet<string> appSubscriptions;
 
 
         public override Task OnConnectedAsync()
         {           
             return base.OnConnectedAsync();
         }
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
-            return base.OnDisconnectedAsync(exception);
+            foreach(var item in moduleSubcriptions)
+                await logStream.SubscribeAsync(item, false);
+
+            foreach (var item in appSubscriptions)
+                await logStream.SubscribeAppInsightsAsync(item, false);
+
+            await base.OnDisconnectedAsync(exception);
         }
         public async Task Subscribe(string resource, bool monitor)
         {
+            if(monitor && !moduleSubcriptions.Contains(resource))
+                moduleSubcriptions.Add(resource);
+            if (!monitor && moduleSubcriptions.Contains(resource))
+                moduleSubcriptions.Remove(resource);
+
             await logStream.SubscribeAsync(resource, monitor);
+
         }
 
         public async Task SubscribeAppInsights(string resource, bool monitor)
         {
+            if (monitor && !moduleSubcriptions.Contains(resource))
+                appSubscriptions.Add(resource);
+            if (!monitor && moduleSubcriptions.Contains(resource))
+                appSubscriptions.Remove(resource);
+
             await logStream.SubscribeAppInsightsAsync(resource, monitor);
         }
+      
 
         private string Decode(string resourceUriString)
         {

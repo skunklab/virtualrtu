@@ -17,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRtu.Configuration.Fu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EchoScadaClient", "EchoScadaClient\EchoScadaClient.csproj", "{A236A1C1-171A-4A79-B526-60520C07630A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoTEdge.VirtualRtu.WebMonitor", "IoTEdge.VirtualRtu.WebMonitor\IoTEdge.VirtualRtu.WebMonitor.csproj", "{EB2583AB-BAA4-4B1D-ABA9-8D597733D5D1}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRtu.Module", "VirtualRtu.Module\VirtualRtu.Module.csproj", "{5BD14589-68BB-4916-AC1D-1FA823FF2AC7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualRtu.WebMonitor", "VirtualRtu.WebMonitor\VirtualRtu.WebMonitor.csproj", "{D3151C92-2082-480C-AD41-118D4D4E5B59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,14 +55,14 @@ Global
 		{A236A1C1-171A-4A79-B526-60520C07630A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A236A1C1-171A-4A79-B526-60520C07630A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A236A1C1-171A-4A79-B526-60520C07630A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB2583AB-BAA4-4B1D-ABA9-8D597733D5D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB2583AB-BAA4-4B1D-ABA9-8D597733D5D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB2583AB-BAA4-4B1D-ABA9-8D597733D5D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB2583AB-BAA4-4B1D-ABA9-8D597733D5D1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5BD14589-68BB-4916-AC1D-1FA823FF2AC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5BD14589-68BB-4916-AC1D-1FA823FF2AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BD14589-68BB-4916-AC1D-1FA823FF2AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BD14589-68BB-4916-AC1D-1FA823FF2AC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3151C92-2082-480C-AD41-118D4D4E5B59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3151C92-2082-480C-AD41-118D4D4E5B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3151C92-2082-480C-AD41-118D4D4E5B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3151C92-2082-480C-AD41-118D4D4E5B59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

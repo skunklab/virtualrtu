@@ -1,5 +1,10 @@
 ﻿@page
 @model IoTEdge.VirtualRtu.WebMonitor.Pages.IndexModel
+@{
+    string treeData = @Model.Data;
+
+}
+
 
 @*
     For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,8 +20,13 @@
 <div id="tree"></div>
 
 <script>
+
+     //var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
+
     
-     var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
+    var data = @Html.Raw(Model.Data);
+
+    //var data = JSON.parse(json);
 
     function getTree() {
         // Some logic to retrieve, or generate tree structure
@@ -29,18 +39,19 @@
 
     $('#tree').treeview({
         data: getTree(), onNodeSelected: function (event, data) {
+
+            var line = String(data.href).replace("#","");
             
-            var line = data.href;            
-            line = "testvrtu-device1";
+            //line = "testvrtu-device1";
             if (line.indexOf("-") > 0) {
                 window.location.assign("/index2?device=" + line);
             }
-            
-            
+
+
     }
     });
 
-   
 
-    
+
+
 </script>

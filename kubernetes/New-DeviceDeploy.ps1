@@ -1,4 +1,4 @@
-﻿function New-DeviceDeploy()  
+﻿function New-DeviceDeploy
 {
   param ([string]$File, [string]$Url = "http://localhost:7071/api/DeploymentFunction", [string]$Key = $null, [bool]$Update = $false)
 

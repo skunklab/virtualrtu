@@ -1,0 +1,447 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\bootstrap-treeview.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\monitor.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\test.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\browser\signalr.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\browser\signalr.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\browser\signalr.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\browser\signalr.min.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\AbortController.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\AbortController.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\browser-index.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\browser-index.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\DefaultHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\DefaultHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\EmptyNodeHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\EmptyNodeHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Errors.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Errors.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HandshakeProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HandshakeProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HttpConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HttpConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HubConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HubConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HubConnectionBuilder.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\HubConnectionBuilder.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IHttpConnectionOptions.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IHttpConnectionOptions.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IHubProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\IHubProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ILogger.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ILogger.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\index.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\index.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ITransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ITransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\JsonHubProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\JsonHubProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Loggers.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Loggers.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\LongPollingTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\LongPollingTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\NodeHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\NodeHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Polyfills.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Polyfills.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ServerSentEventsTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\ServerSentEventsTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Stream.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Stream.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\TextMessageFormat.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\TextMessageFormat.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Utils.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\Utils.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\WebSocketTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\WebSocketTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\XhrHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\cjs\XhrHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\AbortController.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\AbortController.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\AbortController.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\browser-index.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\browser-index.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\browser-index.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\DefaultHttpClient.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\DefaultHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\DefaultHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\EmptyNodeHttpClient.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\EmptyNodeHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\EmptyNodeHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Errors.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Errors.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Errors.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HandshakeProtocol.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HandshakeProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HandshakeProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpClient.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpConnection.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HttpConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnection.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnectionBuilder.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnectionBuilder.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\HubConnectionBuilder.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IConnection.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IConnection.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IConnection.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHttpConnectionOptions.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHttpConnectionOptions.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHttpConnectionOptions.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHubProtocol.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHubProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\IHubProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ILogger.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ILogger.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ILogger.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\index.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\index.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\index.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ITransport.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ITransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ITransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\JsonHubProtocol.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\JsonHubProtocol.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\JsonHubProtocol.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Loggers.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Loggers.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Loggers.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\LongPollingTransport.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\LongPollingTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\LongPollingTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\NodeHttpClient.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\NodeHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\NodeHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Polyfills.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Polyfills.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Polyfills.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ServerSentEventsTransport.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ServerSentEventsTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\ServerSentEventsTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Stream.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Stream.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Stream.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\TextMessageFormat.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\TextMessageFormat.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\TextMessageFormat.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Utils.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Utils.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\Utils.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\WebSocketTransport.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\WebSocketTransport.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\WebSocketTransport.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\XhrHttpClient.d.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\XhrHttpClient.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\dist\esm\XhrHttpClient.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\package.json" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\README.md" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\AbortController.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\browser-index.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\DefaultHttpClient.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\EmptyNodeHttpClient.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\Errors.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\HandshakeProtocol.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\HttpClient.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\HttpConnection.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\HubConnection.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\HubConnectionBuilder.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\IConnection.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\IHttpConnectionOptions.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\IHubProtocol.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\ILogger.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\index.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\ITransport.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\JsonHubProtocol.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\Loggers.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\LongPollingTransport.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\NodeHttpClient.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\Polyfills.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\ServerSentEventsTransport.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\Stream.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\TextMessageFormat.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\third-party-notices.txt" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\Utils.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\WebSocketTransport.ts" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\src\XhrHttpClient.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.12.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" Version="2.12.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.AzureAD.UI" Version="3.0.0" />
+    <PackageReference Include="SkunkLab.Clients" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VirtualRtu.Communications\VirtualRtu.Communications.csproj" />
+    <ProjectReference Include="..\VirtualRtu.Configuration\VirtualRtu.Configuration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\bootstrap4-glyphicons\bootstrap-glyphicons.zip">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\css\bootstrap-glyphicons.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\css\bootstrap-glyphicons.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-brands-400.eot">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-brands-400.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-brands-400.ttf">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-brands-400.woff">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-brands-400.woff2">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-regular-400.eot">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-regular-400.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-regular-400.ttf">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-regular-400.woff">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-regular-400.woff2">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-solid-900.eot">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-solid-900.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-solid-900.ttf">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-solid-900.woff">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\fontawesome\fa-solid-900.woff2">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\glyphicons\glyphicons-halflings-regular.eot">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\glyphicons\glyphicons-halflings-regular.svg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\glyphicons\glyphicons-halflings-regular.ttf">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\glyphicons\glyphicons-halflings-regular.woff">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\fonts\glyphicons\glyphicons-halflings-regular.woff2">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\maps\glyphicons-fontawesome.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\maps\glyphicons-fontawesome.less">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\bootstrap4-glyphicons\maps\glyphicons-fontawesome.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\css\site.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\js\site.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap-reboot.min.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.js.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.bundle.min.js.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.js.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\bootstrap\LICENSE">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation\dist\additional-methods.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation\dist\additional-methods.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery-validation\LICENSE.md">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery\dist\jquery.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery\dist\jquery.min.js">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery\dist\jquery.min.map">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="wwwroot\lib\jquery\LICENSE.txt">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="dockerfile">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

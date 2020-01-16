@@ -3,7 +3,7 @@
 
 ::msbuild ..\src\VirtualRtu.Configuration.Function\VirtualRtu.Configuration.Function.csproj /t:Clean,Rebuild,restore /p:OutputPath=..\..\build\VirtualRtu.Configuration.Function\Output /p:Configuration=Release /fl1 /fl2 /fl3 /flp1:logfile=.\BuildOutput\VirtualRtu.Configuration.Function_errors.log;errorsonly /flp2:logfile=.\BuildOutput\VirtualRtu.Configuration.Function_warnings.log;warningsonly /flp3:logfile=.\BuildOutput\VirtualRtu.Configuration.Function.log
 
-::msbuild ..\src\IoTEdge.VirtualRtu.WebMonitor\IoTEdge.VirtualRtu.WebMonitor.csproj /t:Clean,Rebuild,restore /p:OutputPath=..\..\build\IoTEdge.VirtualRtu.WebMonitor\Output /p:Configuration=Release /fl1 /fl2 /fl3 /flp1:logfile=.\BuildOutput\IoTEdge.VirtualRtu.WebMonitor_errors.log;errorsonly /flp2:logfile=.\BuildOutput\IoTEdge.VirtualRtu.WebMonitor_warnings.log;warningsonly /flp3:logfile=.\BuildOutput\IoTEdge.VirtualRtu.WebMonitor.log
+::msbuild ..\src\VirtualRtu.WebMonitor\VirtualRtu.WebMonitor.csproj /t:Clean,Rebuild,restore /p:OutputPath=..\..\build\VirtualRtu.WebMonitor\Output /p:Configuration=Release /fl1 /fl2 /fl3 /flp1:logfile=.\BuildOutput\VirtualRtu.WebMonitor_errors.log;errorsonly /flp2:logfile=.\BuildOutput\VirtualRtu.WebMonitor_warnings.log;warningsonly /flp3:logfile=.\BuildOutput\VirtualRtu.WebMonitor.log
 
 ::msbuild ..\src\VirtualRtu.Gateway\VirtualRtu.Gateway.csproj /t:Clean,Rebuild,restore /p:OutputPath=..\..\build\VirtualRtu.Gateway\Output /p:Configuration=Release /fl1 /fl2 /fl3 /flp1:logfile=.\BuildOutput\VirtualRtu.Gateway_errors.log;errorsonly /flp2:logfile=.\BuildOutput\VirtualRtu.Gateway_warnings.log;warningsonly /flp3:logfile=.\BuildOutput\VirtualRtu.Gateway.log
 
@@ -14,7 +14,7 @@ dotnet build "..\src\AzureIoT.Deployment.Function\AzureIoT.Deployment.Function.c
 
 dotnet build "..\src\VirtualRtu.Configuration.Function\VirtualRtu.Configuration.Function.csproj" -c Release -f netcoreapp3.0 -v n -o "./BuildOutput/VirtualRtu.Configuration.Function" --force
 
-dotnet build "..\src\IoTEdge.VirtualRtu.WebMonitor\IoTEdge.VirtualRtu.WebMonitor.csproj" -c Release -f netcoreapp3.0 -v n -o "./BuildOutput/IoTEdge.VirtualRtu.WebMonitor" --force
+dotnet build "..\src\VirtualRtu.WebMonitor\VirtualRtu.WebMonitor.csproj" -c Release -f netcoreapp3.0 -v n -o "./BuildOutput/VirtualRtu.WebMonitor" --force
 
 dotnet build "..\src\VirtualRtu.Gateway\VirtualRtu.Gateway.csproj" -c Release -f netcoreapp3.0 -v n -o "./BuildOutput/VirtualRtu.Gateway" --force
 
@@ -24,7 +24,7 @@ dotnet publish "..\src\AzureIoT.Deployment.Function\AzureIoT.Deployment.Function
 
 dotnet publish "..\src\VirtualRtu.Configuration.Function\VirtualRtu.Configuration.Function.csproj" -c Release -f netcoreapp3.0 -o "VirtualRtu.Configuration.Function" 
 
-dotnet publish "..\src\IoTEdge.VirtualRtu.WebMonitor\IoTEdge.VirtualRtu.WebMonitor.csproj" -c Release -f netcoreapp3.0 -o "IoTEdge.VirtualRtu.WebMonitor" 
+dotnet publish "..\src\VirtualRtu.WebMonitor\VirtualRtu.WebMonitor.csproj" -c Release -f netcoreapp3.0 -o "VirtualRtu.WebMonitor" 
 
 dotnet publish "..\src\VirtualRtu.Gateway\VirtualRtu.Gateway.csproj" -c Release -f netcoreapp3.0 -o "VirtualRtu.Gateway" 
 
@@ -32,17 +32,22 @@ dotnet publish "..\src\VirtualRtu.Module\VirtualRtu.Module.csproj" -c Release -f
 
 CALL :remove "virtualrtu-gateway:v3.0"
 CALL :remove "virtualrtu-fieldgateway:v3.0"
+CALL :remove "virtualrtu-webmonitor:v3.0"
 CALL :remove "skunklab/virtualrtu-gateway:v3.0"
 CALL :remove "skunklab/virtualrtu-fieldgateway:v3.0"
+CALL :remove "skunklab/virtualrtu-webmonitor:v3.0"
 
 docker build -t virtualrtu-gateway:v3.0 ./VirtualRtu.Gateway
 docker build -t virtualrtu-fieldgateway:v3.0 ./VirtualRtu.Module
+docker build -t virtualrtu-webmonitor:v3.0 ./VirtualRtu.WebMonitor
 
 docker tag virtualrtu-gateway:v3.0 skunklab/virtualrtu-gateway:v3.0
 docker tag virtualrtu-fieldgateway:v3.0 skunklab/virtualrtu-fieldgateway:v3.0
+docker tag virtualrtu-webmonitor:v3.0 skunklab/virtualrtu-webmonitor:v3.0
 
 ::docker push skunklab/virtualrtu-gateway:v3.0
 ::docker push skunklab/virtualrtu-fieldgateway:v3.0
+::docker push skunklab/virtualrtu-webmonitor:v3.0
 
 ECHO "done"
 EXIT /B %ERRORLEVEL%

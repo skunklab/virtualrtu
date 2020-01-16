@@ -50,24 +50,24 @@ namespace VirtualRtu.Configuration.Uris
 
 
 
-        //public static string GetModuleRtuPiSystem(ContainerEntity entity, byte unitId, bool request)
+        //public static string Get-RtuPiSystem(ContainerEntity entity, byte unitId, bool request)
         //{
-        //    return GetModuleRtuPiSystem(entity.Hostname, entity.VirtualRtuId, entity.DeviceId, entity.ModuleId, unitId, request);
+        //    return Get-RtuPiSystem(entity.Hostname, entity.VirtualRtuId, entity.DeviceId, entity.-Id, unitId, request);
         //}
 
-        //public static string GetModulePiSystem(string hostname, string virtualRtuId, string deviceId, byte unitId, bool request)
+        //public static string Get-PiSystem(string hostname, string virtualRtuId, string deviceId, byte unitId, bool request)
         //{
         //    string direction = request ? "in" : "out";
         //    return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{unitId.ToString()}/{direction}";
         //}
 
-        //public static string GetModuleRtuPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId, byte unitId, bool request)
+        //public static string Get-RtuPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId, byte unitId, bool request)
         //{
         //    string direction = request ? "in" : "out";
         //    return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{moduleId.ToLowerInvariant()}/{unitId.ToString()}/{direction}";
         //}
 
-        //public static string GetModuleMonitorPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId)
+        //public static string Get-MonitorPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId)
         //{
         //    return $"http://{hostname.ToLowerInvariant()}/monitor/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{moduleId.ToLowerInvariant()}";
         //}
@@ -77,7 +77,7 @@ namespace VirtualRtu.Configuration.Uris
         //    return $"http://{hostname.ToLowerInvariant()}/monitor/{virtualRtuId.ToLowerInvariant()}";
         //}
 
-        //public static string GetModuleLogPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId)
+        //public static string Get-LogPiSystem(string hostname, string virtualRtuId, string deviceId, string moduleId)
         //{
         //    return $"http://{hostname.ToLowerInvariant()}/log/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{moduleId.ToLowerInvariant()}";
         //}
@@ -88,7 +88,7 @@ namespace VirtualRtu.Configuration.Uris
         //}
 
 
-        //public static string GetModulePolicyId(string hostname, string virtualRtuId, string deviceId, string moduleId, bool publish)
+        //public static string Get-PolicyId(string hostname, string virtualRtuId, string deviceId, string moduleId, bool publish)
         //{
         //    string direction = publish ? "in" : "out";
         //    return $"http://{hostname.ToLowerInvariant()}/policy/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{moduleId.ToLowerInvariant()}/{direction}";

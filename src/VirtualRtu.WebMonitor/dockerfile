@@ -1,0 +1,7 @@
+﻿FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS build-env
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
+WORKDIR /app
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "VirtualRtu.WebMonitor.dll"]
+COPY . /app

@@ -7,7 +7,7 @@
   "expiryMinutes": 60,
   "module": {
     "moduleId": "fieldgateway",
-    "loggingLevel": "Debug",
+    "loggingLevel": "Information",
     "instrumentationKey": "",
     "slaves": [
       {

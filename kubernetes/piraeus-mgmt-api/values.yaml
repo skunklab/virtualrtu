@@ -1,0 +1,22 @@
+replicaCount: 1
+dockerized: true
+serviceId: "myservice"
+clusterId: "mycluster"
+loggerTypes: "Console"
+#loglevel: "Warning"
+
+image1:
+  registry: docker.io
+  ## Image location, NOT including the tag
+  repository: skunklab/piraeus-mgmt-api
+  ## Image tag
+  tag: v3.0.1 
+  pullPolicy: IfNotPresent
+  
+
+service: 
+  type: ClusterIP
+
+
+
+

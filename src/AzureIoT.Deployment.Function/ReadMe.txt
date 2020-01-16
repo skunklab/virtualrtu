@@ -15,7 +15,7 @@ You can run a deployment using the Powershell script NewDeviceDeploy.ps1 in the 
 (2) Open PowerShell Core, type "pwsh"
 (3) Load the deployment script by typing ". ./newdevicedeploy.ps1"
 (4) Type the following 
-    New-DeviceDeploy -File "file-name-of-the-deploy.json-configuration" -Url "url-of-the-deployment-azure-function"
+    New-DeviceDeploy -File "file-name-of-the-deploy.json" -Url "url-of-the-deployment-azure-function"
 
 This will deploy a new device in the default IoT Hub and return the IoT Edge device connection string to use 
 to configure the new device.

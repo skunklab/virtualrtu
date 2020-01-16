@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "fullname" . }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "fullname" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+        heritage: "{{ .Release.Service }}"
+    spec:
+      containers:
+        - name: piraeus-silo
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: OR_Dockerized
+            value: {{ .Values.dockerized | quote }}
+          - name: OR_LoggerTypes
+            value: {{ .Values.loggerTypes | quote }}
+          - name: OR_ClusterId
+            value: {{ .Values.clusterId | quote }}
+          - name: OR_ServiceId
+            value: {{ .Values.serviceId | quote }}
+          - name: OR_DataConnectionString            
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: dataConnectionString   
+          - name: OR_LogLevel           
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: logLevel      
+          - name: OR_InstrumentationKey           
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: instrumentationKey 
+          - name: APPINSIGHTS_INSTRUMENTATIONKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "fullname" . }}
+                key: instrumentationKey              
+          ports:
+          - containerPort: 11111
+          - containerPort: 30000   
+      nodeSelector:
+        pool: nodepool2       

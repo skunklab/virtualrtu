@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: webmon
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+  - hosts:
+    - INGRESSDNS.LOCATION.cloudapp.azure.com
+    secretName: acme-tls-secret
+  rules:
+  - host: INGRESSDNS.LOCATION.cloudapp.azure.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: monitor
+          servicePort: 8080

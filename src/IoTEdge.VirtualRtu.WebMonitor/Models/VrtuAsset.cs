@@ -19,6 +19,8 @@ namespace IoTEdge.VirtualRtu.WebMonitor.Models
                 var asset = new DevAsset(node.Id, item.Id);
                 Nodes.Add(asset);
             }
+
+            Nodes.Sort();
         }
 
         [JsonProperty("text")]

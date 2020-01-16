@@ -26,11 +26,12 @@ namespace IoTEdge.VirtualRtu.WebMonitor.Pages
             List<VrtuAsset> list = new List<VrtuAsset>();
 
             foreach (var item in assets.VirtualRtus)
-            {
+            {                
                 list.Add(new VrtuAsset(item));
             }
 
-            
+            list.Sort();
+
 
             Data = JsonConvert.SerializeObject(list);
         }

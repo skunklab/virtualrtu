@@ -1,0 +1,20 @@
+replicaCount: 1
+loggerTypes: "Console"
+port: 8080
+forward: "true"
+
+image1:
+  registry: docker.io
+  ## Image location, NOT including the tag
+  repository: skunklab/virtualrtu-webmonitor
+  ## Image tag
+  tag: v3.0
+  pullPolicy: IfNotPresent
+  
+
+service: 
+  type: ClusterIP
+
+
+
+
