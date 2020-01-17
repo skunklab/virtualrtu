@@ -42,7 +42,7 @@ function New-ConfigurationFunctionApp
         New-Item -Path $PublishFolder -ItemType directory
     }
 
-	dotnet publish "$Path\..\src\VirtualRtu.Configuration.Function\VirtualRtu.Configuration.Function.csproj" -c Release -f netcoreapp3.0 -o "$PublishFolder" 
+	dotnet publish "$Path\..\src\VirtualRtu.Configuration.Function\VirtualRtu.Configuration.Function.csproj" -c Release -f netcoreapp3.1 -o "$PublishFolder" 
 	
 	# create the zip
 	$publishZip = "$PublishFolder\$ZipFilename"
@@ -57,14 +57,13 @@ function New-DeploymentFunctionApp
 {
 	param([string]$Path, [string]$PublishFolder, [string]$ZipFilename, [string]$AppName, [string]$ResourceGroupName)
 
-	dotnet publish "$Path\..\src\AzureIoT.Deployment.Function\AzureIoT.Deployment.Function.csproj" -c Release -f netcoreapp3.0 -o "$PublishFolder" 
+	dotnet publish "$Path\..\src\AzureIoT.Deployment.Function\AzureIoT.Deployment.Function.csproj" -c Release -f netcoreapp3.1 -o "$PublishFolder" 
 	
 
 	# create the zip
 	$publishZip = "$ZipFilename"
 	if(Test-path $publishZip) {Remove-item $publishZip}
-	Add-Type -assembly "system.io.compression.filesystem"
-	[io.compression.zipfile]::CreateFromDirectory($PublishFolder, $publishZip)
+	Compress-Archive -Path "$PublishFolder\*" -DestinationPath $publishZip
 
 	# deploy the zipped package
 	az functionapp deployment source config-zip -g $ResourceGroupName -n $AppName --src $publishZip

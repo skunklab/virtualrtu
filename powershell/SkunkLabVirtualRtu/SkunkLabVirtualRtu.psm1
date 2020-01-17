@@ -19,7 +19,7 @@ function New-FullVrtuDeploy
     New-VrtuVnetDeploy -Path $Path -File $File -SubscriptionName $SubscriptionName -ResourceGroupName $ResourceGroupName -Location $Location -VirtualRtuId $VirtualRtuId -Hostname $hostname -SymmetricKey $symmetricKey -IoTHubName $IoTHubName -StorageAcctName $VrtuStorageAcctName -ClusterName $VrtuClusterName -AppID $appId -Password $pwd -LogLevel $LogLevel  -StartTime $start
     New-WebMonitorDeploy -Path $Path  -File $File -SubscriptionName $SubscriptionName  -ResourceGroupName $ResourceGroupName  -Location $Location -PiraeusHostname $hostname -VirtualRtuId $VirtualRtuId  -StorageAcctName $VrtuStorageAcctName  -SymmetricKey $symmetricKey -Dns $MonitorDns -Email $Email -ClusterName $MonitorClusterName  -Domain $Domain -Port $Port  -AppID $appId -Password $pwd -LogLevel $LogLevel -StartTime $start   
     
-    $funcUrl = New-DeployFunctions -Path $Path -File $File -ConfigAppName $ConfigAppName -DeployAppName $DeployAppName -DeployTemplatePath $DeployTemplatePath -Location $Location -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+    $funcUrl = New-DeployFunctions -Path $Path -File $File -VirtualRtuId $VirtualRtuId -ConfigAppName $ConfigAppName -DeployAppName $DeployAppName -DeployTemplatePath $DeployTemplatePath -Location $Location -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
 
 	return $funcUrl
     
@@ -68,25 +68,38 @@ function New-DeviceDeploy
 
 function New-DeployFunctions 
 {
-	param([string]$Path, [string]$File, [string]$ConfigAppName, [string]$DeployAppName, [string]$DeployTemplatePath, [string]$Location, [string]$ResourceGroupName, [string]$SubscriptionName)
+	param([string]$Path, [string]$File, [string]$VirtualRtuId, [string]$ConfigAppName, [string]$DeployAppName, [string]$DeployTemplatePath, [string]$Location, [string]$ResourceGroupName, [string]$SubscriptionName)
 
+	Write-Host "Getting base64 encoded template" -ForegroundColor Yellow
 	$base64Template = New-FileToBase64 -Path $Path -Filename $DeployTemplatePath
-        $config = Get-Content -Raw -Path $File | ConvertFrom-Json
+    Write-Host "Getting config file" -ForegroundColor Yellow
+    $config = Get-Content -Raw -Path $File | ConvertFrom-Json
+    Write-Host "Setting account name for storage" -ForegroundColor Yellow
 	$acctName = Get-AccountName -StorageConnectionString $config.vrtuConnectionString
-
-        Update-ConfigSecrets -Path $Path -Folder "..\src\VirtualRtu.Configuration.Function" -SymmetricKey $config.symmetricKey -ApiToken $config.apiCode -LifetimeMinutes $config.lifetimeMinutes -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -ContainerName  $config.containerName -Filename $config.filename
-	New-FunctionApp -AppName $ConfigAppName -StorageAcctName $acctName -Location $Location -AppInsightsName "configfunc" -ResourceGroupName $ResourceGroupName
-        New-ConfigurationFunctionApp -Path $Path -PublishFolder "../build/VirtualRtu.Configuration.Function/publish" -ZipFilename "configfunc.zip" -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName
-        $creds = Get-FunctionCreds -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+    
+    Write-Host "Updating secrets in azure function" -ForegroundColor Yellow
+    Update-ConfigSecrets -Path $Path -Folder "..\src\VirtualRtu.Configuration.Function" -SymmetricKey $config.symmetricKey -ApiToken $config.apiCode -LifetimeMinutes $config.lifetimeMinutes -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -ContainerName  $config.containerName -Filename $config.filename
+	Write-Host "creating the function app" -ForegroundColor Yellow
+    New-FunctionApp -AppName $ConfigAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
+    Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
+    New-ConfigurationFunctionApp -Path $Path -PublishFolder "../build/VirtualRtu.Configuration.Function/publish" -ZipFilename "configfunc.zip" -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName
+    Write-Host "getting the credentials" -ForegroundColor Yellow
+    $creds = Get-FunctionCreds -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+    Write-Host "getting the code" -ForegroundColor Yellow
 	$code = Get-FunctionCode -AppName $ConfigAppName -FunctionName "ConfigurationFunction" -EncodedCreds $creds
 	$serviceUrl = "https://$ConfigAppName.azurewebsites.net/api/ConfigurationFunction?code=$code"
-	
+
+	Write-Host "Updating secrets in azure function" -ForegroundColor Yellow
 	Update-DeploySecrets -Path $Path -Folder "..\src\AzureIoT.Deployment.Function" -Hostname $config.piraeusHostname -ServiceUrl $serviceUrl -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -IoTHubConnectionString $config.iotHubConnectionString -Template $base64Template
-	New-FunctionApp -AppName $DeployAppName -StorageAcctName $acctName -Location $Location -AppInsightsName "deployfunc" -ResourceGroupName $ResourceGroupName
+	Write-Host "creating the function app" -ForegroundColor Yellow
+	New-FunctionApp -AppName $DeployAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
+	Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
 	New-DeploymentFunctionApp -Path $Path -PublishFolder "../build/AzureIoT.Deployment.Function/publish" -ZipFilename "deployfunc.zip" -AppName $DeployAppName -ResourceGroupName $ResourceGroupName
+	Write-Host "getting the credentials" -ForegroundColor Yellow
 	$creds = Get-FunctionCreds -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+	Write-Host "getting the code" -ForegroundColor Yellow
 	$code2 = Get-FunctionCode -AppName $DeployAppName -FunctionName "DeploymentFunction" -EncodedCreds $creds
-	return "https://$DeployAppName.azurewebsites.net/api/DeploymentFunction?code=$code2"	
+	return "https://$DeployAppName.azurewebsites.net/api/DeploymentFunction?code=$code2"
 }
 
 function Get-AccountName 

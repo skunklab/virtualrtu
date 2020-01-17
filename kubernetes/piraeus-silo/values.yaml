@@ -10,7 +10,7 @@ image:
   ## Image location, NOT including the tag
   repository: skunklab/piraeus-silo
   ## Image tag
-  tag: v3.0.1 
+  tag: v3.0.2 
   pullPolicy: IfNotPresent
 
 service: 

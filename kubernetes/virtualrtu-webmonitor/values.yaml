@@ -8,7 +8,7 @@ image1:
   ## Image location, NOT including the tag
   repository: skunklab/virtualrtu-webmonitor
   ## Image tag
-  tag: v3.0
+  tag: v3.0.2
   pullPolicy: IfNotPresent
   
 
