@@ -7,7 +7,7 @@ function New-FullVrtuDeploy
     [int]$Port, [string]$IoTHubName, [string]$ConfigAppName, [string]$DeployAppName, [string]$DeployTemplatePath, [string]$AppID, [string]$Password, [string]$LogLevel)
 	
     $start = Get-Date
-    New-PiraeusDeploy -Path $Path -File $File -SubscriptionName $SubscriptionName -ResourceGroupName $ResourceGroupName -Location $Location -Email $Email -Dns $PiraeusDns -ClusterName $PiraeusClusterName -AppID $AppID -Password $Password -OrleansStorageAcctName $OrleansStorageAcctName -LogLevel $LogLevel
+    New-PiraeusDeployment -Path $Path -File $File -SubscriptionName $SubscriptionName -ResourceGroupName $ResourceGroupName -Location $Location -Email $Email -Dns $PiraeusDns -ClusterName $PiraeusClusterName -AppID $AppID -Password $Password -OrleansStorageAcctName $OrleansStorageAcctName -LogLevel $LogLevel
 
     #read the config file
     $config = Get-Content -Raw -Path $File | ConvertFrom-Json
@@ -79,21 +79,21 @@ function New-DeployFunctions
         New-ConfigurationFunctionApp -Path $Path -PublishFolder "../build/VirtualRtu.Configuration.Function/publish" -ZipFilename "configfunc.zip" -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName
         $creds = Get-FunctionCreds -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
 	$code = Get-FunctionCode -AppName $ConfigAppName -FunctionName "ConfigurationFunction" -EncodedCreds $creds
-	$serviceUrl = "https://$ConfigAppName.azurewebsites.net/api/ConfigurationFunction?code=$code
+	$serviceUrl = "https://$ConfigAppName.azurewebsites.net/api/ConfigurationFunction?code=$code"
 	
 	Update-DeploySecrets -Path $Path -Folder "..\src\AzureIoT.Deployment.Function" -Hostname $config.piraeusHostname -ServiceUrl $serviceUrl -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -IoTHubConnectionString $config.iotHubConnectionString -Template $base64Template
 	New-FunctionApp -AppName $DeployAppName -StorageAcctName $acctName -Location $Location -AppInsightsName "deployfunc" -ResourceGroupName $ResourceGroupName
 	New-DeploymentFunctionApp -Path $Path -PublishFolder "../build/AzureIoT.Deployment.Function/publish" -ZipFilename "deployfunc.zip" -AppName $DeployAppName -ResourceGroupName $ResourceGroupName
 	$creds = Get-FunctionCreds -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
 	$code2 = Get-FunctionCode -AppName $DeployAppName -FunctionName "DeploymentFunction" -EncodedCreds $creds
-	return "https://$DeployAppName.azurewebsites.net/api/DeploymentFunction?code=$code2	
+	return "https://$DeployAppName.azurewebsites.net/api/DeploymentFunction?code=$code2"	
 }
 
 function Get-AccountName 
 {
     param([string]$StorageConnectionString)
 
-    $vals = $acct.Split(";")
+    $vals = $StorageConnectionString.Split(";")
     foreach($item in $vals)
     {
         if($item.Contains("AccountName="))
@@ -491,18 +491,31 @@ function New-VrtuVnetDeploy
     $step++
     if(Test-Path $File)
     {
-		$config = Get-Content -Raw -Path $File | ConvertFrom-Json
-		$config.claimValues = "$VirtualRtuId"
-        $config.containerName = "$BlobContainerName"
-        $config.filename = "$VirtualRtuId.json"
-        $config.tableName = "$TableName"
-        $config.lifetimeMinutes = $LifetimeMinutes
-        $config.vrtuVmSize = "$VmSize"
-        $config.virtualRtuId = "$VirtualRtuId"
-        $config.vrtuConnectionString = "$storageConnectionString"
-        $config.vrtuInstrumentationKey = "$instrumentationKey"
-        $config.iotHubConnectionString = "$iotHubConnection"
-        $config.vrtuIP = "$ip"
+		$config = Get-Content -Raw -Path $File | ConvertFrom-Json		
+		$config | Add-Member -Name "claimValues" -Value "$VirtualRtuId" -MemberType NoteProperty
+		$config | Add-Member -Name "containerName" -Value "$BlobContainerName" -MemberType NoteProperty
+		$config | Add-Member -Name "filename" -Value "$VirtualRtuId.json" -MemberType NoteProperty
+		$config | Add-Member -Name "tableName" -Value "$TableName" -MemberType NoteProperty
+		$config | Add-Member -Name "vrtuVmSize" -Value "$VmSize" -MemberType NoteProperty
+		$config | Add-Member -Name "virtualRtuId" -Value "$VirtualRtuId" -MemberType NoteProperty
+		$config | Add-Member -Name "vrtuConnectionString" -Value "$storageConnectionString" -MemberType NoteProperty
+		$config | Add-Member -Name "vrtuInstrumentationKey" -Value "$instrumentationKey" -MemberType NoteProperty
+		$config | Add-Member -Name "iotHubConnectionString" -Value "$iotHubConnection" -MemberType NoteProperty
+		$config | Add-Member -Name "vrtuIP" -Value "$ip" -MemberType NoteProperty
+		
+		
+		
+		#$config.claimValues = "$VirtualRtuId"
+        #$config.containerName = "$BlobContainerName"
+        #$config.filename = "$VirtualRtuId.json"
+        #$config.tableName = "$TableName"
+        #$config.lifetimeMinutes = $LifetimeMinutes
+        #$config.vrtuVmSize = "$VmSize"
+        #$config.virtualRtuId = "$VirtualRtuId"
+        #$config.vrtuConnectionString = "$storageConnectionString"
+        #$config.vrtuInstrumentationKey = "$instrumentationKey"
+        #$config.iotHubConnectionString = "$iotHubConnection"
+        #$config.vrtuIP = "$ip"
         
         Update-Step -Step $step -Message "Write file" -Start $start
 		$step++
@@ -874,14 +887,14 @@ function New-WebMonitorDeploy
     if(Test-Path $File)
     {
 		$config = Get-Content -Raw -Path $File | ConvertFrom-Json
-		$config.tenantId = "$tenantId"
-        $config.clientId = "$clientId"
-        $config.domain = "$domain"
-        $config.monitorDns = "$Dns"
-        $config.monitorPublicIP = "$IP"
-        $config.monitorInstrumentationKey = "$aiKey"
-        $config.monitorVmSize = "$VmSize"
-        
+		$config | Add-Member -Name "tenantId" -Value "$tenantId" -MemberType NoteProperty
+		$config | Add-Member -Name "clientId" -Value "$clientId" -MemberType NoteProperty
+		$config | Add-Member -Name "domain" -Value "$domain" -MemberType NoteProperty
+		$config | Add-Member -Name "monitorDns" -Value "$Dns" -MemberType NoteProperty
+		$config | Add-Member -Name "monitorPublicIP" -Value "$IP" -MemberType NoteProperty
+		$config | Add-Member -Name "monitorInstrumentationKey" -Value "$aiKey" -MemberType NoteProperty
+		$config | Add-Member -Name "monitorVmSize" -Value "$VmSize" -MemberType NoteProperty
+	
         Update-Step -Step $step -Message "Write file" -Start $start
 		$step++
         $config | ConvertTo-Json -depth 100 | Out-File $File	
@@ -927,4 +940,58 @@ function New-DeviceDeploy
 		Invoke-WebRequest -Uri $requestUrl -Method Post -ContentType "application/json" -Body $config
 		Write-Host "Update complete"				
     }
+}
+
+function Get-ExternalIPForService
+{
+	param([string]$AppName, [string]$Namespace = "kube-system")
+	$looper = $TRUE
+    while($looper)
+    {   $externalIP = ""                  
+        $lineValue = kubectl get service -l app=$AppName --namespace $Namespace
+        
+        Write-Host "Last Exit Code for get external ip $LASTEXITCODE" -ForegroundColor White
+        if($LASTEXITCODE -ne 0 )
+        {
+            Write-Host "Try get external ip...waiting 30 seconds" -ForegroundColor Yellow
+            Start-Sleep -Seconds 30
+        }  
+        elseif($lineValue.Length -gt 0)
+        {
+            $line = $lineValue[1]
+            $lineout = $line -split '\s+'
+            $externalIP = $lineout[3]              
+        }
+        
+              
+        if($externalIP -eq "<pending>")
+        {        
+            Write-Host "External IP is pending...waiting 30 seconds" -ForegroundColor Yellow
+            Start-Sleep -Seconds 30
+        }
+        elseif($externalIP.Length -eq 0)
+        {
+            Write-Host "External IP is zero length...waiting 30 seconds" -ForegroundColor Yellow
+            Start-Sleep -Seconds 30
+        }
+        else
+        {
+			$looper = $FALSE
+            Write-Host "External IP is $externalIP" -ForegroundColor Magenta
+            return $externalIP
+        }
+    }
+}
+
+
+function Add-CertManager2
+{
+	param([string]$Namespace = "cert-manager")
+
+    kubectl label namespace $Namespace certmanager.k8s.io/disable-validation="true"
+    kubectl apply -f "https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml" -n "$Namespace" --validate=false
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+    helm install --name cert-manager --namespace $Namespace --version v0.11.0 --set ingressShim.extraArgs='{--default-issuer-name=letsencrypt-prod,--default-issuer-kind=ClusterIssuer}' jetstack/cert-manager --set webhook.enabled=true      
+    
 }

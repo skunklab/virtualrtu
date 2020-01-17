@@ -105,7 +105,7 @@ function New-FileToBase64
 {
     param([string]$Path, [string]$Filename)
 
-    $fileBytes = Get-Content "$Path/$Filename" -Encoding Byte -ReadCount 0
+    $fileBytes = [System.IO.File]::ReadAllBytes("$Path/$Filename")
     return [System.Convert]::ToBase64String($fileBytes)
 }
 
