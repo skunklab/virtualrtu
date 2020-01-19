@@ -61,7 +61,7 @@ function New-DeploymentFunctionApp
 	
 
 	# create the zip
-	$publishZip = "$ZipFilename"
+	$publishZip = "$PublishFolder\$ZipFilename"
 	if(Test-path $publishZip) {Remove-item $publishZip}
 	Compress-Archive -Path "$PublishFolder\*" -DestinationPath $publishZip
 
