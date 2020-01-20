@@ -51,48 +51,70 @@ following types (AllowAll \| DenyAll \| Filter).
 The following examples show how constraints can be applied to Modbus function
 type “1”, i.e., read coils.
 
-### 1.3.1 Example Configuration of Single Device with Range restriction on Read Coils
-
-| { "deviceId": "device1", "virtualRtuId": "testvrtu", "storageConnectionString": null, "iotHubConnectionString": null, "base64Template": null, "expiryMinutes": 525600, "module": { "moduleId": "fieldgateway", "loggingLevel": "Debug", "instrumentationKey": "c6e42c8d-054b-4097-93fd-09a4734bdfac", "slaves": [ { "unitId": 1, "ipAddress": "192.168.0.1", "port": 502, "alias": 0, "constraint": "Filter" "scope": 1 "filters": [ "permission": "Allow" "start": 1 "end": 23 ] } ] } } |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
-
-### 1.3.1 Example – Allow All Coils Constraint
-
-A constraint that allows Modbus function \#1 to read any coil.
-
-| { “constraint”: “AllowAll” “scope”: 1 } |
-|-----------------------------------------|
-
-
-### 1.3.2 Example – Deny All Coils Constraint
-
-A constraint that denies Modbus function \#1 to read any coil..
-
-| { “constraint”: “DenyAll” “scope”: 1 } |
-|----------------------------------------|
-
-
-### 1.3.3 Example – Read Coils Filter Constraint (Allow)
-
-A constraint that applies a filter that allows Modbus function \#1 – Read Coils
-to only read in the range 1-23, i.e., 0-22 in the Modbus message.
-
-| { “constraint”: “Filter” “scope”: 1 “filters”: [ “permission”: “Allow” “start”: 1 “end”: 23 ] } |
-|-------------------------------------------------------------------------------------------------|
-
-
-### 1.3.3 Example – Read Coils Multiple Filter Constraint (Deny)
-
-A constraint that applies a filter that allows Modbus function \#1 – Deny coils
-to be read in the range 1-23, i.e., 0-22 in the Modbus message.
-
-| { “constraint”: “Filter” “scope”: 1 “filters: [ “permission”: “Deny” “start”: 1 “end”: 23 ] } |
-|-----------------------------------------------------------------------------------------------|
-
-
-2.0 Properties 
-===============
+### 1.3.1 Example - 1 Slave, 5 Constraints
+Alllows ModBus functions 1 and 2, denies 5,6, and allows function code 4 access to registers 40001-40005 and 40021-40031
+```
+{
+  "deviceId": "device1",
+  "virtualRtuId": "myvrtu",
+  "storageConnectionString": null,
+  "iotHubConnectionString": null,
+  "base64Template": null,
+  "expiryMinutes": 60,
+  "module": {
+    "moduleId": "fieldgateway",
+    "loggingLevel": "Information",
+    "instrumentationKey": "some-app-insights-key",
+    "slaves": [
+      {
+        "unitId": 1,
+        "ipAddress": "10.0.0.1",
+        "port": 502,
+        "alias": 0,
+        "constraints": [
+          {
+            "constraint": "AllowAll",
+            "scope": 1,
+            "filters": null
+          },
+          {
+            "constraint": "AllowAll",
+            "scope": 2,
+            "filters": null
+          },
+          {
+            "constraint": "Filter",
+            "scope": 4,
+            "filters": [
+              {
+                "permission": "Allow",
+                "start": 40001,
+                "end": 40005
+              },
+              {
+                "permission": "Allow",
+                "start": 40021,
+                "end": 40031
+              }
+            ]
+          },
+          {
+            "constraint": "DenyAll",
+            "scope": 5,
+            "filters": null
+          },
+          {
+            "constraint": "DenyAll",
+            "scope": 6,
+            "filters": null
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+==========
 
 2.1 Constraints & Scopes
 ------------------------
@@ -144,3 +166,4 @@ Table 1
 | 12       | Fetch Event Log                  | AllowAll, DenyAll         |           |
 | 15       | Write Multiple Coils             | AllowAll, DenyAll, Filter | 1         |
 | 16       | Write Multiple Holding Registers | AllowAll, DenyAll, Filter | 40001     |
+
