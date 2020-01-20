@@ -76,6 +76,21 @@ function New-DeployFunctions
     $config = Get-Content -Raw -Path $File | ConvertFrom-Json
     Write-Host "Setting account name for storage" -ForegroundColor Yellow
 	$acctName = Get-AccountName -StorageConnectionString $config.vrtuConnectionString
+	
+	$test = Get-FunctionAppExists -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+	if($test -eq $true)
+	{
+		Write-Host "Function app $ConfigAppName exists...removing" -ForegroundColor Yellow
+		Remove-FunctionApp -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+	}
+	
+	$test = Get-FunctionAppExists -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+	if($test -eq $true)
+	{
+		Write-Host "Function app $DeployAppName exists...removing" -ForegroundColor Yellow
+		Remove-FunctionApp -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+	}
+		
     
     Write-Host "Updating secrets in azure function" -ForegroundColor Yellow
     Update-ConfigSecrets -Path $Path -Folder "..\src\VirtualRtu.Configuration.Function" -SymmetricKey $config.symmetricKey -ApiToken $config.apiCode -LifetimeMinutes $config.lifetimeMinutes -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -ContainerName  $config.containerName -Filename $config.filename
@@ -83,22 +98,57 @@ function New-DeployFunctions
     New-FunctionApp -AppName $ConfigAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
     Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
     New-ConfigurationFunctionApp -Path $Path -PublishFolder "../build/VirtualRtu.Configuration.Function/publish" -ZipFilename "configfunc.zip" -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName
+    
+    if($LASTEXITCODE -ne 0)
+	{
+	    Write-Host "Error creating function app" -ForegroundColor Yellow
+		$test = Get-FunctionAppExists -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+		if($test -eq $true)
+		{
+		    Write-Host "Removing function app $ConfigAppName...will try again" -ForegroundColor Yellow
+			Remove-FunctionApp -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+		}
+		
+		Write-Host "creating the function app" -ForegroundColor Yellow
+		New-FunctionApp -AppName $ConfigAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
+		Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
+		New-ConfigurationFunctionApp -Path $Path -PublishFolder "../build/VirtualRtu.Configuration.Function/publish" -ZipFilename "configfunc.zip" -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName
+	}
+    
     Write-Host "getting the credentials" -ForegroundColor Yellow
     $creds = Get-FunctionCreds -AppName $ConfigAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
     Write-Host "getting the code" -ForegroundColor Yellow
 	$code = Get-FunctionCode -AppName $ConfigAppName -FunctionName "ConfigurationFunction" -EncodedCreds $creds
 	$serviceUrl = "https://$ConfigAppName.azurewebsites.net/api/ConfigurationFunction?code=$code"
-
+	
+	
 	Write-Host "Updating secrets in azure function" -ForegroundColor Yellow
 	Update-DeploySecrets -Path $Path -Folder "..\src\AzureIoT.Deployment.Function" -Hostname $config.piraeusHostname -ServiceUrl $serviceUrl -TableName $config.tableName -StorageConnectionString $config.vrtuConnectionString -IoTHubConnectionString $config.iotHubConnectionString -Template $base64Template
 	Write-Host "creating the function app" -ForegroundColor Yellow
 	New-FunctionApp -AppName $DeployAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
 	Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
 	New-DeploymentFunctionApp -Path $Path -PublishFolder "../build/AzureIoT.Deployment.Function/publish" -ZipFilename "deployfunc.zip" -AppName $DeployAppName -ResourceGroupName $ResourceGroupName
+	
+	if($LASTEXITCODE -ne 0)
+	{
+		Write-Host "Error creating function app" -ForegroundColor Yellow
+		$test = Get-FunctionAppExists -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+		if($test -eq $true)
+		{
+		    Write-Host "Removing function app...will try again" -ForegroundColor Yellow
+			Remove-FunctionApp -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
+		}
+		
+		Write-Host "creating the function app" -ForegroundColor Yellow
+		New-FunctionApp -AppName $DeployAppName -StorageAcctName $acctName -Location $Location -AppInsightsName $VirtualRtuId -ResourceGroupName $ResourceGroupName
+		Write-Host "build the function and deploying the function app" -ForegroundColor Yellow
+		New-DeploymentFunctionApp -Path $Path -PublishFolder "../build/AzureIoT.Deployment.Function/publish" -ZipFilename "deployfunc.zip" -AppName $DeployAppName -ResourceGroupName $ResourceGroupName
+	}
+	
 	Write-Host "getting the credentials" -ForegroundColor Yellow
 	$creds = Get-FunctionCreds -AppName $DeployAppName -ResourceGroupName $ResourceGroupName -SubscriptionName $SubscriptionName
 	Write-Host "getting the code" -ForegroundColor Yellow
-	$code2 = Get-FunctionCode -AppName $DeployAppName -FunctionName "DeploymentFunction" -EncodedCreds $creds
+	$code2 = Get-FunctionCode -AppName $DeployAppName -FunctionName "DeploymentFunction" -EncodedCreds $creds	
 	return "https://$DeployAppName.azurewebsites.net/api/DeploymentFunction?code=$code2"
 }
 
@@ -266,6 +316,14 @@ function Add-VrtuVnetDeploy
     $step++
     az role assignment create --assignee $spnAppId --scope $VnetName_ID --role Contributor
 
+    #may have to allow access...so play a sound
+    $sound = new-Object System.Media.SoundPlayer;
+    $sound.SoundLocation="c:\WINDOWS\Media\notify.wav";
+    try
+    {
+      $sound.Play();
+    }catch{}
+    
     Update-Step -Step $step -Message "Creating new VRTU AKS cluster" -Start $start
     $step++
     az aks create --resource-group $ResourceGroupName --name $ClusterName --node-count $NodeCount --network-plugin kubenet --service-cidr $ServiceCidr --dns-service-ip $DnsServiceIP --pod-cidr $PodCidr --docker-bridge-address $DockerBridgeIP --vnet-subnet-id $SubnetName_ID --service-principal "$spnAppId" --client-secret "$spnPwd"    

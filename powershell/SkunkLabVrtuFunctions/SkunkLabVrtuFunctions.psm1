@@ -108,3 +108,27 @@ function New-FileToBase64
     return [System.Convert]::ToBase64String($fileBytes)
 }
 
+function Get-FunctionAppExists
+{
+   param([string]$AppName, [string]$ResourceGroupName, [string]$SubscriptionName)
+   $fqdn = "'$AppName.azurewebsites.net'"
+   $fqdn
+   $f = az functionapp list --resource-group $ResourceGroupName --subscription $SubscriptionName --query "[?defaultHostName==$fqdn].{hostName: defaultHostName}" | ConvertTo-Json
+
+   if($f.Length -eq 4)
+   {
+      return $false
+   }
+   else
+   {
+      return $true
+   }
+}
+
+function Remove-FunctionApp
+{
+    param([string]$AppName, [string]$ResourceGroupName, [string]$SubscriptionName)
+
+    az functionapp delete --name $AppName --resource-group $ResourceGroupName --subscription $SubscriptionName
+}
+

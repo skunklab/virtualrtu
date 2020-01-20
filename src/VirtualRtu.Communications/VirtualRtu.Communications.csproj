@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.Azure.Devices" Version="1.18.2" />
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.21.3" />
     <PackageReference Include="SkunkLab.Channels" Version="3.0.2" />
-    <PackageReference Include="SkunkLab.Clients" Version="3.0.0" />
+    <PackageReference Include="SkunkLab.Clients" Version="3.0.2" />
     <PackageReference Include="System.Runtime.Caching" Version="4.7.0" />
   </ItemGroup>
 
