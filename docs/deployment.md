@@ -3,7 +3,7 @@ Deploying Virtual RTU
 
 
 The following tasks and steps will create the [infrastructure](./images/deployment.png) needed for VRTU.
-Video available [here](./images/Task1.mpg) for environmental setup.
+Video available [here](./images/Task1.mp4) for environmental setup.
 
 Task 1 – Create VM and get the source
 ---
