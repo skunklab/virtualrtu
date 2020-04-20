@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.WebMonitor.Configuration
 {
@@ -8,12 +7,6 @@ namespace VirtualRtu.WebMonitor.Configuration
     [JsonObject]
     public class DeviceAsset
     {
-        public DeviceAsset()
-        {
-        }
-
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
+        [JsonProperty("id")] public string Id { get; set; }
     }
 }

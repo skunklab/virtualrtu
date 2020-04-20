@@ -1,9 +1,9 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Extensions.Logging;
-using SkunkLab.Channels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Client;
+using Microsoft.Extensions.Logging;
+using SkunkLab.Channels;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Configuration;
 using VirtualRtu.Configuration.Vrtu;
@@ -12,13 +12,35 @@ namespace VirtualRtu.Communications.Pipelines
 {
     public class VirtualRtuPipeline : Pipeline
     {
+        #region private methods
+
+        private async Task ExecuteOutputRetryPolicyAsync()
+
+        {
+            if (outputPolicy == null || !outputPolicy.ShouldRetry(outputCount, null, out TimeSpan interval))
+            {
+                outputCount = 0;
+                outputPolicy = new ExponentialBackoff(5, TimeSpan.FromSeconds(5.0), TimeSpan.FromSeconds(30.0),
+                    TimeSpan.FromSeconds(10.0));
+            }
+            else
+            {
+                outputCount++;
+                await Task.Delay(interval);
+            }
+        }
+
+        #endregion
+
         #region ctor
+
         public VirtualRtuPipeline()
         {
             Id = Guid.NewGuid().ToString();
         }
 
-        public VirtualRtuPipeline(VrtuConfig config, IChannel input, IChannel output, List<IFilter> inputFiters, List<IFilter> outputFilters, ILogger logger = null)
+        public VirtualRtuPipeline(VrtuConfig config, IChannel input, IChannel output, List<IFilter> inputFiters,
+            List<IFilter> outputFilters, ILogger logger = null)
         {
             Id = Guid.NewGuid().ToString();
             this.config = config;
@@ -27,30 +49,37 @@ namespace VirtualRtu.Communications.Pipelines
             OutputChannel = output;
             InputFilters = inputFiters;
             OutputFilters = outputFilters;
-            map = RtuMap.LoadAsync(config.StorageConnectionString, config.Container, config.Filename).GetAwaiter().GetResult();
+            map = RtuMap.LoadAsync(config.StorageConnectionString, config.Container, config.Filename).GetAwaiter()
+                .GetResult();
         }
+
         #endregion
 
         #region private fields
+
         private VrtuConfig config;
-        private ILogger logger;
+        private readonly ILogger logger;
         private ExponentialBackoff outputPolicy;
         private int outputCount;
         private bool outputDisposed;
         private bool disposed;
-        private RtuMap map;
+        private readonly RtuMap map;
+
         #endregion
 
         #region public properties
-        public override event System.EventHandler<PipelineErrorEventArgs> OnPipelineError;
+
+        public override event EventHandler<PipelineErrorEventArgs> OnPipelineError;
         public override string Id { get; set; }
         public override IChannel InputChannel { get; set; }
-        public override IChannel OutputChannel { get; set; }      
+        public override IChannel OutputChannel { get; set; }
         public override List<IFilter> InputFilters { get; set; }
         public override List<IFilter> OutputFilters { get; set; }
+
         #endregion
 
         #region public methods
+
         public override void Execute()
         {
             //wire up events
@@ -69,7 +98,7 @@ namespace VirtualRtu.Communications.Pipelines
                 InputChannel.OpenAsync().GetAwaiter();
                 OutputChannel.OpenAsync().GetAwaiter();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 OnPipelineError?.Invoke(this, new PipelineErrorEventArgs(Id, ex));
             }
@@ -93,38 +122,42 @@ namespace VirtualRtu.Communications.Pipelines
                 }
             }
         }
+
         public override void Dispose()
         {
             Disposing(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
         #region Input Events
+
         private void Input_OnOpen(object sender, ChannelOpenEventArgs e)
         {
             InputChannel.ReceiveAsync().GetAwaiter();
         }
-        private void Input_OnReceive(object sender, ChannelReceivedEventArgs e)
-        {            
 
+        private void Input_OnReceive(object sender, ChannelReceivedEventArgs e)
+        {
             MbapHeader header = MbapHeader.Decode(e.Message);
             if (header == null)
             {
-                logger?.LogWarning("MBAP Header returned null");                
-                return;  //assume keep alive
+                logger?.LogWarning("MBAP Header returned null");
+                return; //assume keep alive
             }
-            if(!map.HasItem(header.UnitId))
+
+            if (!map.HasItem(header.UnitId))
             {
                 byte[] errorMsg = ModbusErrorMessage.Create(e.Message, ErrorCode.GatewayPathsNotAvailable);
-                this.InputChannel.SendAsync(errorMsg).GetAwaiter();
+                InputChannel.SendAsync(errorMsg).GetAwaiter();
                 return;
             }
-            
-            if(!map.GetItem(header.UnitId).Authorize(e.Message))
+
+            if (!map.GetItem(header.UnitId).Authorize(e.Message))
             {
                 byte[] errorMsg = ModbusErrorMessage.Create(e.Message, ErrorCode.IllegalAddress);
-                this.InputChannel.SendAsync(errorMsg).GetAwaiter();
+                InputChannel.SendAsync(errorMsg).GetAwaiter();
                 return;
             }
 
@@ -139,6 +172,7 @@ namespace VirtualRtu.Communications.Pipelines
 
             OutputChannel.SendAsync(msg).GetAwaiter();
         }
+
         private void Input_OnError(object sender, ChannelErrorEventArgs e)
         {
             logger?.LogError(e.Error, "Fault in input channel.");
@@ -149,37 +183,43 @@ namespace VirtualRtu.Communications.Pipelines
 
             try
             {
-                InputChannel.Dispose();                
+                InputChannel.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 
             try
             {
                 OutputChannel.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
+        }
 
-        }
         private void Input_OnClose(object sender, ChannelCloseEventArgs e)
-        {            
+        {
             logger?.LogWarning("Input channel closed.");
-            OnPipelineError?.Invoke(this, new PipelineErrorEventArgs(this.Id));
+            OnPipelineError?.Invoke(this, new PipelineErrorEventArgs(Id));
         }
+
         #endregion
 
         #region Output Events
+
         private void Output_OnOpen(object sender, ChannelOpenEventArgs e)
         {
             OutputChannel.ReceiveAsync().GetAwaiter();
         }
+
         private void Output_OnReceive(object sender, ChannelReceivedEventArgs e)
         {
             byte[] message = e.Message;
-            
 
 
             byte[] msg = null;
-            foreach(var filter in OutputFilters)
+            foreach (var filter in OutputFilters)
             {
                 msg = filter.Execute(message);
                 msg ??= message;
@@ -187,6 +227,7 @@ namespace VirtualRtu.Communications.Pipelines
 
             InputChannel.SendAsync(msg);
         }
+
         private void Output_OnError(object sender, ChannelErrorEventArgs e)
         {
             logger?.LogError(e.Error, "Fault in output channel.");
@@ -198,33 +239,12 @@ namespace VirtualRtu.Communications.Pipelines
                 OutputChannel.OpenAsync().GetAwaiter();
             }
         }
+
         private void Output_OnClose(object sender, ChannelCloseEventArgs e)
         {
             logger?.LogWarning("Output channel closed.");
         }
+
         #endregion
-
-        #region private methods
-        private async Task ExecuteOutputRetryPolicyAsync()
-
-        {
-            if (outputPolicy == null || !outputPolicy.ShouldRetry(outputCount, null, out TimeSpan interval))
-            {
-                outputCount = 0;
-                outputPolicy = new ExponentialBackoff(5, TimeSpan.FromSeconds(5.0), TimeSpan.FromSeconds(30.0), TimeSpan.FromSeconds(10.0));
-            }
-            else
-            {
-                outputCount++;
-                await Task.Delay(interval);
-            }
-        }
-        #endregion
-
-
-
-
-
-
     }
 }

@@ -9,6 +9,7 @@ export declare enum HttpTransportType {
     /** Specifies the Long Polling transport. */
     LongPolling = 4
 }
+
 /** Specifies the transfer format for a connection. */
 export declare enum TransferFormat {
     /** Specifies that only text data will be transmitted over the connection. */
@@ -16,6 +17,7 @@ export declare enum TransferFormat {
     /** Specifies that binary data will be transmitted over the connection. */
     Binary = 2
 }
+
 /** An abstraction over the behavior of transports. This is designed to support the framework and not intended for use by applications. */
 export interface ITransport {
     connect(url: string, transferFormat: TransferFormat): Promise<void>;

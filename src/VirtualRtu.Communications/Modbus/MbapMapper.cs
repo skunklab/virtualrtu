@@ -6,12 +6,12 @@ namespace VirtualRtu.Communications.Modbus
 {
     public class MbapMapper
     {
+        private readonly LocalCache cache;
+
         public MbapMapper(string name)
         {
             cache = new LocalCache(name);
         }
-
-        private LocalCache cache;
 
         public byte[] MapIn(byte[] message)
         {
@@ -38,7 +38,6 @@ namespace VirtualRtu.Communications.Modbus
             Buffer.BlockCopy(message, src.Length, buffer, src.Length, message.Length - src.Length);
 
 
-
             return buffer;
         }
 
@@ -50,7 +49,7 @@ namespace VirtualRtu.Communications.Modbus
             string key = GetProxyMap(header.UnitId, header.TransactionId);
             if (cache.Contains(key))
             {
-                Tuple<ushort, byte> tuple = (Tuple<ushort, byte>)(cache[key]);
+                Tuple<ushort, byte> tuple = (Tuple<ushort, byte>) cache[key];
                 header.TransactionId = tuple.Item1;
                 header.UnitId = tuple.Item2;
                 cache.Remove(key);
@@ -60,10 +59,8 @@ namespace VirtualRtu.Communications.Modbus
                 Buffer.BlockCopy(message, src.Length, buffer, src.Length, message.Length - src.Length);
                 return buffer;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         private string GetProxyMap(byte unitId, ushort proxy)
@@ -73,7 +70,7 @@ namespace VirtualRtu.Communications.Modbus
 
         private CacheItemPolicy GetCachePolicy(double expirySeconds)
         {
-            return new CacheItemPolicy()
+            return new CacheItemPolicy
             {
                 AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(expirySeconds)
             };

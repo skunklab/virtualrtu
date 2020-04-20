@@ -8,13 +8,13 @@ import { IStreamResult, IStreamSubscriber, ISubscription } from "./Stream";
 
 /** @private */
 export class Arg {
-    public static isRequired(val: any, name: string): void {
+    static isRequired(val: any, name: string): void {
         if (val === null || val === undefined) {
             throw new Error(`The '${name}' argument is required.`);
         }
     }
 
-    public static isIn(val: any, values: any, name: string): void {
+    static isIn(val: any, values: any, name: string): void {
         // TypeScript enums have keys for **both** the name and the value of each enum member on the type itself.
         if (!(val in values)) {
             throw new Error(`Unknown ${name} value: ${val}.`);
@@ -57,15 +57,22 @@ export function formatArrayBuffer(data: ArrayBuffer): string {
 // Also in signalr-protocol-msgpack/Utils.ts
 /** @private */
 export function isArrayBuffer(val: any): val is ArrayBuffer {
-    return val && typeof ArrayBuffer !== "undefined" &&
+    return val &&
+        typeof ArrayBuffer !== "undefined" &&
         (val instanceof ArrayBuffer ||
-        // Sometimes we get an ArrayBuffer that doesn't satisfy instanceof
-        (val.constructor && val.constructor.name === "ArrayBuffer"));
+            // Sometimes we get an ArrayBuffer that doesn't satisfy instanceof
+            (val.constructor && val.constructor.name === "ArrayBuffer"));
 }
 
 /** @private */
-export async function sendMessage(logger: ILogger, transportName: string, httpClient: HttpClient, url: string, accessTokenFactory: (() => string | Promise<string>) | undefined, content: string | ArrayBuffer, logMessageContent: boolean): Promise<void> {
-    let headers;
+export async function sendMessage(logger: ILogger,
+    transportName: string,
+    httpClient: HttpClient,
+    url: string,
+    accessTokenFactory: (() => string | Promise<string>) | undefined,
+    content: string | ArrayBuffer,
+    logMessageContent: boolean): Promise<void> {
+    let headers: { Authorization: string };
     if (accessTokenFactory) {
         const token = await accessTokenFactory();
         if (token) {
@@ -75,16 +82,19 @@ export async function sendMessage(logger: ILogger, transportName: string, httpCl
         }
     }
 
-    logger.log(LogLevel.Trace, `(${transportName} transport) sending data. ${getDataDetail(content, logMessageContent)}.`);
+    logger.log(LogLevel.Trace,
+        `(${transportName} transport) sending data. ${getDataDetail(content, logMessageContent)}.`);
 
     const responseType = isArrayBuffer(content) ? "arraybuffer" : "text";
-    const response = await httpClient.post(url, {
-        content,
-        headers,
-        responseType,
-    });
+    const response = await httpClient.post(url,
+        {
+            content,
+            headers,
+            responseType,
+        });
 
-    logger.log(LogLevel.Trace, `(${transportName} transport) request complete. Response status: ${response.statusCode}.`);
+    logger.log(LogLevel.Trace,
+        `(${transportName} transport) request complete. Response status: ${response.statusCode}.`);
 }
 
 /** @private */
@@ -106,20 +116,20 @@ export function createLogger(logger?: ILogger | LogLevel) {
 
 /** @private */
 export class Subject<T> implements IStreamResult<T> {
-    public observers: Array<IStreamSubscriber<T>>;
-    public cancelCallback?: () => Promise<void>;
+    observers: Array<IStreamSubscriber<T>>;
+    cancelCallback?: () => Promise<void>;
 
     constructor() {
         this.observers = [];
     }
 
-    public next(item: T): void {
+    next(item: T): void {
         for (const observer of this.observers) {
             observer.next(item);
         }
     }
 
-    public error(err: any): void {
+    error(err: any): void {
         for (const observer of this.observers) {
             if (observer.error) {
                 observer.error(err);
@@ -127,7 +137,7 @@ export class Subject<T> implements IStreamResult<T> {
         }
     }
 
-    public complete(): void {
+    complete(): void {
         for (const observer of this.observers) {
             if (observer.complete) {
                 observer.complete();
@@ -135,7 +145,7 @@ export class Subject<T> implements IStreamResult<T> {
         }
     }
 
-    public subscribe(observer: IStreamSubscriber<T>): ISubscription<T> {
+    subscribe(observer: IStreamSubscriber<T>): ISubscription<T> {
         this.observers.push(observer);
         return new SubjectSubscription(this, observer);
     }
@@ -151,14 +161,14 @@ export class SubjectSubscription<T> implements ISubscription<T> {
         this.observer = observer;
     }
 
-    public dispose(): void {
-        const index: number = this.subject.observers.indexOf(this.observer);
+    dispose(): void {
+        const index = this.subject.observers.indexOf(this.observer);
         if (index > -1) {
             this.subject.observers.splice(index, 1);
         }
 
         if (this.subject.observers.length === 0 && this.subject.cancelCallback) {
-            this.subject.cancelCallback().catch((_) => { });
+            this.subject.cancelCallback().catch((_) => {});
         }
     }
 }
@@ -171,23 +181,23 @@ export class ConsoleLogger implements ILogger {
         this.minimumLogLevel = minimumLogLevel;
     }
 
-    public log(logLevel: LogLevel, message: string): void {
+    log(logLevel: LogLevel, message: string): void {
         if (logLevel >= this.minimumLogLevel) {
             switch (logLevel) {
-                case LogLevel.Critical:
-                case LogLevel.Error:
-                    console.error(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                case LogLevel.Warning:
-                    console.warn(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                case LogLevel.Information:
-                    console.info(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                default:
-                    // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
-                    console.log(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
+            case LogLevel.Critical:
+            case LogLevel.Error:
+                console.error(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            case LogLevel.Warning:
+                console.warn(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            case LogLevel.Information:
+                console.info(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            default:
+                // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
+                console.log(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
             }
         }
     }

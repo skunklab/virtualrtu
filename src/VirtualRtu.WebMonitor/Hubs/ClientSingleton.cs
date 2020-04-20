@@ -1,14 +1,15 @@
-﻿using Newtonsoft.Json;
-using Piraeus.Clients.Mqtt;
-using SkunkLab.Channels;
-using SkunkLab.Channels.WebSocket;
-using SkunkLab.Protocols.Mqtt;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Piraeus.Clients.Mqtt;
+using SkunkLab.Channels;
+using SkunkLab.Channels.WebSocket;
+using SkunkLab.Protocols.Mqtt;
+using SkunkLab.Security.Tokens;
 using VirtualRtu.Communications.Diagnostics;
 using VirtualRtu.Configuration.Uris;
 
@@ -16,15 +17,16 @@ namespace VirtualRtu.WebMonitor.Hubs
 {
     public class ClientSingleton
     {
-        public static ClientSingleton Create(string hostname, string symmetricKey)
-        {
-            if(instance == null)
-            {
-                instance = new ClientSingleton(hostname, symmetricKey);
-            }
+        private static ClientSingleton instance;
+        private readonly IChannel channel;
+        private readonly PiraeusMqttClient client;
+        private readonly CancellationTokenSource cts;
 
-            return instance;
-        }
+        private readonly string hostname;
+        private readonly string securityToken;
+        private readonly HashSet<string> subscriptions;
+        private readonly string symmetricKey;
+        private readonly string uriString;
 
         protected ClientSingleton(string hostname, string symmetricKey)
         {
@@ -36,25 +38,25 @@ namespace VirtualRtu.WebMonitor.Hubs
             Uri uri = new Uri(uriString);
             cts = new CancellationTokenSource();
             channel = ChannelFactory.Create(uri, securityToken, "mqtt", new WebSocketConfig(), cts.Token);
-            client = new PiraeusMqttClient(new SkunkLab.Protocols.Mqtt.MqttConfig(180), channel);
+            client = new PiraeusMqttClient(new MqttConfig(180), channel);
             string sessionId = Guid.NewGuid().ToString();
             ConnectAckCode code = client.ConnectAsync(sessionId, "JWT", securityToken, 180).GetAwaiter().GetResult();
 
-            if(code != ConnectAckCode.ConnectionAccepted)
+            if (code != ConnectAckCode.ConnectionAccepted)
             {
                 throw new Exception("Invalid MQTT connection code.");
             }
         }
 
-        private string hostname;
-        private string symmetricKey;
-        private PiraeusMqttClient client;
-        private static ClientSingleton instance;
-        private CancellationTokenSource cts;
-        private IChannel channel;
-        private HashSet<string> subscriptions;
-        private string uriString;
-        private string securityToken;
+        public static ClientSingleton Create(string hostname, string symmetricKey)
+        {
+            if (instance == null)
+            {
+                instance = new ClientSingleton(hostname, symmetricKey);
+            }
+
+            return instance;
+        }
 
         public event System.EventHandler<MonitorEventArgs> OnReceive;
 
@@ -63,7 +65,7 @@ namespace VirtualRtu.WebMonitor.Hubs
             string monitorUriString = null;
             string logUriString = null;
 
-            string[] parts = resource.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = resource.Split(new[] {"-"}, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
             {
                 //virtual rtu
@@ -77,10 +79,12 @@ namespace VirtualRtu.WebMonitor.Hubs
                 logUriString = UriGenerator.GetDeviceTelemetryPiSystem(hostname, parts[0], parts[1]);
             }
 
-            DiagnosticsMessage mevent = new DiagnosticsMessage() { Type = monitor ? DiagnosticsEventType.Native : DiagnosticsEventType.None };
-        
+            DiagnosticsMessage mevent = new DiagnosticsMessage
+                {Type = monitor ? DiagnosticsEventType.Native : DiagnosticsEventType.None};
+
             string jsonString = JsonConvert.SerializeObject(mevent);
-            await client.PublishAsync(QualityOfServiceLevelType.AtMostOnce, monitorUriString, "application/json", Encoding.UTF8.GetBytes(jsonString));
+            await client.PublishAsync(QualityOfServiceLevelType.AtMostOnce, monitorUriString, "application/json",
+                Encoding.UTF8.GetBytes(jsonString));
 
             if (monitor)
             {
@@ -104,7 +108,7 @@ namespace VirtualRtu.WebMonitor.Hubs
         {
             string monitorUriString = null;
 
-            string[] parts = resource.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = resource.Split(new[] {"-"}, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
             {
                 //virtual rtu
@@ -116,31 +120,31 @@ namespace VirtualRtu.WebMonitor.Hubs
                 monitorUriString = UriGenerator.GetDeviceDiagnosticsPiSystem(hostname, parts[0], parts[1]);
             }
 
-            DiagnosticsMessage mevent = new DiagnosticsMessage() { Type = monitor ? DiagnosticsEventType.AppInsights : DiagnosticsEventType.None };
+            DiagnosticsMessage mevent = new DiagnosticsMessage
+                {Type = monitor ? DiagnosticsEventType.AppInsights : DiagnosticsEventType.None};
             string jsonString = JsonConvert.SerializeObject(mevent);
-            await client.PublishAsync(QualityOfServiceLevelType.AtMostOnce, monitorUriString, "application/json", Encoding.UTF8.GetBytes(jsonString));
-
-           
+            await client.PublishAsync(QualityOfServiceLevelType.AtMostOnce, monitorUriString, "application/json",
+                Encoding.UTF8.GetBytes(jsonString));
         }
 
         private void ReceiveLog(string resourceUriString, string contentType, byte[] message)
         {
             //signal event
-            
+
             OnReceive?.Invoke(this, new MonitorEventArgs(resourceUriString, contentType, message));
         }
 
         private string GetSecurityToken()
         {
-            List<Claim> claims = new List<Claim>();
-            claims.Add(new Claim($"http://{hostname.ToLowerInvariant()}/role", "diagnostics"));
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim($"http://{hostname.ToLowerInvariant()}/role", "diagnostics")
+            };
             string issuer = $"http://{hostname.ToLowerInvariant()}/";
             string audience = issuer;
 
-            SkunkLab.Security.Tokens.JsonWebToken jwt = new SkunkLab.Security.Tokens.JsonWebToken(symmetricKey, claims, 65000, issuer, audience);
+            JsonWebToken jwt = new JsonWebToken(symmetricKey, claims, 65000, issuer, audience);
             return jwt.ToString();
         }
-
-
     }
 }

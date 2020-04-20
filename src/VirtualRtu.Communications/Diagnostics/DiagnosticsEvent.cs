@@ -1,11 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace VirtualRtu.Communications.Diagnostics
 {
-
     [Serializable]
     [JsonObject]
     public class DiagnosticsEvent
@@ -32,7 +31,9 @@ namespace VirtualRtu.Communications.Diagnostics
             Latency = latency;
             Timestamp = timestamp;
         }
-        public DiagnosticsEvent(string name, byte unitId, ushort transactionId, ushort? proxyTransactionId, double latency, string timestamp)
+
+        public DiagnosticsEvent(string name, byte unitId, ushort transactionId, ushort? proxyTransactionId,
+            double latency, string timestamp)
         {
             Name = name;
             UnitId = unitId;
@@ -43,27 +44,21 @@ namespace VirtualRtu.Communications.Diagnostics
             Timestamp = timestamp;
         }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
 
-        [JsonProperty("unitId")]
-        public byte UnitId { get; set; }
+        [JsonProperty("unitId")] public byte UnitId { get; set; }
 
-        [JsonProperty("transactionId")]
-        public ushort TransactionId { get; set; }
+        [JsonProperty("transactionId")] public ushort TransactionId { get; set; }
 
-        [JsonProperty("proxyTransactionId")]
-        public ushort? ProxyTransactionId { get; set; }
+        [JsonProperty("proxyTransactionId")] public ushort? ProxyTransactionId { get; set; }
 
         [JsonProperty("direction")]
         [JsonConverter(typeof(StringEnumConverter))]
         public DirectionType Direction { get; set; }
 
-        [JsonProperty("latency")]
-        public double Latency { get; set; } = -1.0;
+        [JsonProperty("latency")] public double Latency { get; set; } = -1.0;
 
-        [JsonProperty("timestamp")]
-        public string Timestamp { get; set; }
+        [JsonProperty("timestamp")] public string Timestamp { get; set; }
 
         public IDictionary<string, string> GetEventProperties()
         {
@@ -84,11 +79,8 @@ namespace VirtualRtu.Communications.Diagnostics
                 metrics.Add("Latency", Latency);
                 return metrics;
             }
-            else
-            {
-                return null;
-            }
 
+            return null;
         }
     }
 }

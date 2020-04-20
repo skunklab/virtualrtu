@@ -1,5 +1,5 @@
-﻿using SkunkLab.Storage;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SkunkLab.Storage;
 using VirtualRtu.Configuration.Tables;
 
 namespace VirtualRtu.WebMonitor.Configuration
@@ -10,16 +10,12 @@ namespace VirtualRtu.WebMonitor.Configuration
         {
             var assets = new GraphAssets();
             TableStorage tableStorage = TableStorage.New(connectionString);
-            List<ContainerEntity> gatewayList = tableStorage.ReadAsync<ContainerEntity>(tableName).GetAwaiter().GetResult();
-            foreach (var item in gatewayList)
-            {
-                assets.Add(item.VirtualRtuId, item.DeviceId);
-            }
+            List<ContainerEntity> gatewayList =
+                tableStorage.ReadAsync<ContainerEntity>(tableName).GetAwaiter().GetResult();
+            foreach (var item in gatewayList) assets.Add(item.VirtualRtuId, item.DeviceId);
 
 
             return assets;
-
         }
-
     }
 }

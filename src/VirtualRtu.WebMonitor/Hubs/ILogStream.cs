@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace VirtualRtu.WebMonitor.Hubs
 {
@@ -11,6 +7,5 @@ namespace VirtualRtu.WebMonitor.Hubs
         Task SubscribeAsync(string resource, bool monitor);
 
         Task SubscribeAppInsightsAsync(string resource, bool monitor);
-
     }
 }

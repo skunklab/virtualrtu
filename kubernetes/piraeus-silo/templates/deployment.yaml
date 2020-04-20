@@ -12,6 +12,7 @@ spec:
   selector:
     matchLabels:
       app: {{ template "fullname" . }}
+  serviceName: piraeus-silo
   template:
     metadata:
       labels:

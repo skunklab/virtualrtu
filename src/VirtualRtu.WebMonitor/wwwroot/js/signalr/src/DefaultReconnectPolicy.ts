@@ -14,7 +14,7 @@ export class DefaultReconnectPolicy implements IRetryPolicy {
         this.retryDelays = retryDelays !== undefined ? [...retryDelays, null] : DEFAULT_RETRY_DELAYS_IN_MILLISECONDS;
     }
 
-    public nextRetryDelayInMilliseconds(retryContext: RetryContext): number | null {
+    nextRetryDelayInMilliseconds(retryContext: RetryContext): number | null {
         return this.retryDelays[retryContext.previousRetryCount];
     }
 }

@@ -1,30 +1,32 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob.Protocol;
-using System;
-
-namespace VirtualRtu.Configuration.Uris
+﻿namespace VirtualRtu.Configuration.Uris
 {
     public class UriGenerator
-    {        
-        public static string GetRtuPiSystem(string hostname, string virtualRtuId, string deviceId, byte unitId, bool inbound)
+    {
+        public static string GetRtuPiSystem(string hostname, string virtualRtuId, string deviceId, byte unitId,
+            bool inbound)
         {
             string direction = inbound ? "in" : "out";
-            return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{unitId.ToString()}/{direction}";
+            return
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{unitId.ToString()}/{direction}";
         }
-        
+
         public static string GetDeviceDiagnosticsPiSystem(string hostname, string virtualRtuId, string deviceId)
         {
-            return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/diagnostics";
+            return
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/diagnostics";
         }
 
         public static string GetDeviceTelemetryPiSystem(string hostname, string virtualRtuId, string deviceId)
         {
-            return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/telemetry";
+            return
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/telemetry";
         }
 
         public static string GetDevicePolicyId(string hostname, string virtualRtuId, string deviceId, bool publish)
         {
             string direction = publish ? "in" : "out";
-            return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{direction}/policy";
+            return
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/{direction}/policy";
         }
 
         public static string GetVirtualRtuDiagnosticsPiSystem(string hostname, string virtualRtuId)
@@ -43,11 +45,10 @@ namespace VirtualRtu.Configuration.Uris
             return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{direction}/policy";
         }
 
-       public static string GetDiagnosticsRequestPolicyId(string hostname, string virtualRtuId)
+        public static string GetDiagnosticsRequestPolicyId(string hostname, string virtualRtuId)
         {
             return $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/diagnotics/policy";
         }
-
 
 
         //public static string Get-RtuPiSystem(ContainerEntity entity, byte unitId, bool request)
@@ -102,21 +103,26 @@ namespace VirtualRtu.Configuration.Uris
 
         public static string GetDevicePublishPolicyId(string hostname, string virtualRtuId, string deviceId)
         {
-            return String.Format($"http:/{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/publish");
+            return string.Format(
+                $"http:/{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/publish");
         }
 
         public static string GetDeviceSubscribePolicyId(string hostname, string virtualRtuId, string deviceId)
         {
-            return String.Format($"http:/{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/subscribe");
+            return string.Format(
+                $"http:/{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/subscribe");
         }
+
         public static string GetDevicePublishPiSystem(string hostname, string virtualRtuId, string deviceId)
         {
-            return String.Format($"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/publish");
+            return string.Format(
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/publish");
         }
 
         public static string GetDeviceSubscribePiSystem(string hostname, string virtualRtuId, string deviceId)
         {
-            return String.Format($"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/subscribe");
+            return string.Format(
+                $"http://{hostname.ToLowerInvariant()}/{virtualRtuId.ToLowerInvariant()}/{deviceId.ToLowerInvariant()}/subscribe");
         }
     }
 }

@@ -6,23 +6,24 @@ namespace VirtualRtu.Configuration.Deployment
 {
     internal class RestRequest : RestRequestBase
     {
+        private readonly RestRequestBuilder requestBuilder;
+
         public RestRequest(RestRequestBuilder builder)
         {
-            this.requestBuilder = builder;
+            requestBuilder = builder;
         }
-
-        private RestRequestBuilder requestBuilder;
 
         public override T Get<T>()
         {
             byte[] buffer = null;
             string contentType = requestBuilder.ContentType.ToLowerInvariant();
             HttpWebRequest request = requestBuilder.BuildRequest();
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST GET operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST GET operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
 
             using (Stream stream = response.GetResponseStream())
@@ -38,11 +39,12 @@ namespace VirtualRtu.Configuration.Deployment
         {
             HttpWebRequest request = requestBuilder.BuildRequest();
             request.ContentLength = 0;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST POST operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST POST operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
         }
 
@@ -53,11 +55,12 @@ namespace VirtualRtu.Configuration.Deployment
 
             HttpWebRequest request = requestBuilder.BuildRequest();
             request.ContentLength = 0;
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST POST operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST POST operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
 
             using (Stream responseStream = response.GetResponseStream())
@@ -68,11 +71,12 @@ namespace VirtualRtu.Configuration.Deployment
 
             return Serializer.Deserialize<T>(contentType, buffer);
         }
+
         public override U Post<T, U>(T body)
         {
             byte[] buffer = null;
             string contentType = requestBuilder.ContentType.ToLowerInvariant();
-            byte[] payload = Serializer.Serialize<T>(contentType, body);
+            byte[] payload = Serializer.Serialize(contentType, body);
 
             HttpWebRequest request = requestBuilder.BuildRequest();
             request.ContentLength = payload.Length;
@@ -80,11 +84,12 @@ namespace VirtualRtu.Configuration.Deployment
             Stream stream = request.GetRequestStream();
             stream.Write(payload, 0, payload.Length);
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST POST operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST POST operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
 
             using (Stream responseStream = response.GetResponseStream())
@@ -99,39 +104,39 @@ namespace VirtualRtu.Configuration.Deployment
         public override void Post<T>(T body)
         {
             string contentType = requestBuilder.ContentType.ToLowerInvariant();
-            byte[] payload = Serializer.Serialize<T>(contentType, body);
+            byte[] payload = Serializer.Serialize(contentType, body);
             HttpWebRequest request = requestBuilder.BuildRequest();
             request.ContentLength = payload.Length;
 
             Stream stream = request.GetRequestStream();
             stream.Write(payload, 0, payload.Length);
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST POST operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST POST operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
-
         }
 
         public override void Delete()
         {
             HttpWebRequest request = requestBuilder.BuildRequest();
 
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                throw new WebException(String.Format("REST POST operation return status code {0}", response.StatusCode.ToString()));
+                throw new WebException(string.Format("REST POST operation return status code {0}",
+                    response.StatusCode.ToString()));
             }
         }
 
         public override void Put<T>(T body)
         {
-
             string contentType = requestBuilder.ContentType.ToLowerInvariant();
-            byte[] payload = Serializer.Serialize<T>(contentType, body);
+            byte[] payload = Serializer.Serialize(contentType, body);
             HttpWebRequest request = requestBuilder.BuildRequest();
             request.ContentLength = payload.Length;
 
@@ -140,11 +145,12 @@ namespace VirtualRtu.Configuration.Deployment
 
             try
             {
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
 
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
-                    throw new WebException(String.Format("REST PUT operation return status code {0}", response.StatusCode.ToString()));
+                    throw new WebException(string.Format("REST PUT operation return status code {0}",
+                        response.StatusCode.ToString()));
                 }
             }
             catch (WebException we)

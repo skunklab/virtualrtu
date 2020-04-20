@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
+using VirtualRtu.Communications.Logging;
 using VirtualRtu.WebMonitor.Configuration;
 using VirtualRtu.WebMonitor.Hubs;
 
@@ -19,8 +20,8 @@ namespace VirtualRtu.WebMonitor
 {
     public class Startup
     {
-
         private MonitorConfig config;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,14 +29,13 @@ namespace VirtualRtu.WebMonitor
 
         public IConfiguration Configuration { get; }
 
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddConfiguration(out config);
             services.AddSingleton<ILogStream, LogStream>();
-
-            // using Microsoft.AspNetCore.HttpOverrides;
+            services.AddSingleton<ILog, Logger>();
 
             if (string.Equals(
                 Environment.GetEnvironmentVariable("ASPNETCORE_FORWARDEDHEADERS_ENABLED"),
@@ -44,9 +44,9 @@ namespace VirtualRtu.WebMonitor
                 services.Configure<ForwardedHeadersOptions>(options =>
                 {
                     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-                        ForwardedHeaders.XForwardedProto;
+                                               ForwardedHeaders.XForwardedProto;
                     // Only loopback proxies are allowed by default.
-                    // Clear that restriction because forwarders are enabled by explicit 
+                    // Clear that restriction because forwarders are enabled by explicit
                     // configuration.
                     options.KnownNetworks.Clear();
                     options.KnownProxies.Clear();
@@ -76,7 +76,7 @@ namespace VirtualRtu.WebMonitor
                     {
                         options.CallbackPath = "/signin-oidc";
                         options.ClientId = config.ClientId;
-                        options.Domain = $"{config.Domain}.onmicrosoft.com";                    
+                        options.Domain = $"{config.Domain}.onmicrosoft.com";
                         options.TenantId = config.TenantId;
                         options.SignedOutCallbackPath = "/signout-oidc";
                         options.Instance = "https://login.microsoftonline.com/";
@@ -84,7 +84,7 @@ namespace VirtualRtu.WebMonitor
 
                 services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
                 {
-                    options.Authority = options.Authority + "/v2.0/";
+                    options.Authority += "/v2.0/";
                     options.TokenValidationParameters.ValidateIssuer = true;
                     options.TokenValidationParameters.ValidateAudience = true;
                     options.TokenValidationParameters.ValidateIssuerSigningKey = true;
@@ -94,22 +94,22 @@ namespace VirtualRtu.WebMonitor
                 });
                 //----------------------------------------------------------------
             }
-           
+
             services.AddSignalR();
 
             services.AddMvc(options =>
-            {
-                options.EnableEndpointRouting = false;
-
-                if (!string.IsNullOrEmpty(config.TenantId))
                 {
-                    var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-                }                    
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                    options.EnableEndpointRouting = false;
+
+                    if (!string.IsNullOrEmpty(config.TenantId))
+                    {
+                        var policy = new AuthorizationPolicyBuilder()
+                            .RequireAuthenticatedUser()
+                            .Build();
+                        options.Filters.Add(new AuthorizeFilter(policy));
+                    }
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             Console.WriteLine("Application configured");
         }
@@ -128,24 +128,7 @@ namespace VirtualRtu.WebMonitor
                 app.UseHsts();
             }
 
-            //app.UseForwardedHeaders(new ForwardedHeadersOptions
-            //{
-            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            //});
 
-            //app.UseHttpsRedirection();
-            //app.UseStaticFiles();
-
-            //app.UseRouting();
-
-            //app.UseAuthorization();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapRazorPages();
-            //});
-
-            //
             app.UseExceptionHandler("/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
@@ -160,12 +143,13 @@ namespace VirtualRtu.WebMonitor
                 app.UseCookiePolicy();
                 app.UseAuthentication();
             }
+
             //app.UseMvc();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
             });
 
             Console.WriteLine("Web configuration complete");

@@ -1,6 +1,7 @@
 import { IConnection } from "./IConnection";
 import { IHttpConnectionOptions } from "./IHttpConnectionOptions";
 import { HttpTransportType, ITransport, TransferFormat } from "./ITransport";
+
 /** @private */
 export interface INegotiateResponse {
     connectionId?: string;
@@ -11,11 +12,13 @@ export interface INegotiateResponse {
     accessToken?: string;
     error?: string;
 }
+
 /** @private */
 export interface IAvailableTransport {
     transport: keyof typeof HttpTransportType;
     transferFormats: Array<keyof typeof TransferFormat>;
 }
+
 /** @private */
 export declare class HttpConnection implements IConnection {
     private connectionState;
@@ -23,24 +26,30 @@ export declare class HttpConnection implements IConnection {
     private readonly httpClient;
     private readonly logger;
     private readonly options;
-    private transport?;
-    private startInternalPromise?;
-    private stopPromise?;
+    private transport: undefined?;
+    private startInternalPromise: undefined?;
+    private stopPromise: undefined?;
     private stopPromiseResolver;
-    private stopError?;
-    private accessTokenFactory?;
-    private sendQueue?;
+    private stopError: undefined?;
+    private accessTokenFactory: undefined?;
+    private sendQueue: undefined?;
     readonly features: any;
     baseUrl: string;
     connectionId?: string;
     onreceive: ((data: string | ArrayBuffer) => void) | null;
     onclose: ((e?: Error) => void) | null;
     private readonly negotiateVersion;
+
     constructor(url: string, options?: IHttpConnectionOptions);
+
     start(): Promise<void>;
+
     start(transferFormat: TransferFormat): Promise<void>;
+
     send(data: string | ArrayBuffer): Promise<void>;
+
     stop(error?: Error): Promise<void>;
+
     private stopInternal;
     private startInternal;
     private getNegotiationResponse;
@@ -54,17 +63,22 @@ export declare class HttpConnection implements IConnection {
     private resolveUrl;
     private resolveNegotiateUrl;
 }
+
 /** @private */
 export declare class TransportSendQueue {
     private readonly transport;
     private buffer;
     private sendBufferedData;
     private executing;
-    private transportResult?;
+    private transportResult: undefined?;
     private sendLoopPromise;
+
     constructor(transport: ITransport);
+
     send(data: string | ArrayBuffer): Promise<void>;
+
     stop(): Promise<void>;
+
     private bufferData;
     private sendLoop;
     private static concatBuffers;

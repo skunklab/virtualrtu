@@ -5,21 +5,22 @@ namespace VirtualRtu.Communications.Caching
 {
     public class LocalCache
     {
+        private readonly MemoryCache cache;
+        private readonly string name;
+
         public LocalCache(string name)
         {
             this.name = name;
-            cache = MemoryCache.Default;            
+            cache = MemoryCache.Default;
         }
-
-        public event System.EventHandler<CacheItemExpiredEventArgs> OnExpired;
-        private string name;
-        private MemoryCache cache;
 
         public object this[string key]
         {
-            get { return cache[CreateNamedKey(key)]; }
-            set { cache[CreateNamedKey(key)] = value; }
+            get => cache[CreateNamedKey(key)];
+            set => cache[CreateNamedKey(key)] = value;
         }
+
+        public event EventHandler<CacheItemExpiredEventArgs> OnExpired;
 
         public bool Contains(string key)
         {
@@ -43,13 +44,13 @@ namespace VirtualRtu.Communications.Caching
 
         public T Get<T>(string key)
         {
-            return (T)cache.Get(CreateNamedKey(key));
+            return (T) cache.Get(CreateNamedKey(key));
         }
 
 
         private CacheItemPolicy GetCachePolicy(double expirySeconds)
         {
-            return new CacheItemPolicy()
+            return new CacheItemPolicy
             {
                 AbsoluteExpiration = DateTimeOffset.Now.AddSeconds(expirySeconds),
                 RemovedCallback = OnRemovedFromCache
@@ -70,6 +71,5 @@ namespace VirtualRtu.Communications.Caching
                 OnExpired?.Invoke(this, new CacheItemExpiredEventArgs(name, key, args.CacheItem.Value));
             }
         }
-
     }
 }

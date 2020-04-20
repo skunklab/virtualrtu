@@ -1,36 +1,31 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-
-using Microsoft.IdentityModel.Tokens;
-using System;
-
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
+using System.Threading;
+using Microsoft.IdentityModel.Tokens;
 
 namespace VirtualRtu.Configuration.Function
 {
-    public class JsonWebToken : Microsoft.IdentityModel.Tokens.SecurityToken
+    public class JsonWebToken : SecurityToken
     {
-        private string issuer;
-        private DateTime created;
-        private DateTime expires;
-        private string tokenString;
-        private string id;
+        private readonly DateTime created;
+        private readonly DateTime expires;
+        private readonly string tokenString;
 
-        public JsonWebToken(string securityKey, IEnumerable<Claim> claims, double? lifetimeMinutes, string issuer = null, string audience = null)
+        public JsonWebToken(string securityKey, IEnumerable<Claim> claims, double? lifetimeMinutes,
+            string issuer = null, string audience = null)
         {
-
-            this.issuer = issuer;
-            id = Guid.NewGuid().ToString();
+            Issuer = issuer;
+            Id = Guid.NewGuid().ToString();
             created = DateTime.UtcNow;
             expires = created.AddMinutes(lifetimeMinutes.HasValue ? lifetimeMinutes.Value : 20);
-            SigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(securityKey));
+            SigningKey = new SymmetricSecurityKey(Convert.FromBase64String(securityKey));
 
             JwtSecurityTokenHandler jwt = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor msstd = new Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor()
+            SecurityTokenDescriptor msstd = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
                 Subject = new ClaimsIdentity(claims),
@@ -38,7 +33,7 @@ namespace VirtualRtu.Configuration.Function
                 IssuedAt = created,
                 NotBefore = created,
                 Audience = audience,
-                SigningCredentials = new Microsoft.IdentityModel.Tokens.SigningCredentials(SigningKey, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(SigningKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
             try
@@ -54,14 +49,14 @@ namespace VirtualRtu.Configuration.Function
 
         public JsonWebToken(Uri address, string securityKey, string issuer, IEnumerable<Claim> claims)
         {
-            this.issuer = issuer;
-            id = Guid.NewGuid().ToString();
+            Issuer = issuer;
+            Id = Guid.NewGuid().ToString();
             created = DateTime.UtcNow;
             expires = created.AddMinutes(20);
-            SigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(securityKey));
+            SigningKey = new SymmetricSecurityKey(Convert.FromBase64String(securityKey));
 
             JwtSecurityTokenHandler jwt = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor msstd = new Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor()
+            SecurityTokenDescriptor msstd = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
                 Subject = new ClaimsIdentity(claims),
@@ -69,23 +64,24 @@ namespace VirtualRtu.Configuration.Function
                 IssuedAt = created,
                 NotBefore = created,
                 Audience = address.ToString(),
-                SigningCredentials = new Microsoft.IdentityModel.Tokens.SigningCredentials(SigningKey, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(SigningKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
             JwtSecurityToken jwtToken = jwt.CreateJwtSecurityToken(msstd);
             tokenString = jwt.WriteToken(jwtToken);
         }
 
-        public JsonWebToken(Uri audience, string securityKey, string issuer, IEnumerable<Claim> claims, double lifetimeMinutes)
+        public JsonWebToken(Uri audience, string securityKey, string issuer, IEnumerable<Claim> claims,
+            double lifetimeMinutes)
         {
-            this.issuer = issuer;
-            id = Guid.NewGuid().ToString();
+            Issuer = issuer;
+            Id = Guid.NewGuid().ToString();
             created = DateTime.UtcNow;
             expires = created.AddMinutes(lifetimeMinutes);
-            SigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(securityKey));
+            SigningKey = new SymmetricSecurityKey(Convert.FromBase64String(securityKey));
 
             JwtSecurityTokenHandler jwt = new JwtSecurityTokenHandler();
-            Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor msstd = new Microsoft.IdentityModel.Tokens.SecurityTokenDescriptor()
+            SecurityTokenDescriptor msstd = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
                 Subject = new ClaimsIdentity(claims),
@@ -93,7 +89,7 @@ namespace VirtualRtu.Configuration.Function
                 IssuedAt = created,
                 NotBefore = created,
                 Audience = audience.ToString(),
-                SigningCredentials = new Microsoft.IdentityModel.Tokens.SigningCredentials(SigningKey, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(SigningKey, SecurityAlgorithms.HmacSha256Signature)
             };
 
 
@@ -101,33 +97,17 @@ namespace VirtualRtu.Configuration.Function
             tokenString = jwt.WriteToken(jwtToken);
         }
 
-        public override string Id
-        {
-            get { return this.id; }
-        }
+        public override string Id { get; }
 
 
+        public override DateTime ValidFrom => created;
 
-        public override DateTime ValidFrom
-        {
-            get { return created; }
-        }
+        public override DateTime ValidTo => expires;
 
-        public override DateTime ValidTo
-        {
-            get { return expires; }
-        }
-
-        public override string Issuer
-        {
-            get { return this.issuer; }
-        }
+        public override string Issuer { get; }
 
 
-        public override SecurityKey SecurityKey
-        {
-            get { return null; }
-        }
+        public override SecurityKey SecurityKey => null;
 
         public override SecurityKey SigningKey { get; set; }
 
@@ -139,7 +119,7 @@ namespace VirtualRtu.Configuration.Function
 
         public void SetSecurityToken(HttpWebRequest request)
         {
-            request.Headers.Add("Authorization", String.Format("Bearer {0}", tokenString));
+            request.Headers.Add("Authorization", string.Format("Bearer {0}", tokenString));
         }
 
         public static void Authenticate(string token, string issuer, string audience, string signingKey)
@@ -148,9 +128,9 @@ namespace VirtualRtu.Configuration.Function
             {
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-                TokenValidationParameters validationParameters = new TokenValidationParameters()
+                TokenValidationParameters validationParameters = new TokenValidationParameters
                 {
-                    IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Convert.FromBase64String(signingKey)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(signingKey)),
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     ValidateAudience = true,
@@ -158,12 +138,11 @@ namespace VirtualRtu.Configuration.Function
                     ValidateIssuerSigningKey = true
                 };
 
-                Microsoft.IdentityModel.Tokens.SecurityToken stoken = null;
+                SecurityToken stoken = null;
 
-                System.Threading.Thread.CurrentPrincipal = tokenHandler.ValidateToken(token, validationParameters, out stoken);
-
+                Thread.CurrentPrincipal = tokenHandler.ValidateToken(token, validationParameters, out stoken);
             }
-            catch (Microsoft.IdentityModel.Tokens.SecurityTokenValidationException e)
+            catch (SecurityTokenValidationException e)
             {
                 Trace.TraceWarning("JWT validation has security token exception.");
                 Trace.TraceError(e.Message);
@@ -174,6 +153,5 @@ namespace VirtualRtu.Configuration.Function
                 Trace.TraceError(ex.Message);
             }
         }
-
     }
 }

@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.WebMonitor.Configuration
 {
@@ -15,16 +15,11 @@ namespace VirtualRtu.WebMonitor.Configuration
 
         public int this[string deviceId]
         {
-            get
-            {
-                return Devices.FindIndex((item) => item.Id == deviceId.ToLowerInvariant());
-            }
+            get { return Devices.FindIndex(item => item.Id == deviceId.ToLowerInvariant()); }
         }
 
-        [JsonProperty("id")]
-        public string Id { get; set; }
+        [JsonProperty("id")] public string Id { get; set; }
 
-        [JsonProperty("modules")]
-        public List<DeviceAsset> Devices { get; set; }
+        [JsonProperty("modules")] public List<DeviceAsset> Devices { get; set; }
     }
 }

@@ -1,14 +1,10 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
-using SkunkLab.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SkunkLab.Storage;
 
 namespace VirtualRtu.Configuration.Vrtu
 {
@@ -20,6 +16,11 @@ namespace VirtualRtu.Configuration.Vrtu
         {
             Map = new Dictionary<byte, RtuPiSystem>();
         }
+
+        //Name of the Virtual RTU
+        [JsonProperty("name")] public string Name { get; set; }
+
+        [JsonProperty("map")] public Dictionary<byte, RtuPiSystem> Map { get; set; }
 
         public static async Task<RtuMap> LoadAsync(string uriString)
         {
@@ -38,17 +39,12 @@ namespace VirtualRtu.Configuration.Vrtu
                 string jsonString = Encoding.UTF8.GetString(blobBytes);
                 return JsonConvert.DeserializeObject<RtuMap>(jsonString);
             }
-            catch { }
+            catch
+            {
+            }
 
             return null;
         }
-
-        //Name of the Virtual RTU
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("map")]
-        public Dictionary<byte, RtuPiSystem> Map { get; set; }
 
         public void Add(byte unitId, string rtuInputEvent, string rtuOutputEvent, List<Constraint> contraints = null)
         {
@@ -70,10 +66,8 @@ namespace VirtualRtu.Configuration.Vrtu
                 Map.Remove(unitId);
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public RtuPiSystem GetItem(byte unitId)
@@ -82,10 +76,8 @@ namespace VirtualRtu.Configuration.Vrtu
             {
                 return Map[unitId];
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public bool HasItem(byte unitId)
@@ -97,8 +89,8 @@ namespace VirtualRtu.Configuration.Vrtu
         {
             BlobStorage storage = BlobStorage.CreateSingleton(connectionString);
             string jsonString = JsonConvert.SerializeObject(this);
-            await storage.WriteBlockBlobAsync(container, filename, Encoding.UTF8.GetBytes(jsonString), "application/json");
+            await storage.WriteBlockBlobAsync(container, filename, Encoding.UTF8.GetBytes(jsonString),
+                "application/json");
         }
-
     }
 }

@@ -1,10 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
-using VirtualRtu.Communications.Modbus;
-using VirtualRtu.Communications.Tcp;
-
-namespace VirtualRtu.Communications.Rest
+﻿namespace VirtualRtu.Communications.Rest
 {
     public class RestManager
     {
@@ -48,6 +42,5 @@ namespace VirtualRtu.Communications.Rest
         //        logger?.LogDebug("Message received by rest manager and mismatched.");
         //    }
         //}
-
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace VirtualRtu.Configuration.Deployment
 {
     public class LussGenerator
     {
-        private static string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrtstuvwxyz0123456789";
+        private static readonly string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcefghijklmnopqrtstuvwxyz0123456789";
+
         public static string Create()
         {
             int len = alphabet.Length - 1;
@@ -21,8 +21,5 @@ namespace VirtualRtu.Configuration.Deployment
 
             return builder.ToString();
         }
-
-
-
     }
 }

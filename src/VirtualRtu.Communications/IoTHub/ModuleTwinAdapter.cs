@@ -1,36 +1,39 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.Devices.Shared;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Client;
+using Microsoft.Azure.Devices.Shared;
+using Microsoft.Extensions.Logging;
 
 namespace VirtualRtu.Communications.IoTHub
 {
     public class ModuleTwinAdapter
     {
+        private ModuleClient client;
+        private string jsonString;
+        private readonly ILogger logger;
+        private string luss;
+
         public ModuleTwinAdapter(ILogger logger = null)
         {
             this.logger = logger;
         }
 
         public event EventHandler<ModuleTwinEventArgs> OnConfigurationReceived;
-        private ModuleClient client;
-        private ILogger logger;
-        private string jsonString;
-        private string luss;
 
         public async Task StartAsync()
         {
-            if(client != null)
+            if (client != null)
             {
                 await client.CloseAsync();
             }
-           
+
 #if DEBUG
-                client = ModuleClient.CreateFromConnectionString(System.Environment.GetEnvironmentVariable("MODULE_CONNECTIONSTRING"));
+                client =
+ ModuleClient.CreateFromConnectionString(System.Environment.GetEnvironmentVariable("MODULE_CONNECTIONSTRING"));
 #else
-                client = await ModuleClient.CreateFromEnvironmentAsync();    
+            client = await ModuleClient.CreateFromEnvironmentAsync();
 #endif
             await client.OpenAsync();
             var moduleTwin = await client.GetTwinAsync();
@@ -40,7 +43,7 @@ namespace VirtualRtu.Communications.IoTHub
 
         public async Task UpdateReportedProperties(string luss)
         {
-            TwinCollection collection = new TwinCollection();            
+            TwinCollection collection = new TwinCollection();
             collection["luss"] = luss;
             collection["timestamp"] = DateTime.UtcNow.ToString();
             await client.UpdateReportedPropertiesAsync(collection);
@@ -49,21 +52,21 @@ namespace VirtualRtu.Communications.IoTHub
 
         private async Task OnDesiredPropertiesUpdate(TwinCollection desiredProperties, object userContext)
         {
-            if(desiredProperties == null)
+            if (desiredProperties == null)
             {
                 await Task.CompletedTask;
             }
 
             jsonString = null;
             luss = desiredProperties["luss"];
-            string serviceUrl = desiredProperties["serviceUrl"];            
+            string serviceUrl = desiredProperties["serviceUrl"];
 
             if (!string.IsNullOrEmpty(luss) && !string.IsNullOrEmpty(serviceUrl))
             {
                 jsonString = await GetFunctionResultAsync(luss, serviceUrl);
                 if (jsonString == null)
                 {
-                    logger?.LogWarning($"Azure configuration function returned null.");
+                    logger?.LogWarning("Azure configuration function returned null.");
                 }
                 else
                 {
@@ -71,7 +74,7 @@ namespace VirtualRtu.Communications.IoTHub
                 }
             }
             else
-            {                
+            {
                 logger?.LogInformation($"Desired properities are incomplete LUSS = {luss} - ServiceUrl = {serviceUrl}");
             }
         }
@@ -96,16 +99,16 @@ namespace VirtualRtu.Communications.IoTHub
 
                 HttpClient httpClient = new HttpClient();
                 HttpResponseMessage message = await httpClient.GetAsync(requestUrl);
-                if (message.StatusCode != System.Net.HttpStatusCode.OK)
+                if (message.StatusCode != HttpStatusCode.OK)
                 {
                     logger?.LogWarning($"Azure configuration function returned status code {message.StatusCode}");
                     return null;
                 }
 
-                logger?.LogInformation($"Acquired new configuration from Azure configuration function.");
+                logger?.LogInformation("Acquired new configuration from Azure configuration function.");
                 return await message.Content.ReadAsStringAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(new EventId(9001, "Azure Function"), ex, "Fault calling configuration service.");
                 return null;

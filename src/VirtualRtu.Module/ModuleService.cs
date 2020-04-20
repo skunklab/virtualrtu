@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SkunkLab.Channels;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SkunkLab.Channels;
 using VirtualRtu.Communications.Channels;
 using VirtualRtu.Communications.IoTHub;
 using VirtualRtu.Communications.Logging;
@@ -17,23 +17,24 @@ namespace VirtualRtu.Module
 {
     public class ModuleService : IHostedService
     {
+        private readonly ModuleTwinAdapter adapter;
+        private readonly ModuleConfig config;
+        private IChannel input;
+
+        private readonly ILogger logger;
+        private readonly MbapMapper mapper;
+        private IChannel output;
+        private Pipeline pipeline;
+
         public ModuleService(ModuleConfig config, ModuleTcpChannel channel, Logger logger = null)
         {
             this.config = config;
-            this.output = channel;
+            output = channel;
             this.logger = logger;
-            mapper = new MbapMapper(Guid.NewGuid().ToString());            
+            mapper = new MbapMapper(Guid.NewGuid().ToString());
             adapter = new ModuleTwinAdapter();
             adapter.OnConfigurationReceived += Adapter_OnConfigurationReceived;
-        }        
-
-        private ILogger logger;
-        private ModuleConfig config;
-        private ModuleTwinAdapter adapter;
-        private IChannel input;
-        private IChannel output;
-        private MbapMapper mapper;
-        private Pipeline pipeline;
+        }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -41,14 +42,14 @@ namespace VirtualRtu.Module
             await Task.Delay(5000);
 #endif
             await adapter.StartAsync();
-            
+
             //wait for 5 minutes to get the configuration; otherwise fault
             int attempts = 0;
-            while(!File.Exists("./data/config.json"))
+            while (!File.Exists("./data/config.json"))
             {
                 attempts++;
                 await Task.Delay(30000); //wait 30 seconds for new configuration
-                if(attempts >= 10)
+                if (attempts >= 10)
                 {
                     break;
                 }
@@ -62,6 +63,13 @@ namespace VirtualRtu.Module
             {
                 throw new Exception("No configuration available.");
             }
+        }
+
+        public async Task StopAsync(CancellationToken cancellationToken)
+        {
+            logger?.LogInformation("Module service stopping.");
+            DisposePipeline();
+            await Task.CompletedTask;
         }
 
         private void BuildPipeline()
@@ -95,7 +103,7 @@ namespace VirtualRtu.Module
                 pipeline.Execute();
                 logger?.LogInformation("Module pipeline running.");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, "Fault building module pipeline.");
                 throw ex;
@@ -105,30 +113,27 @@ namespace VirtualRtu.Module
         private void DisposePipeline()
         {
             if (pipeline == null)
+            {
                 return;
+            }
 
             try
             {
                 pipeline.Dispose();
             }
-            catch { }
+            catch
+            {
+            }
 
             pipeline = null;
 
             logger?.LogInformation("Module pipeline disposed.");
-        }        
-        
+        }
+
         private void Pipeline_OnPipelineError(object sender, PipelineErrorEventArgs e)
         {
             logger?.LogError(e.Error, "Fault in module pipeline.");
             BuildPipeline();
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            logger?.LogInformation("Module service stopping.");
-            DisposePipeline();
-            await Task.CompletedTask;
         }
 
         private void Adapter_OnConfigurationReceived(object sender, ModuleTwinEventArgs e)
@@ -152,7 +157,6 @@ namespace VirtualRtu.Module
                     logger?.LogError(ex, "Fault writing new module config.");
                 }
             }
-
         }
     }
 }

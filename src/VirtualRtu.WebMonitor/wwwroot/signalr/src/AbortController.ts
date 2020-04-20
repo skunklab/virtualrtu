@@ -9,9 +9,9 @@
 /** @private */
 export class AbortController implements AbortSignal {
     private isAborted: boolean = false;
-    public onabort: (() => void) | null = null;
+    onabort: (() => void) | null = null;
 
-    public abort() {
+    abort() {
         if (!this.isAborted) {
             this.isAborted = true;
             if (this.onabort) {

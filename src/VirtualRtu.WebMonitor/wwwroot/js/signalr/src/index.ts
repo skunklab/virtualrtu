@@ -13,7 +13,8 @@ export { DefaultHttpClient } from "./DefaultHttpClient";
 export { IHttpConnectionOptions } from "./IHttpConnectionOptions";
 export { HubConnection, HubConnectionState } from "./HubConnection";
 export { HubConnectionBuilder } from "./HubConnectionBuilder";
-export { MessageType, MessageHeaders, HubMessage, HubMessageBase, HubInvocationMessage, InvocationMessage, StreamInvocationMessage, StreamItemMessage, CompletionMessage,
+export { MessageType, MessageHeaders, HubMessage, HubMessageBase, HubInvocationMessage, InvocationMessage,
+    StreamInvocationMessage, StreamItemMessage, CompletionMessage,
     PingMessage, CloseMessage, CancelInvocationMessage, IHubProtocol } from "./IHubProtocol";
 export { ILogger, LogLevel } from "./ILogger";
 export { HttpTransportType, TransferFormat, ITransport } from "./ITransport";

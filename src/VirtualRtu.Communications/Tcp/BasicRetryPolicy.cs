@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace VirtualRtu.Communications.Tcp
+﻿namespace VirtualRtu.Communications.Tcp
 {
     public class BasicRetryPolicy
     {
+        private readonly ExponentialDelayPolicy delayPolicy;
+
+        private readonly int max;
+
         public BasicRetryPolicy(ExponentialDelayPolicy delayPolicy, int maxRetries)
         {
             this.delayPolicy = delayPolicy;
             max = maxRetries;
-
         }
-
-        private int max;
-        private ExponentialDelayPolicy delayPolicy;
 
         public bool ShouldRetry(int retryCount)
         {
@@ -25,7 +21,5 @@ namespace VirtualRtu.Communications.Tcp
         {
             delayPolicy.Delay();
         }
-
-
     }
 }

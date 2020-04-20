@@ -1,13 +1,13 @@
-﻿using Microsoft.Azure.Devices.Client;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.Devices.Client;
 using Microsoft.Extensions.Logging;
 using Piraeus.Clients.Mqtt;
 using SkunkLab.Channels;
 using SkunkLab.Channels.WebSocket;
 using SkunkLab.Protocols.Mqtt;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using VirtualRtu.Communications.Diagnostics;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Configuration;
@@ -16,7 +16,7 @@ using VirtualRtu.Configuration.Uris;
 namespace VirtualRtu.Communications.Channels
 {
     /// <summary>
-    /// Channel used by an edge device to connect to the cloud.
+    ///     Channel used by an edge device to connect to the cloud.
     /// </summary>
     public class ModuleChannel : IChannel
     {
@@ -33,15 +33,53 @@ namespace VirtualRtu.Communications.Channels
             endpointUrl = new Uri($"wss://{config.Hostname}/ws/api/connect");
         }
 
+        private void ModuleReceived(string resource, string contentType, byte[] message)
+        {
+            //received a message from subscription
+            try
+            {
+                MbapHeader header = MbapHeader.Decode(message);
+                diag?.PublishInput(header).GetAwaiter();
+                logger?.LogDebug("Diagnostics sent input.");
+                OnReceive?.Invoke(this, new ChannelReceivedEventArgs(channel.Id, message));
+            }
+            catch (Exception ex)
+            {
+                logger?.LogError(ex, "Unable to decode MBAP header module channel input.");
+            }
+        }
+
+        #region Private methods
+
+        private async Task ExecuteRetryPolicy()
+        {
+            if (retryPolicy == null || !retryPolicy.ShouldRetry(retryCount, null, out TimeSpan interval))
+            {
+                retryCount = 0;
+                retryPolicy = new ExponentialBackoff(5, TimeSpan.FromSeconds(5.0), TimeSpan.FromSeconds(30.0),
+                    TimeSpan.FromSeconds(10.0));
+            }
+            else
+            {
+                retryCount++;
+                await Task.Delay(interval);
+            }
+        }
+
+        #endregion
+
         #region Public Events
+
         public event System.EventHandler<ChannelReceivedEventArgs> OnReceive;
         public event System.EventHandler<ChannelCloseEventArgs> OnClose;
         public event System.EventHandler<ChannelOpenEventArgs> OnOpen;
         public event System.EventHandler<ChannelErrorEventArgs> OnError;
         public event System.EventHandler<ChannelStateEventArgs> OnStateChange;
+
         #endregion
 
         #region IChannel Properties
+
         public bool RequireBlocking { get; set; }
         public bool IsConnected { get; set; }
         public string Id { get; set; }
@@ -50,27 +88,31 @@ namespace VirtualRtu.Communications.Channels
         public ChannelState State { get; set; }
         public bool IsEncrypted { get; set; }
         public bool IsAuthenticated { get; set; }
+
         #endregion
 
         #region Private Fields
+
         //private string inputPiSystem;
         private int retryCount;
         private bool disposed;
         private PiraeusMqttClient client;
-        private string virtualRtuId;
-        private string deviceId;
-        private string hostname;
+        private readonly string virtualRtuId;
+        private readonly string deviceId;
+        private readonly string hostname;
         private IChannel channel;
-        private string securityToken;
-        private Uri endpointUrl;
-        private HashSet<byte> subscriptions;
-        private ILogger logger;
+        private readonly string securityToken;
+        private readonly Uri endpointUrl;
+        private readonly HashSet<byte> subscriptions;
+        private readonly ILogger logger;
         private ExponentialBackoff retryPolicy;
         private DiagnosticsChannel diag;
-        private ModuleConfig config;
+        private readonly ModuleConfig config;
+
         #endregion
 
         #region Public interface Methods
+
         public async Task OpenAsync()
         {
             await ExecuteRetryPolicy();
@@ -93,8 +135,9 @@ namespace VirtualRtu.Communications.Channels
 
             try
             {
-                channel = new WebSocketClientChannel(endpointUrl, securityToken, "mqtt", new WebSocketConfig(), CancellationToken.None);
-                client = new PiraeusMqttClient(new MqttConfig(180), channel);                
+                channel = new WebSocketClientChannel(endpointUrl, securityToken, "mqtt", new WebSocketConfig(),
+                    CancellationToken.None);
+                client = new PiraeusMqttClient(new MqttConfig(180), channel);
                 client.OnChannelError += Client_OnChannelError;
                 client.OnChannelStateChange += Client_OnChannelStateChange;
 
@@ -103,21 +146,25 @@ namespace VirtualRtu.Communications.Channels
                 if (code != ConnectAckCode.ConnectionAccepted)
                 {
                     logger?.LogWarning($"Module client connect return code = '{code}'.");
-                    OnError?.Invoke(this, new ChannelErrorEventArgs(channel.Id, new Exception($"Module channel failed to open with code = {code}")));
+                    OnError?.Invoke(this,
+                        new ChannelErrorEventArgs(channel.Id,
+                            new Exception($"Module channel failed to open with code = {code}")));
                 }
                 else
-                {   
+                {
                     logger?.LogInformation("Module client connected.");
-                    foreach(var slave in config.Slaves)
+                    foreach (var slave in config.Slaves)
                     {
-                        string inputPiSystem = UriGenerator.GetRtuPiSystem(config.Hostname, config.VirtualRtuId, config.DeviceId, slave.UnitId, true);
-                        await client.SubscribeAsync(inputPiSystem, QualityOfServiceLevelType.AtMostOnce, ModuleReceived);
+                        string inputPiSystem = UriGenerator.GetRtuPiSystem(config.Hostname, config.VirtualRtuId,
+                            config.DeviceId, slave.UnitId, true);
+                        await client.SubscribeAsync(inputPiSystem, QualityOfServiceLevelType.AtMostOnce,
+                            ModuleReceived);
                         logger?.LogDebug($"Module client subscribed to '{inputPiSystem}'");
                     }
 
                     try
                     {
-                        diag = new DiagnosticsChannel(config, client, logger);                        
+                        diag = new DiagnosticsChannel(config, client, logger);
                         diag.StartAsync().GetAwaiter();
                     }
                     catch (Exception ex)
@@ -132,9 +179,10 @@ namespace VirtualRtu.Communications.Channels
                 logger?.LogError(ex, "Fault opening module channel.");
             }
         }
+
         public async Task SendAsync(byte[] message)
         {
-            if(client == null || !client.IsConnected)
+            if (client == null || !client.IsConnected)
             {
                 logger?.LogWarning("Module channel client is unavailable to send.");
                 return;
@@ -148,11 +196,12 @@ namespace VirtualRtu.Communications.Channels
                 await diag?.PublishOutput(header);
                 logger?.LogDebug("Published message on module channel");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, "Fault sending on module channel.");
             }
         }
+
         public async Task CloseAsync()
         {
             if (client == null || !client.IsConnected)
@@ -172,14 +221,17 @@ namespace VirtualRtu.Communications.Channels
                 logger?.LogError(ex, "Fault closing module channel.");
             }
         }
+
         public async Task ReceiveAsync()
         {
             await Task.CompletedTask;
         }
+
         public async Task AddMessageAsync(byte[] message)
         {
             await Task.CompletedTask;
         }
+
         protected void Disposing(bool dispose)
         {
             if (dispose & !disposed)
@@ -187,26 +239,29 @@ namespace VirtualRtu.Communications.Channels
                 disposed = true;
                 try
                 {
-                    if(client != null)
+                    if (client != null)
                     {
                         client.Channel.Dispose();
                         client = null;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger?.LogError(ex, "Fault disposing module channel.");
                 }
             }
         }
+
         public void Dispose()
         {
             Disposing(true);
             GC.SuppressFinalize(this);
         }
+
         #endregion
 
         #region Internal MQTT Client Events
+
         private void Client_OnChannelStateChange(object sender, ChannelStateEventArgs args)
         {
             logger?.LogDebug($"Module channel state = {args.State}");
@@ -218,40 +273,5 @@ namespace VirtualRtu.Communications.Channels
         }
 
         #endregion
-
-        private void ModuleReceived(string resource, string contentType, byte[] message)
-        {
-            //received a message from subscription
-            try
-            {
-                MbapHeader header = MbapHeader.Decode(message);
-                diag?.PublishInput(header).GetAwaiter();
-                logger?.LogDebug("Diagnostics sent input.");
-                OnReceive?.Invoke(this, new ChannelReceivedEventArgs(channel.Id, message));
-            }
-            catch(Exception ex)
-            {
-                logger?.LogError(ex, "Unable to decode MBAP header module channel input.");
-            }
-        }
-
-        #region Private methods
-        private async Task ExecuteRetryPolicy()
-        {
-            if (retryPolicy == null || !retryPolicy.ShouldRetry(retryCount, null, out TimeSpan interval))
-            {
-                retryCount = 0;
-                retryPolicy = new ExponentialBackoff(5, TimeSpan.FromSeconds(5.0), TimeSpan.FromSeconds(30.0), TimeSpan.FromSeconds(10.0));
-            }
-            else
-            {
-                retryCount++;
-                await Task.Delay(interval);
-            }
-        }
-
-        #endregion
-
-
     }
 }

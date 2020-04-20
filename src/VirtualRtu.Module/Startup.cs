@@ -17,13 +17,9 @@ namespace VirtualRtu.Module
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute("Rtu", "{controller=Manage}/{id}");
-            });
-
-
+            app.UseEndpoints(endpoints => { endpoints.MapControllerRoute("Rtu", "{controller=Manage}/{id}"); });
         }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
@@ -38,7 +34,6 @@ namespace VirtualRtu.Module
 
             services.AddRouting();
             services.AddMvcCore();
-
         }
     }
 }

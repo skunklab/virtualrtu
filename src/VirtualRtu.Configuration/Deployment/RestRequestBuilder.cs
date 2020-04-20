@@ -1,27 +1,28 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 
 namespace VirtualRtu.Configuration.Deployment
 {
     internal class RestRequestBuilder
     {
-        public RestRequestBuilder(string method, string url, string contentType, bool zeroLength, string securityToken = null)
+        public RestRequestBuilder(string method, string url, string contentType, bool zeroLength,
+            string securityToken = null)
         {
-            this.Method = method;
-            this.ContentType = contentType;
-            this.BaseUrl = url;
-            this.IsZeroContentLength = zeroLength;
-            this.SecurityToken = securityToken;
+            Method = method;
+            ContentType = contentType;
+            BaseUrl = url;
+            IsZeroContentLength = zeroLength;
+            SecurityToken = securityToken;
         }
 
         public RestRequestBuilder(string method, string url, string contentType, string securityKey)
         {
-            this.Method = method;
-            this.ContentType = contentType;
-            this.BaseUrl = url;
-            this.IsZeroContentLength = true;
-            this.SecurityKey = securityKey;
+            Method = method;
+            ContentType = contentType;
+            BaseUrl = url;
+            IsZeroContentLength = true;
+            SecurityKey = securityKey;
         }
+
         public string ContentType { get; internal set; }
         public string Method { get; internal set; }
         public string BaseUrl { get; internal set; }
@@ -35,27 +36,27 @@ namespace VirtualRtu.Configuration.Deployment
         {
             HttpWebRequest request = null;
 
-            if (!string.IsNullOrEmpty(this.SecurityKey))
+            if (!string.IsNullOrEmpty(SecurityKey))
             {
-                string url = String.Format("{0}?key={1}", this.BaseUrl, this.SecurityKey);
-                request = (HttpWebRequest)HttpWebRequest.Create(url);
+                string url = string.Format("{0}?key={1}", BaseUrl, SecurityKey);
+                request = (HttpWebRequest) WebRequest.Create(url);
             }
             else
             {
-                request = (HttpWebRequest)HttpWebRequest.Create(this.BaseUrl);
+                request = (HttpWebRequest) WebRequest.Create(BaseUrl);
             }
 
-            request.ContentType = this.ContentType;
-            request.Method = this.Method;
+            request.ContentType = ContentType;
+            request.Method = Method;
 
-            if (this.IsZeroContentLength)
+            if (IsZeroContentLength)
             {
                 request.ContentLength = 0;
             }
 
-            if (!string.IsNullOrEmpty(this.SecurityToken))
+            if (!string.IsNullOrEmpty(SecurityToken))
             {
-                request.Headers.Add("Authorization", String.Format("Bearer {0}", this.SecurityToken));
+                request.Headers.Add("Authorization", string.Format("Bearer {0}", SecurityToken));
             }
 
             return request;

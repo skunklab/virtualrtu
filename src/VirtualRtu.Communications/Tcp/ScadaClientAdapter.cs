@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using SkunkLab.Channels;
-using SkunkLab.Protocols.Mqtt;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SkunkLab.Channels;
+using SkunkLab.Protocols.Mqtt;
 using VirtualRtu.Communications.Diagnostics;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Communications.WebSockets;
@@ -14,6 +14,20 @@ namespace VirtualRtu.Communications.Tcp
 {
     public class ScadaClientAdapter : IDisposable
     {
+        private const string CONTENT_TYPE = "application/octet-stream";
+        private readonly IChannel channel;
+        private readonly VrtuConfig config;
+        private WebSocketConnection connection;
+        private DiagnosticsConnection diagnostics;
+        private bool disposed;
+
+        private readonly ILogger logger;
+        private RtuMap map;
+        private readonly MbapMapper mapper;
+        private bool restarting;
+        private bool shutdown;
+        private readonly HashSet<byte> subscribed;
+
         public ScadaClientAdapter(VrtuConfig config, IChannel channel, ILogger logger)
         {
             Id = Guid.NewGuid().ToString();
@@ -26,25 +40,18 @@ namespace VirtualRtu.Communications.Tcp
             OpenWebSocketAsync().GetAwaiter();
         }
 
-        
+        public string Id { get; internal set; }
+
+        public void Dispose()
+        {
+            Disposing(true);
+            GC.SuppressFinalize(this);
+        }
+
 
         public event System.EventHandler<AdapterErrorEventArgs> OnError;
         public event System.EventHandler<AdapterCloseEventArgs> OnClose;
 
-        private ILogger logger;
-        private VrtuConfig config;
-        private IChannel channel;
-        private HashSet<byte> subscribed;
-        private RtuMap map;
-        private WebSocketConnection connection;
-        private DiagnosticsConnection diagnostics;
-        private MbapMapper mapper;
-        private const string CONTENT_TYPE = "application/octet-stream";
-        private bool disposed;
-        private bool shutdown;
-        private bool restarting;
-
-        public string Id { get; internal set; }
         public async Task RunAsync()
         {
             try
@@ -82,11 +89,13 @@ namespace VirtualRtu.Communications.Tcp
             connection.OnClose += WebSocket_OnClose;
             ConnectAckCode code = await connection.OpenAsync();
             restarting = false;
-            this.logger?.LogDebug($"VRTU web socket client opened with code '{code}'");
-            
+            logger?.LogDebug($"VRTU web socket client opened with code '{code}'");
+
             if (code != ConnectAckCode.ConnectionAccepted)
             {
-                OnError?.Invoke(this, new AdapterErrorEventArgs(Id, new Exception($"SCADA adapter failed to open web socket with code = {code}")));
+                OnError?.Invoke(this,
+                    new AdapterErrorEventArgs(Id,
+                        new Exception($"SCADA adapter failed to open web socket with code = {code}")));
             }
         }
 
@@ -121,8 +130,8 @@ namespace VirtualRtu.Communications.Tcp
                 byte[] msg = mapper.MapIn(e.Message);
                 await connection.SendAsync(piSystem.RtuInputEvent.ToLowerInvariant(), CONTENT_TYPE, msg);
                 MbapHeader mheader = MbapHeader.Decode(msg);
-                
-                
+
+
                 //await connection.Monitor.SendInAsync(ModuleType.VRTU.ToString(), e.Message, mheader.TransactionId);
             }
             catch (Exception ex)
@@ -140,9 +149,10 @@ namespace VirtualRtu.Communications.Tcp
             {
                 connection.CloseAsync().GetAwaiter();
                 logger?.LogDebug("Closing VRTU Web socket connection.");
-                
             }
-            catch { }
+            catch
+            {
+            }
 
             connection = null;
             OnClose?.Invoke(this, new AdapterCloseEventArgs(Id));
@@ -156,9 +166,10 @@ namespace VirtualRtu.Communications.Tcp
             {
                 connection.CloseAsync().GetAwaiter();
                 logger?.LogDebug("Closing VRTU Web socket connection.");
-
             }
-            catch { }
+            catch
+            {
+            }
 
             connection = null;
             OnError?.Invoke(this, new AdapterErrorEventArgs(Id, e.Error));
@@ -185,31 +196,6 @@ namespace VirtualRtu.Communications.Tcp
             }
         }
 
-        #region Web Socket events
-        private void WebSocket_OnClose(object sender, ChannelCloseEventArgs e)
-        {
-            logger?.LogWarning("VRTU Web socket is closed.");
-            if (!shutdown && !restarting)
-            {
-                //restart Web socket 
-                restarting = true;
-                OpenWebSocketAsync().GetAwaiter();
-            }
-        }       
-
-        private void WebSocket_OnError(object sender, ChannelErrorEventArgs e)
-        {
-            logger?.LogError($"VRTU received error from web socket - {e.Error.Message}");
-            if(!shutdown && !restarting)
-            {
-                //restart Web socket
-                restarting = true;
-                OpenWebSocketAsync().GetAwaiter();
-            }
-        }
-
-        #endregion
-
         protected void Disposing(bool dispose)
         {
             if (dispose & !disposed)
@@ -218,10 +204,10 @@ namespace VirtualRtu.Communications.Tcp
                 shutdown = true;
 
                 if (connection != null)
-                {                    
+                {
                     try
                     {
-                        if(connection.IsConnected)
+                        if (connection.IsConnected)
                         {
                             connection.CloseAsync().GetAwaiter();
                         }
@@ -248,13 +234,30 @@ namespace VirtualRtu.Communications.Tcp
             }
         }
 
-        public void Dispose()
+        #region Web Socket events
+
+        private void WebSocket_OnClose(object sender, ChannelCloseEventArgs e)
         {
-            Disposing(true);
-            GC.SuppressFinalize(this);
+            logger?.LogWarning("VRTU Web socket is closed.");
+            if (!shutdown && !restarting)
+            {
+                //restart Web socket 
+                restarting = true;
+                OpenWebSocketAsync().GetAwaiter();
+            }
         }
 
-        
+        private void WebSocket_OnError(object sender, ChannelErrorEventArgs e)
+        {
+            logger?.LogError($"VRTU received error from web socket - {e.Error.Message}");
+            if (!shutdown && !restarting)
+            {
+                //restart Web socket
+                restarting = true;
+                OpenWebSocketAsync().GetAwaiter();
+            }
+        }
 
+        #endregion
     }
 }

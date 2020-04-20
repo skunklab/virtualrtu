@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.Configuration.Deployment
 {
@@ -8,39 +8,31 @@ namespace VirtualRtu.Configuration.Deployment
     [JsonObject]
     public class DeviceConfig
     {
-        public DeviceConfig()
-        {
-        }
+        [JsonProperty("deviceId")] public string DeviceId { get; set; }
 
-        [JsonProperty("deviceId")]
-        public string DeviceId { get; set; }
-
-        [JsonProperty("virtualRtuId")]
-        public string VirtualRtuId { get; set; }
+        [JsonProperty("virtualRtuId")] public string VirtualRtuId { get; set; }
 
         /// <summary>
-        /// Optional
+        ///     Optional
         /// </summary>
         [JsonProperty("storageConnectionString")]
         public string StorageConnectionString { get; set; }
 
         /// <summary>
-        /// Optional
+        ///     Optional
         /// </summary>
         [JsonProperty("iotHubConnectionString")]
         public string IoTHubConnectionString { get; set; }
 
         /// <summary>
-        /// Optional
+        ///     Optional
         /// </summary>
         [JsonProperty("base64Template")]
         public string Base64EncodedTemplate { get; set; }
 
-        [JsonProperty("expiryMinutes")]
-        public double Expiry { get; set; }
+        [JsonProperty("expiryMinutes")] public double Expiry { get; set; }
 
-        [JsonProperty("module")]
-        public Module Container { get; set; }      
+        [JsonProperty("module")] public Module Container { get; set; }
 
         public string GetTemplate()
         {
@@ -48,10 +40,8 @@ namespace VirtualRtu.Configuration.Deployment
             {
                 return Encoding.UTF8.GetString(Convert.FromBase64String(Base64EncodedTemplate));
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

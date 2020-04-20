@@ -23,7 +23,7 @@ export class DefaultHttpClient extends HttpClient {
     }
 
     /** @inheritDoc */
-    public send(request: HttpRequest): Promise<HttpResponse> {
+    send(request: HttpRequest): Promise<HttpResponse> {
         // Check that abort was not signaled before calling send
         if (request.abortSignal && request.abortSignal.aborted) {
             return Promise.reject(new AbortError());
@@ -39,7 +39,7 @@ export class DefaultHttpClient extends HttpClient {
         return this.httpClient.send(request);
     }
 
-    public getCookieString(url: string): string {
+    getCookieString(url: string): string {
         return this.httpClient.getCookieString(url);
     }
 }

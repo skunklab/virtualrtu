@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.IO;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.IO;
 using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Module
 {
     public static class GatewayExtensions
     {
-        public static IServiceCollection AddModuleConfiguration(this IServiceCollection services, out ModuleConfig config)
+        public static IServiceCollection AddModuleConfiguration(this IServiceCollection services,
+            out ModuleConfig config)
         {
             IConfigurationBuilder builder = new ConfigurationBuilder();
             if (File.Exists("./data/config.json"))
@@ -16,10 +17,11 @@ namespace VirtualRtu.Module
                 builder.AddJsonFile("./data/config.json")
                     .AddEnvironmentVariables("MC_");
             }
+
             IConfigurationRoot root = builder.Build();
             config = new ModuleConfig();
-            ConfigurationBinder.Bind(root, config);
-            services.AddSingleton<ModuleConfig>(config);
+            root.Bind(config);
+            services.AddSingleton(config);
 
             return services;
         }

@@ -1,7 +1,7 @@
 ﻿@page
 @model VirtualRtu.WebMonitor.Pages.IndexModel
 @{
-    string treeData = @Model.Data;
+    string treeData = Model.Data;
 
 }
 
@@ -11,7 +11,7 @@
 *@
 
 <!-- Required Stylesheets -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css"/>
 
 <!-- Required Javascript -->
 <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -21,9 +21,9 @@
 
 <script>
 
-     //var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
+    //var data = JSON.parse("[{\"text\":\"testvrtu\",\"href\":\"#testvrtu\",\"nodes\":[{\"text\":\"device1\",\"href\":\"#testvrtu-device1\"}]}]");
 
-    
+
     var data = @Html.Raw(Model.Data);
 
     //var data = JSON.parse(json);
@@ -38,20 +38,19 @@
     }
 
     $('#tree').treeview({
-        data: getTree(), onNodeSelected: function (event, data) {
+        data: getTree(),
+        onNodeSelected: function(event, data) {
 
-            var line = String(data.href).replace("#","");
-            
+            var line = String(data.href).replace("#", "");
+
             //line = "testvrtu-device1";
             if (line.indexOf("-") > 0) {
                 window.location.assign("/monitor?device=" + line);
             }
 
 
-    }
+        }
     });
-
-
 
 
 </script>

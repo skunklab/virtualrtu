@@ -1,32 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using VirtualRtu.WebMonitor.Configuration;
 using Microsoft.AspNetCore.SignalR;
+using VirtualRtu.WebMonitor.Configuration;
 
 namespace VirtualRtu.WebMonitor.Hubs
 {
     public class LogStream : ILogStream
     {
+        private readonly MonitorConfig config;
+        private readonly IHubContext<MonitorHub> context;
+
+
+        private readonly ClientSingleton cs;
+
         public LogStream(IHubContext<MonitorHub> context, MonitorConfig config)
         {
             this.context = context;
             this.config = config;
             cs = ClientSingleton.Create(config.Hostname, config.SymmetricKey);
-            cs.OnReceive += Cs_OnReceive;             
-        }
-
-        
-
-        private ClientSingleton cs;
-        private MonitorConfig config;
-        private IHubContext<MonitorHub> context;
-
-        private async void Cs_OnReceive(object sender, MonitorEventArgs e)
-        {  
-            await context.Clients.All.SendAsync("ReceiveMessage", Decode(e.ResoureUriString), Encoding.UTF8.GetString(e.Message));
+            cs.OnReceive += Cs_OnReceive;
         }
 
         public async Task SubscribeAsync(string resource, bool monitor)
@@ -39,21 +32,27 @@ namespace VirtualRtu.WebMonitor.Hubs
             await cs.SubscribeAppInsightsAsync(resource, monitor);
         }
 
+        private async void Cs_OnReceive(object sender, MonitorEventArgs e)
+        {
+            await context.Clients.All.SendAsync("ReceiveMessage", Decode(e.ResoureUriString),
+                Encoding.UTF8.GetString(e.Message));
+        }
+
         private string Decode(string resourceUriString)
         {
             string id = null;
             Uri uri = new Uri(resourceUriString);
-            if(uri.Segments.Length == 3)
-            {                
-                id = uri.Segments[uri.Segments.Length - 2].Replace("/", "");
+            if (uri.Segments.Length == 3)
+            {
+                id = uri.Segments[^2].Replace("/", "");
             }
             else
             {
-                id = uri.Segments[uri.Segments.Length - 3].Replace("/","") + "-" + uri.Segments[uri.Segments.Length - 2].Replace("/","");
+                id = uri.Segments[^3].Replace("/", "") + "-" +
+                     uri.Segments[^2].Replace("/", "");
             }
 
             return id;
         }
-
     }
 }

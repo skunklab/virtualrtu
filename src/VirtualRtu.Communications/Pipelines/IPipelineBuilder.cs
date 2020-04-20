@@ -1,7 +1,4 @@
 ﻿using SkunkLab.Channels;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Communications.Pipelines
@@ -12,7 +9,7 @@ namespace VirtualRtu.Communications.Pipelines
         IPipelineBuilder AddInputChannel(IChannel channel);
         IPipelineBuilder AddOutputChannel(IChannel channel);
         IPipelineBuilder AddInputFilter(IFilter filter);
-        IPipelineBuilder AddOutputFilter(IFilter filter);       
+        IPipelineBuilder AddOutputFilter(IFilter filter);
         Pipeline Build();
     }
 }

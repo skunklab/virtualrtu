@@ -3,13 +3,14 @@
 
 import { HandshakeProtocol, HandshakeRequestMessage, HandshakeResponseMessage } from "./HandshakeProtocol";
 import { IConnection } from "./IConnection";
-import { CancelInvocationMessage, CompletionMessage, IHubProtocol, InvocationMessage, MessageType, StreamInvocationMessage, StreamItemMessage } from "./IHubProtocol";
+import { CancelInvocationMessage, CompletionMessage, IHubProtocol, MessageType, StreamItemMessage } from
+    "./IHubProtocol";
 import { ILogger, LogLevel } from "./ILogger";
 import { IStreamResult } from "./Stream";
 import { Arg, Subject } from "./Utils";
 
-const DEFAULT_TIMEOUT_IN_MS: number = 30 * 1000;
-const DEFAULT_PING_INTERVAL_IN_MS: number = 15 * 1000;
+const DEFAULT_TIMEOUT_IN_MS = 30 * 1000;
+const DEFAULT_PING_INTERVAL_IN_MS = 15 * 1000;
 
 /** Describes the current state of the {@link HubConnection} to the server. */
 export enum HubConnectionState {
@@ -26,7 +27,9 @@ export class HubConnection {
     private readonly logger: ILogger;
     private protocol: IHubProtocol;
     private handshakeProtocol: HandshakeProtocol;
-    private callbacks: { [invocationId: string]: (invocationEvent: StreamItemMessage | CompletionMessage | null, error?: Error) => void };
+    private callbacks: {
+        [invocationId: string]: (invocationEvent: StreamItemMessage | CompletionMessage | null, error?: Error) => void
+    };
     private methods: { [name: string]: Array<(...args: any[]) => void> };
     private id: number;
     private closedCallbacks: Array<(error?: Error) => void>;
@@ -46,21 +49,21 @@ export class HubConnection {
      * If this timeout elapses without receiving any messages from the server, the connection will be terminated with an error.
      * The default timeout value is 30,000 milliseconds (30 seconds).
      */
-    public serverTimeoutInMilliseconds: number;
+    serverTimeoutInMilliseconds: number;
 
     /** Default interval at which to ping the server.
      *
      * The default value is 15,000 milliseconds (15 seconds).
      * Allows the server to detect hard disconnects (like when a client unplugs their computer).
      */
-    public keepAliveIntervalInMilliseconds: number;
+    keepAliveIntervalInMilliseconds: number;
 
     /** @internal */
     // Using a public static factory method means we can have a private constructor and an _internal_
     // create method that can be used by HubConnectionBuilder. An "internal" constructor would just
     // be stripped away and the '.d.ts' file would have no constructor, which is interpreted as a
     // public parameter-less constructor.
-    public static create(connection: IConnection, logger: ILogger, protocol: IHubProtocol): HubConnection {
+    static create(connection: IConnection, logger: ILogger, protocol: IHubProtocol): HubConnection {
         return new HubConnection(connection, logger, protocol);
     }
 
@@ -99,7 +102,7 @@ export class HubConnection {
      *
      * @returns {Promise<void>} A Promise that resolves when the connection has been successfully established, or rejects with an error.
      */
-    public async start(): Promise<void> {
+    async start(): Promise<void> {
         const handshakeRequest: HandshakeRequestMessage = {
             protocol: this.protocol.name,
             version: this.protocol.version,
@@ -136,7 +139,7 @@ export class HubConnection {
      *
      * @returns {Promise<void>} A Promise that resolves when the connection has been successfully terminated, or rejects with an error.
      */
-    public stop(): Promise<void> {
+    stop(): Promise<void> {
         this.logger.log(LogLevel.Debug, "Stopping HubConnection.");
 
         this.cleanupTimeout();
@@ -151,13 +154,14 @@ export class HubConnection {
      * @param {any[]} args The arguments used to invoke the server method.
      * @returns {IStreamResult<T>} An object that yields results from the server as they are received.
      */
-    public stream<T = any>(methodName: string, ...args: any[]): IStreamResult<T> {
+    stream<T = any>(methodName: string, ...args: any[]): IStreamResult<T> {
         const invocationDescriptor = this.createStreamInvocation(methodName, args);
 
         let promiseQueue: Promise<void>;
         const subject = new Subject<T>();
         subject.cancelCallback = () => {
-            const cancelInvocation: CancelInvocationMessage = this.createCancelInvocation(invocationDescriptor.invocationId);
+            const cancelInvocation: CancelInvocationMessage =
+                this.createCancelInvocation(invocationDescriptor.invocationId);
             const cancelMessage: any = this.protocol.writeMessage(cancelInvocation);
 
             delete this.callbacks[invocationDescriptor.invocationId];
@@ -167,23 +171,24 @@ export class HubConnection {
             });
         };
 
-        this.callbacks[invocationDescriptor.invocationId] = (invocationEvent: CompletionMessage | StreamItemMessage | null, error?: Error) => {
-            if (error) {
-                subject.error(error);
-                return;
-            } else if (invocationEvent) {
-                // invocationEvent will not be null when an error is not passed to the callback
-                if (invocationEvent.type === MessageType.Completion) {
-                    if (invocationEvent.error) {
-                        subject.error(new Error(invocationEvent.error));
+        this.callbacks[invocationDescriptor.invocationId] =
+            (invocationEvent: CompletionMessage | StreamItemMessage | null, error?: Error) => {
+                if (error) {
+                    subject.error(error);
+                    return;
+                } else if (invocationEvent) {
+                    // invocationEvent will not be null when an error is not passed to the callback
+                    if (invocationEvent.type === MessageType.Completion) {
+                        if (invocationEvent.error) {
+                            subject.error(new Error(invocationEvent.error));
+                        } else {
+                            subject.complete();
+                        }
                     } else {
-                        subject.complete();
+                        subject.next((invocationEvent.item) as T);
                     }
-                } else {
-                    subject.next((invocationEvent.item) as T);
                 }
-            }
-        };
+            };
 
         const message = this.protocol.writeMessage(invocationDescriptor);
 
@@ -210,7 +215,7 @@ export class HubConnection {
      * @param {any[]} args The arguments used to invoke the server method.
      * @returns {Promise<void>} A Promise that resolves when the invocation has been successfully sent, or rejects with an error.
      */
-    public send(methodName: string, ...args: any[]): Promise<void> {
+    send(methodName: string, ...args: any[]): Promise<void> {
         const invocationDescriptor = this.createInvocation(methodName, args, true);
 
         const message = this.protocol.writeMessage(invocationDescriptor);
@@ -229,28 +234,29 @@ export class HubConnection {
      * @param {any[]} args The arguments used to invoke the server method.
      * @returns {Promise<T>} A Promise that resolves with the result of the server method (if any), or rejects with an error.
      */
-    public invoke<T = any>(methodName: string, ...args: any[]): Promise<T> {
+    invoke<T = any>(methodName: string, ...args: any[]): Promise<T> {
         const invocationDescriptor = this.createInvocation(methodName, args, false);
 
         const p = new Promise<any>((resolve, reject) => {
             // invocationId will always have a value for a non-blocking invocation
-            this.callbacks[invocationDescriptor.invocationId!] = (invocationEvent: StreamItemMessage | CompletionMessage | null, error?: Error) => {
-                if (error) {
-                    reject(error);
-                    return;
-                } else if (invocationEvent) {
-                    // invocationEvent will not be null when an error is not passed to the callback
-                    if (invocationEvent.type === MessageType.Completion) {
-                        if (invocationEvent.error) {
-                            reject(new Error(invocationEvent.error));
+            this.callbacks[invocationDescriptor.invocationId!] =
+                (invocationEvent: StreamItemMessage | CompletionMessage | null, error?: Error) => {
+                    if (error) {
+                        reject(error);
+                        return;
+                    } else if (invocationEvent) {
+                        // invocationEvent will not be null when an error is not passed to the callback
+                        if (invocationEvent.type === MessageType.Completion) {
+                            if (invocationEvent.error) {
+                                reject(new Error(invocationEvent.error));
+                            } else {
+                                resolve(invocationEvent.result);
+                            }
                         } else {
-                            resolve(invocationEvent.result);
+                            reject(new Error(`Unexpected message type: ${invocationEvent.type}`));
                         }
-                    } else {
-                        reject(new Error(`Unexpected message type: ${invocationEvent.type}`));
                     }
-                }
-            };
+                };
 
             const message = this.protocol.writeMessage(invocationDescriptor);
 
@@ -270,7 +276,7 @@ export class HubConnection {
      * @param {string} methodName The name of the hub method to define.
      * @param {Function} newMethod The handler that will be raised when the hub method is invoked.
      */
-    public on(methodName: string, newMethod: (...args: any[]) => void) {
+    on(methodName: string, newMethod: (...args: any[]) => void) {
         if (!methodName || !newMethod) {
             return;
         }
@@ -292,7 +298,7 @@ export class HubConnection {
      *
      * @param {string} methodName The name of the method to remove handlers for.
      */
-    public off(methodName: string): void;
+    off(methodName: string): void;
 
     /** Removes the specified handler for the specified hub method.
      *
@@ -302,8 +308,8 @@ export class HubConnection {
      * @param {string} methodName The name of the method to remove handlers for.
      * @param {Function} method The handler to remove. This must be the same Function instance as the one passed to {@link @aspnet/signalr.HubConnection.on}.
      */
-    public off(methodName: string, method: (...args: any[]) => void): void;
-    public off(methodName: string, method?: (...args: any[]) => void): void {
+    off(methodName: string, method: (...args: any[]) => void): void;
+    off(methodName: string, method?: (...args: any[]) => void): void {
         if (!methodName) {
             return;
         }
@@ -331,7 +337,7 @@ export class HubConnection {
      *
      * @param {Function} callback The handler that will be invoked when the connection is closed. Optionally receives a single argument containing the error that caused the connection to close (if any).
      */
-    public onclose(callback: (error?: Error) => void) {
+    onclose(callback: (error?: Error) => void) {
         if (callback) {
             this.closedCallbacks.push(callback);
         }
@@ -352,33 +358,35 @@ export class HubConnection {
 
             for (const message of messages) {
                 switch (message.type) {
-                    case MessageType.Invocation:
-                        this.invokeClientMethod(message);
-                        break;
-                    case MessageType.StreamItem:
-                    case MessageType.Completion:
-                        const callback = this.callbacks[message.invocationId];
-                        if (callback != null) {
-                            if (message.type === MessageType.Completion) {
-                                delete this.callbacks[message.invocationId];
-                            }
-                            callback(message);
+                case MessageType.Invocation:
+                    this.invokeClientMethod(message);
+                    break;
+                case MessageType.StreamItem:
+                case MessageType.Completion:
+                    const callback = this.callbacks[message.invocationId];
+                    if (callback != null) {
+                        if (message.type === MessageType.Completion) {
+                            delete this.callbacks[message.invocationId];
                         }
-                        break;
-                    case MessageType.Ping:
-                        // Don't care about pings
-                        break;
-                    case MessageType.Close:
-                        this.logger.log(LogLevel.Information, "Close message received from server.");
+                        callback(message);
+                    }
+                    break;
+                case MessageType.Ping:
+                    // Don't care about pings
+                    break;
+                case MessageType.Close:
+                    this.logger.log(LogLevel.Information, "Close message received from server.");
 
-                        // We don't want to wait on the stop itself.
-                        // tslint:disable-next-line:no-floating-promises
-                        this.connection.stop(message.error ? new Error("Server returned an error on close: " + message.error) : undefined);
+                    // We don't want to wait on the stop itself.
+                    // tslint:disable-next-line:no-floating-promises
+                    this.connection.stop(message.error
+                        ? new Error(`Server returned an error on close: ${message.error}`)
+                        : undefined);
 
-                        break;
-                    default:
-                        this.logger.log(LogLevel.Warning, `Invalid message type: ${message.type}.`);
-                        break;
+                    break;
+                default:
+                    this.logger.log(LogLevel.Warning, `Invalid message type: ${message.type}.`);
+                    break;
                 }
             }
         }
@@ -393,7 +401,7 @@ export class HubConnection {
         try {
             [remainingData, responseMessage] = this.handshakeProtocol.parseHandshakeResponse(data);
         } catch (e) {
-            const message = "Error parsing handshake response: " + e;
+            const message = `Error parsing handshake response: ${e}`;
             this.logger.log(LogLevel.Error, message);
 
             const error = new Error(message);
@@ -405,7 +413,7 @@ export class HubConnection {
             throw error;
         }
         if (responseMessage.error) {
-            const message = "Server returned handshake error: " + responseMessage.error;
+            const message = `Server returned handshake error: ${responseMessage.error}`;
             this.logger.log(LogLevel.Error, message);
 
             this.handshakeRejecter(message);
@@ -431,100 +439,110 @@ export class HubConnection {
                     // We don't care about the error. It should be seen elsewhere in the client.
                     // The connection is probably in a bad or closed state now, cleanup the timer so it stops triggering
                     this.cleanupPingTimer();
-                }
             }
-        }, this.keepAliveIntervalInMilliseconds);
-    }
+        };
+    },
+    this.;
+    keepAliveIntervalInMilliseconds: number);;
+}
 
-    private resetTimeoutPeriod() {
-        if (!this.connection.features || !this.connection.features.inherentKeepAlive) {
-            // Set the timeout timer
-            this.timeoutHandle = setTimeout(() => this.serverTimeout(), this.serverTimeoutInMilliseconds);
+private;
+resetTimeoutPeriod();
+{
+    if (!this.connection.features || !this.connection.features.inherentKeepAlive) {
+        // Set the timeout timer
+        this.timeoutHandle = setTimeout(() => this.serverTimeout(), this.serverTimeoutInMilliseconds);
+    }
+}
+
+private;
+serverTimeout();
+{
+    // The server hasn't talked to us in a while. It doesn't like us anymore ... :(
+    // Terminate the connection, but we don't need to wait on the promise.
+    // tslint:disable-next-line:no-floating-promises
+    this.connection.stop(new Error("Server timeout elapsed without receiving a message from the server."));
+}
+
+private;
+invokeClientMethod(invocationMessage:;
+InvocationMessage);
+{
+    const methods = this.methods[invocationMessage.target.toLowerCase()];
+    if (methods) {
+        methods.forEach((m) => m.apply(this, invocationMessage.arguments));
+        if (invocationMessage.invocationId) {
+            // This is not supported in v1. So we return an error to avoid blocking the server waiting for the response.
+            const message = "Server requested a response, which is not supported in this version of the client.";
+            this.logger.log(LogLevel.Error, message);
+
+            // We don't need to wait on this Promise.
+            // tslint:disable-next-line:no-floating-promises
+            this.connection.stop(new Error(message));
         }
+    } else {
+        this.logger.log(LogLevel.Warning, `No client method with the name '${invocationMessage.target}' found.`);
+    }
+}
+
+private;
+connectionClosed(error ? : Error);
+{
+    const callbacks = this.callbacks;
+    this.callbacks = {};
+
+    this.connectionState = HubConnectionState.Disconnected;
+
+    // if handshake is in progress start will be waiting for the handshake promise, so we complete it
+    // if it has already completed this should just noop
+    if (this.handshakeRejecter) {
+        this.handshakeRejecter(error);
     }
 
-    private serverTimeout() {
-        // The server hasn't talked to us in a while. It doesn't like us anymore ... :(
-        // Terminate the connection, but we don't need to wait on the promise.
-        // tslint:disable-next-line:no-floating-promises
-        this.connection.stop(new Error("Server timeout elapsed without receiving a message from the server."));
-    }
+    Object.keys(callbacks)
+        .forEach((key) => {
+            const callback = callbacks[key];
+            callback(null, error ? error : new Error("Invocation canceled due to connection being closed."));
+        });
 
-    private invokeClientMethod(invocationMessage: InvocationMessage) {
-        const methods = this.methods[invocationMessage.target.toLowerCase()];
-        if (methods) {
-            methods.forEach((m) => m.apply(this, invocationMessage.arguments));
-            if (invocationMessage.invocationId) {
-                // This is not supported in v1. So we return an error to avoid blocking the server waiting for the response.
-                const message = "Server requested a response, which is not supported in this version of the client.";
-                this.logger.log(LogLevel.Error, message);
+    this.cleanupTimeout();
+    this.cleanupPingTimer();
 
-                // We don't need to wait on this Promise.
-                // tslint:disable-next-line:no-floating-promises
-                this.connection.stop(new Error(message));
-            }
-        } else {
-            this.logger.log(LogLevel.Warning, `No client method with the name '${invocationMessage.target}' found.`);
-        }
-    }
+    this.closedCallbacks.forEach((c) => c.apply(this, [error]));
+}
 
-    private connectionClosed(error?: Error) {
-        const callbacks = this.callbacks;
-        this.callbacks = {};
+private;
+cleanupPingTimer():;
+void {
+    if (this.pingServerHandle);
+{
+    clearTimeout(this.pingServerHandle);
+}
+}
 
-        this.connectionState = HubConnectionState.Disconnected;
+private;
+cleanupTimeout():;
+void {
+    if (this.timeoutHandle);
+{
+    clearTimeout(this.timeoutHandle);
+}
+}
 
-        // if handshake is in progress start will be waiting for the handshake promise, so we complete it
-        // if it has already completed this should just noop
-        if (this.handshakeRejecter) {
-            this.handshakeRejecter(error);
-        }
-
-        Object.keys(callbacks)
-            .forEach((key) => {
-                const callback = callbacks[key];
-                callback(null, error ? error : new Error("Invocation canceled due to connection being closed."));
-            });
-
-        this.cleanupTimeout();
-        this.cleanupPingTimer();
-
-        this.closedCallbacks.forEach((c) => c.apply(this, [error]));
-    }
-
-    private cleanupPingTimer(): void {
-        if (this.pingServerHandle) {
-            clearTimeout(this.pingServerHandle);
-        }
-    }
-
-    private cleanupTimeout(): void {
-        if (this.timeoutHandle) {
-            clearTimeout(this.timeoutHandle);
-        }
-    }
-
-    private createInvocation(methodName: string, args: any[], nonblocking: boolean): InvocationMessage {
-        if (nonblocking) {
-            return {
-                arguments: args,
-                target: methodName,
-                type: MessageType.Invocation,
-            };
-        } else {
-            const id = this.id;
-            this.id++;
-
-            return {
-                arguments: args,
-                invocationId: id.toString(),
-                target: methodName,
-                type: MessageType.Invocation,
-            };
-        }
-    }
-
-    private createStreamInvocation(methodName: string, args: any[]): StreamInvocationMessage {
+private;
+createInvocation(methodName:;
+string, args:;
+any[], nonblocking:;
+boolean);:
+InvocationMessage;
+{
+    if (nonblocking) {
+        return {
+            arguments: args,
+            target: methodName,
+            type: MessageType.Invocation,
+        };
+    } else {
         const id = this.id;
         this.id++;
 
@@ -532,14 +550,36 @@ export class HubConnection {
             arguments: args,
             invocationId: id.toString(),
             target: methodName,
-            type: MessageType.StreamInvocation,
+            type: MessageType.Invocation,
         };
     }
+}
 
-    private createCancelInvocation(id: string): CancelInvocationMessage {
-        return {
-            invocationId: id,
-            type: MessageType.CancelInvocation,
-        };
-    }
+private;
+createStreamInvocation(methodName:;
+string, args:;
+any[]);:
+StreamInvocationMessage;
+{
+    const id = this.id;
+    this.id++;
+
+    return {
+        arguments: args,
+        invocationId: id.toString(),
+        target: methodName,
+        type: MessageType.StreamInvocation,
+    };
+}
+
+private;
+createCancelInvocation(id:;
+string);:
+CancelInvocationMessage;
+{
+    return {
+        invocationId: id,
+        type: MessageType.CancelInvocation,
+    };
+}
 }

@@ -4,28 +4,6 @@ namespace VirtualRtu.Configuration.Vrtu
 {
     public abstract class ModbusTcpMessage
     {
-        public static ModbusTcpMessage Create(byte[] message)
-        {
-
-            if (message[7] <= 4 || message[7] == 15 || message[7] == 16)
-            {
-                return BasicModbusMessage.Decode(message);
-            }
-            else if (message[7] > 4 && message[7] < 7)
-            {
-                return WriteSingleMessage.Decode(message);
-            }
-            else if(message[7] == 8 || message[7] == 11 || message[7] == 12)
-            {
-                return DiagnosticsMessage.Decode(message);
-            }
-            else
-            {
-                throw new InvalidCastException("Invalid modbus message type.");
-            }
-
-        }
-
         public virtual ushort TransactionId { get; set; }
 
         public virtual ushort ProtocolId { get; set; }
@@ -38,6 +16,24 @@ namespace VirtualRtu.Configuration.Vrtu
 
         public virtual ModbusMessageType MessageType { get; set; }
 
+        public static ModbusTcpMessage Create(byte[] message)
+        {
+            if (message[7] <= 4 || message[7] == 15 || message[7] == 16)
+            {
+                return BasicModbusMessage.Decode(message);
+            }
 
+            if (message[7] > 4 && message[7] < 7)
+            {
+                return WriteSingleMessage.Decode(message);
+            }
+
+            if (message[7] == 8 || message[7] == 11 || message[7] == 12)
+            {
+                return DiagnosticsMessage.Decode(message);
+            }
+
+            throw new InvalidCastException("Invalid modbus message type.");
+        }
     }
 }

@@ -18,6 +18,7 @@ export interface IStreamSubscriber<T> {
      */
     complete(): void;
 }
+
 /** Defines the result of a streaming hub method.
  *
  * @typeparam T The type of the items being sent by the server.
@@ -30,6 +31,7 @@ export interface IStreamResult<T> {
      */
     subscribe(subscriber: IStreamSubscriber<T>): ISubscription<T>;
 }
+
 /** An interface that allows an {@link @microsoft/signalr.IStreamSubscriber} to be disconnected from a stream.
  *
  * @typeparam T The type of the items being sent by the server.

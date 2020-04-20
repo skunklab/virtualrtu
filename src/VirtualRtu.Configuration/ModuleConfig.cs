@@ -1,8 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.Configuration
 {
@@ -10,41 +9,38 @@ namespace VirtualRtu.Configuration
     [JsonObject]
     public class ModuleConfig : VConfig
     {
+        private string slaveJson;
+        private List<Slave> slaves;
+
         public ModuleConfig()
         {
         }
 
         //entity.Hostname, entity.DeviceId, entity.VirtualRtuId, entity.ModuleId, securityToken, entity.UnitIds,  entity.LoggingLevel, entity.InstrumentationKey);
-        public ModuleConfig(string hostname, string virtualRtuId, string deviceId, string moduleId, List<Slave> slaves, string securityToken, LogLevel logLevel, string instrumentationKey)
+        public ModuleConfig(string hostname, string virtualRtuId, string deviceId, string moduleId, List<Slave> slaves,
+            string securityToken, LogLevel logLevel, string instrumentationKey)
         {
-            this.Hostname = hostname;
-            this.VirtualRtuId = virtualRtuId;
-            this.DeviceId = deviceId;
-            this.ModuleId = moduleId;
-            this.SecurityToken = securityToken;
-            this.LoggingLevel = logLevel;
-            this.InstrumentationKey = instrumentationKey;
-            this.Slaves = slaves;
+            Hostname = hostname;
+            VirtualRtuId = virtualRtuId;
+            DeviceId = deviceId;
+            ModuleId = moduleId;
+            SecurityToken = securityToken;
+            LoggingLevel = logLevel;
+            InstrumentationKey = instrumentationKey;
+            Slaves = slaves;
         }
 
-        public override event EventHandler<ConfigUpdateEventArgs> OnChanged;
 
-        private string slaveJson;
-        private List<Slave> slaves;
-        
-
-       
         /// <summary>
-        /// The device identifier
+        ///     The device identifier
         /// </summary>
         [JsonProperty("deviceId")]
         public virtual string DeviceId { get; set; }
 
-        [JsonProperty("moduleId")]
-        public virtual string ModuleId { get; set; } 
+        [JsonProperty("moduleId")] public virtual string ModuleId { get; set; }
 
         /// <summary>
-        /// JWT security token as string
+        ///     JWT security token as string
         /// </summary>
         [JsonProperty("securityToken")]
         public virtual string SecurityToken { get; set; }
@@ -58,14 +54,13 @@ namespace VirtualRtu.Configuration
                 {
                     return slaves;
                 }
-                else if (!string.IsNullOrEmpty(slaveJson))
+
+                if (!string.IsNullOrEmpty(slaveJson))
                 {
                     return JsonConvert.DeserializeObject<List<Slave>>(slaveJson);
                 }
-                else
-                {
-                    return null;
-                }
+
+                return null;
             }
 
             set
@@ -80,11 +75,11 @@ namespace VirtualRtu.Configuration
                 }
             }
         }
-        
+
         [JsonProperty("slavesJsonString")]
         public string SlavesJsonString
         {
-            get { return slaveJson; }
+            get => slaveJson;
             set
             {
                 slaveJson = value;
@@ -95,35 +90,31 @@ namespace VirtualRtu.Configuration
             }
         }
 
+        public override event EventHandler<ConfigUpdateEventArgs> OnChanged;
+
         public string GetSlavesString()
         {
             if (Slaves != null && Slaves.Count > 0)
             {
                 return JsonConvert.SerializeObject(Slaves);
+            }
 
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
         public void UpdateConfig(string jsonString)
         {
             ModuleConfig config = JsonConvert.DeserializeObject<ModuleConfig>(jsonString);
-            this.DeviceId = config.DeviceId;
-            this.Hostname = config.Hostname;
-            this.InstrumentationKey = config.InstrumentationKey;
-            this.LoggingLevel = config.LoggingLevel;
-            this.ModuleId = config.ModuleId;
-            this.SecurityToken = config.SecurityToken;
-            this.Slaves = config.Slaves;
-            this.VirtualRtuId = config.VirtualRtuId;
+            DeviceId = config.DeviceId;
+            Hostname = config.Hostname;
+            InstrumentationKey = config.InstrumentationKey;
+            LoggingLevel = config.LoggingLevel;
+            ModuleId = config.ModuleId;
+            SecurityToken = config.SecurityToken;
+            Slaves = config.Slaves;
+            VirtualRtuId = config.VirtualRtuId;
 
             OnChanged?.Invoke(this, new ConfigUpdateEventArgs(true));
         }
-
-
-
     }
 }

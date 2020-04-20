@@ -74,7 +74,7 @@ export abstract class HttpClient {
      * @param {string} url The URL for the request.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public get(url: string): Promise<HttpResponse>;
+    get(url: string): Promise<HttpResponse>;
 
     /** Issues an HTTP GET request to the specified URL, returning a Promise that resolves with an {@link @aspnet/signalr.HttpResponse} representing the result.
      *
@@ -82,8 +82,8 @@ export abstract class HttpClient {
      * @param {HttpRequest} options Additional options to configure the request. The 'url' field in this object will be overridden by the url parameter.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public get(url: string, options: HttpRequest): Promise<HttpResponse>;
-    public get(url: string, options?: HttpRequest): Promise<HttpResponse> {
+    get(url: string, options: HttpRequest): Promise<HttpResponse>;
+    get(url: string, options?: HttpRequest): Promise<HttpResponse> {
         return this.send({
             ...options,
             method: "GET",
@@ -96,7 +96,7 @@ export abstract class HttpClient {
      * @param {string} url The URL for the request.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public post(url: string): Promise<HttpResponse>;
+    post(url: string): Promise<HttpResponse>;
 
     /** Issues an HTTP POST request to the specified URL, returning a Promise that resolves with an {@link @aspnet/signalr.HttpResponse} representing the result.
      *
@@ -104,8 +104,8 @@ export abstract class HttpClient {
      * @param {HttpRequest} options Additional options to configure the request. The 'url' field in this object will be overridden by the url parameter.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public post(url: string, options: HttpRequest): Promise<HttpResponse>;
-    public post(url: string, options?: HttpRequest): Promise<HttpResponse> {
+    post(url: string, options: HttpRequest): Promise<HttpResponse>;
+    post(url: string, options?: HttpRequest): Promise<HttpResponse> {
         return this.send({
             ...options,
             method: "POST",
@@ -118,7 +118,7 @@ export abstract class HttpClient {
      * @param {string} url The URL for the request.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public delete(url: string): Promise<HttpResponse>;
+    delete(url: string): Promise<HttpResponse>;
 
     /** Issues an HTTP DELETE request to the specified URL, returning a Promise that resolves with an {@link @aspnet/signalr.HttpResponse} representing the result.
      *
@@ -126,8 +126,8 @@ export abstract class HttpClient {
      * @param {HttpRequest} options Additional options to configure the request. The 'url' field in this object will be overridden by the url parameter.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an {@link @aspnet/signalr.HttpResponse} describing the response, or rejects with an Error indicating a failure.
      */
-    public delete(url: string, options: HttpRequest): Promise<HttpResponse>;
-    public delete(url: string, options?: HttpRequest): Promise<HttpResponse> {
+    delete(url: string, options: HttpRequest): Promise<HttpResponse>;
+    delete(url: string, options?: HttpRequest): Promise<HttpResponse> {
         return this.send({
             ...options,
             method: "DELETE",
@@ -140,7 +140,7 @@ export abstract class HttpClient {
      * @param {HttpRequest} request An {@link @aspnet/signalr.HttpRequest} describing the request to send.
      * @returns {Promise<HttpResponse>} A Promise that resolves with an HttpResponse describing the response, or rejects with an Error indicating a failure.
      */
-    public abstract send(request: HttpRequest): Promise<HttpResponse>;
+    abstract send(request: HttpRequest): Promise<HttpResponse>;
 
     /** Gets all cookies that apply to the specified URL.
      *
@@ -148,7 +148,7 @@ export abstract class HttpClient {
      * @returns {string} A string containing all the key-value cookie pairs for the specified URL.
      */
     // @ts-ignore
-    public getCookieString(url: string): string {
+    getCookieString(url: string): string {
         return "";
     }
 }

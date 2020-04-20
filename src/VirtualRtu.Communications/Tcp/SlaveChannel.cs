@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using SkunkLab.Channels;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SkunkLab.Channels;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Configuration;
 
@@ -12,28 +12,35 @@ namespace VirtualRtu.Communications.Tcp
     public class SlaveChannel : IDisposable
     {
         private IChannel channel;
+        private readonly ExponentialDelayPolicy delayPolicy;
+        private bool disposed;
+        private byte[] lastMessage;
+        private readonly ILogger logger;
+        private readonly MbapMapper mapper;
+        private int retryCount;
+        private readonly BasicRetryPolicy retryPolicy;
+        private readonly Slave slave;
+
         public SlaveChannel(Slave slave, ILogger logger = null)
         {
             this.slave = slave;
             this.logger = logger;
             SlaveId = slave.UnitId;
             mapper = new MbapMapper(Guid.NewGuid().ToString());
-            delayPolicy = new ExponentialDelayPolicy(30000, 2, true);
+            delayPolicy = new ExponentialDelayPolicy(30000, 2);
             retryPolicy = new BasicRetryPolicy(delayPolicy, 5);
             CreateChannelAsync().GetAwaiter();
         }
 
-        public event System.EventHandler<ChannelReceivedEventArgs> OnReceive;
-        private MbapMapper mapper;
-        private Slave slave;
-        private ILogger logger;
-        private byte[] lastMessage;
-        private int retryCount;
-        private ExponentialDelayPolicy delayPolicy;
-        private BasicRetryPolicy retryPolicy;
-        private bool disposed;
-
         public byte SlaveId { get; set; }
+
+        public void Dispose()
+        {
+            Disposing(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public event EventHandler<ChannelReceivedEventArgs> OnReceive;
 
         public async Task SendAsync(byte[] message)
         {
@@ -68,8 +75,8 @@ namespace VirtualRtu.Communications.Tcp
         {
             logger?.LogError($"Slave channel '{e.ChannelId}' with Id = '{slave.UnitId}' error - '{e.Error.Message}'");
             await channel.CloseAsync();
-            
         }
+
         private async void Channel_OnClose(object sender, ChannelCloseEventArgs e)
         {
             logger?.LogInformation($"Slave channel '{e.ChannelId}' with Id = '{slave.UnitId}' closing.");
@@ -80,13 +87,13 @@ namespace VirtualRtu.Communications.Tcp
 
         private async Task CreateChannelAsync()
         {
-            if(channel != null)
+            if (channel != null)
             {
                 channel.Dispose();
                 channel = null;
             }
 
-            if(retryCount > 0)
+            if (retryCount > 0)
             {
                 if (retryPolicy.ShouldRetry(retryCount++))
                 {
@@ -102,7 +109,8 @@ namespace VirtualRtu.Communications.Tcp
                 retryCount++;
             }
 
-            channel = ChannelFactory.Create(false, new IPEndPoint(IPAddress.Parse(slave.IPAddress), slave.Port), 1024, 102400, CancellationToken.None);
+            channel = ChannelFactory.Create(false, new IPEndPoint(IPAddress.Parse(slave.IPAddress), slave.Port), 1024,
+                102400, CancellationToken.None);
             channel.OnOpen += Channel_OnOpen;
             channel.OnReceive += Channel_OnReceive;
             channel.OnError += Channel_OnError;
@@ -117,7 +125,7 @@ namespace VirtualRtu.Communications.Tcp
             if (dispose & !disposed)
             {
                 disposed = true;
-              
+
                 {
                     try
                     {
@@ -131,11 +139,6 @@ namespace VirtualRtu.Communications.Tcp
 
                 channel = null;
             }
-        }
-        public void Dispose()
-        {
-            Disposing(true);
-            GC.SuppressFinalize(this);
         }
     }
 }

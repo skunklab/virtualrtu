@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.WebMonitor.Configuration
 {
@@ -14,28 +14,24 @@ namespace VirtualRtu.WebMonitor.Configuration
         }
 
 
-        [JsonProperty("virtualRtus")]
-        public List<VirtualRtuAsset> VirtualRtus { get; set; }
+        [JsonProperty("virtualRtus")] public List<VirtualRtuAsset> VirtualRtus { get; set; }
 
         /// <summary>
-        /// returns index of virtual rtu
+        ///     returns index of virtual rtu
         /// </summary>
         /// <param name="virtualRtuId"></param>
         /// <returns></returns>
         public int this[string virtualRtuId]
         {
-            get
-            {
-                return VirtualRtus.FindIndex((item) => item.Id == virtualRtuId.ToLowerInvariant());
-            }
+            get { return VirtualRtus.FindIndex(item => item.Id == virtualRtuId.ToLowerInvariant()); }
         }
 
         public void Add(string virtualRtuId, string deviceId)
         {
             if (this[virtualRtuId] == -1)
             {
-                VirtualRtuAsset vasset = new VirtualRtuAsset() { Id = virtualRtuId.ToLowerInvariant() };
-                vasset.Devices.Add(new DeviceAsset() { Id = deviceId.ToLowerInvariant() });
+                VirtualRtuAsset vasset = new VirtualRtuAsset {Id = virtualRtuId.ToLowerInvariant()};
+                vasset.Devices.Add(new DeviceAsset {Id = deviceId.ToLowerInvariant()});
                 VirtualRtus.Add(vasset);
             }
             else
@@ -43,13 +39,12 @@ namespace VirtualRtu.WebMonitor.Configuration
                 var vasset = VirtualRtus[this[virtualRtuId]];
                 if (vasset[deviceId] == -1)
                 {
-                    vasset.Devices.Add(new DeviceAsset() { Id = deviceId.ToLowerInvariant() });
+                    vasset.Devices.Add(new DeviceAsset {Id = deviceId.ToLowerInvariant()});
                 }
                 else
                 {
-                    var dasset = vasset.Devices[vasset[deviceId]];                    
+                    var dasset = vasset.Devices[vasset[deviceId]];
                 }
-
             }
         }
     }

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.Configuration.Deployment
 {
@@ -7,31 +7,20 @@ namespace VirtualRtu.Configuration.Deployment
     [JsonObject]
     public class EventMetadata
     {
-        public EventMetadata()
-        {
-        }
+        [JsonProperty("resourceUriString")] public string ResourceUriString { get; set; }
 
+        [JsonProperty("description")] public string Description { get; set; }
 
-        [JsonProperty("resourceUriString")]
-        public string ResourceUriString { get; set; }
+        [JsonProperty("discoveryUrl")] public string DiscoveryUrl { get; set; }
 
-        [JsonProperty("description")]
-        public string Description { get; set; }
+        [JsonProperty("enabled")] public bool Enabled { get; set; }
 
-        [JsonProperty("discoveryUrl")]
-        public string DiscoveryUrl { get; set; }
-
-        [JsonProperty("enabled")]
-        public bool Enabled { get; set; }
-
-        [JsonProperty("expires")]
-        public DateTime? Expires { get; set; }
+        [JsonProperty("expires")] public DateTime? Expires { get; set; }
 
         [JsonProperty("maxSubscriptionDuration")]
         public TimeSpan? MaxSubscriptionDuration { get; set; }
 
-        [JsonProperty("audit")]
-        public bool Audit { get; set; }
+        [JsonProperty("audit")] public bool Audit { get; set; }
 
         [JsonProperty("requireEncryptedChannel")]
         public bool RequireEncryptedChannel { get; set; }

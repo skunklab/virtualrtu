@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Text;
+﻿using System.Text;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.Configuration.Deployment
 {
@@ -9,6 +9,7 @@ namespace VirtualRtu.Configuration.Deployment
 
         public abstract U Post<T, U>(T body)
             where T : class, new();
+
         public abstract void Post<T>(T body) where T : class;
 
         public abstract void Post();
@@ -27,8 +28,5 @@ namespace VirtualRtu.Configuration.Deployment
 
             return byteArray;
         }
-
-
-
     }
 }

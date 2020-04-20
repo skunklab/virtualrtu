@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { ILogger } from "./ILogger";
 import { TransferFormat } from "./ITransport";
+
 /** Defines the type of a Hub Message. */
 export declare enum MessageType {
     /** Indicates the message is an Invocation message and implements the {@link @aspnet/signalr.InvocationMessage} interface. */
@@ -18,18 +19,28 @@ export declare enum MessageType {
     /** Indicates the message is a Close message and implements the {@link @aspnet/signalr.CloseMessage} interface. */
     Close = 7
 }
+
 /** Defines a dictionary of string keys and string values representing headers attached to a Hub message. */
 export interface MessageHeaders {
     /** Gets or sets the header with the specified key. */
     [key: string]: string;
 }
+
 /** Union type of all known Hub messages. */
-export declare type HubMessage = InvocationMessage | StreamInvocationMessage | StreamItemMessage | CompletionMessage | CancelInvocationMessage | PingMessage | CloseMessage;
+export declare type HubMessage = InvocationMessage |
+                                 StreamInvocationMessage |
+                                 StreamItemMessage |
+                                 CompletionMessage |
+                                 CancelInvocationMessage |
+                                 PingMessage |
+                                 CloseMessage;
+
 /** Defines properties common to all Hub messages. */
 export interface HubMessageBase {
     /** A {@link @aspnet/signalr.MessageType} value indicating the type of this message. */
     readonly type: MessageType;
 }
+
 /** Defines properties common to all Hub messages relating to a specific invocation. */
 export interface HubInvocationMessage extends HubMessageBase {
     /** A {@link @aspnet/signalr.MessageHeaders} dictionary containing headers attached to the message. */
@@ -41,6 +52,7 @@ export interface HubInvocationMessage extends HubMessageBase {
      */
     readonly invocationId?: string;
 }
+
 /** A hub message representing a non-streaming invocation. */
 export interface InvocationMessage extends HubInvocationMessage {
     /** @inheritDoc */
@@ -50,6 +62,7 @@ export interface InvocationMessage extends HubInvocationMessage {
     /** The target method arguments. */
     readonly arguments: any[];
 }
+
 /** A hub message representing a streaming invocation. */
 export interface StreamInvocationMessage extends HubInvocationMessage {
     /** @inheritDoc */
@@ -61,6 +74,7 @@ export interface StreamInvocationMessage extends HubInvocationMessage {
     /** The target method arguments. */
     readonly arguments: any[];
 }
+
 /** A hub message representing a single item produced as part of a result stream. */
 export interface StreamItemMessage extends HubInvocationMessage {
     /** @inheritDoc */
@@ -70,6 +84,7 @@ export interface StreamItemMessage extends HubInvocationMessage {
     /** The item produced by the server. */
     readonly item?: any;
 }
+
 /** A hub message representing the result of an invocation. */
 export interface CompletionMessage extends HubInvocationMessage {
     /** @inheritDoc */
@@ -87,11 +102,13 @@ export interface CompletionMessage extends HubInvocationMessage {
      */
     readonly result?: any;
 }
+
 /** A hub message indicating that the sender is still active. */
 export interface PingMessage extends HubMessageBase {
     /** @inheritDoc */
     readonly type: MessageType.Ping;
 }
+
 /** A hub message indicating that the sender is closing the connection.
  *
  * If {@link @aspnet/signalr.CloseMessage.error} is defined, the sender is closing the connection due to an error.
@@ -105,6 +122,7 @@ export interface CloseMessage extends HubMessageBase {
      */
     readonly error?: string;
 }
+
 /** A hub message sent to request that a streaming invocation be canceled. */
 export interface CancelInvocationMessage extends HubInvocationMessage {
     /** @inheritDoc */
@@ -112,6 +130,7 @@ export interface CancelInvocationMessage extends HubInvocationMessage {
     /** The invocation ID. */
     readonly invocationId: string;
 }
+
 /** A protocol abstraction for communicating with SignalR Hubs.  */
 export interface IHubProtocol {
     /** The name of the protocol. This is used by SignalR to resolve the protocol between the client and server. */

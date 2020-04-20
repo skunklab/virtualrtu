@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System;
 
 namespace VirtualRtu.Communications.Diagnostics
 {
@@ -8,10 +8,6 @@ namespace VirtualRtu.Communications.Diagnostics
     [JsonObject]
     public class DiagnosticsMessage
     {
-        public DiagnosticsMessage()
-        {
-        }
-
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
         public DiagnosticsEventType Type { get; set; }

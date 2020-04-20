@@ -549,8 +549,8 @@ function New-VrtuVnetDeploy
     Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
 
     Update-Step -Step $step -Message "Deploying helm chart for VRTU VNET" -Start $start
-    $step++
-    helm install "$Path/virtualrtu-vnet" --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$ltm --set symmetricKey=$SymmetricKey --set hostname=$Hostname --set storageConnectionString="$storageConnectionString" --set container=$BlobContainerName --set filename=$filename --set virtualRtuId=$VirtualRtuId --set instrumentationKey=$instrumentationKey --set logLevel=$LogLevel
+    $step++ 
+    helm install virtualrtu "$Path/virtualrtu-vnet" --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$ltm --set symmetricKey=$SymmetricKey --set hostname=$Hostname --set storageConnectionString="$storageConnectionString" --set container=$BlobContainerName --set filename=$filename --set virtualRtuId=$VirtualRtuId --set instrumentationKey=$instrumentationKey --set logLevel=$LogLevel
 
     Write-Host "-- Step $step - Geting IP for Subnet communications" -ForegroundColor Green
     $ip = Get-ExternalIPForService -AppName "vrtu"
@@ -709,7 +709,7 @@ function Add-WedMonitorDeploy
 
         Update-Step -Step $step -Message "Add cert manager for Let's Encrypt" -Start $start
         $step++
-        Add-CertManager2 -Namespace "cert-manager2"
+        Add-CertManager2
         Set-Timer -Message "...waiting 45 seconds for cert-manager to initialize" -Seconds 45
 
         Update-Step -Step $step -Message "Add cert issuer for Lets Encrypt" -Start $start
@@ -753,7 +753,7 @@ function Add-WedMonitorDeploy
     $step++
     $domain = "$Domain.onmicrosoft.com"
     $hostname = $PiraeusHostname 
-    helm install "$Path/virtualrtu-webmonitor" --name virtualrtu-webmonitor --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
+    helm install virtualrtu-webmonitor "$Path/virtualrtu-webmonitor" --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
 	if($LASTEXITCODE -ne 0 )
 	{
         Update-Step -Step $step -Message "Waiting for Kubernetes API Services to start" -Start $start
@@ -762,7 +762,7 @@ function Add-WedMonitorDeploy
         
         Update-Step -Step $step -Message "Trying again to install VRTU Monitor from helm chart" -Start $start
         $step++
-		helm install "$Path/virtualrtu-webmonitor" --name virtualrtu-webmonitor --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
+		helm install virtualrtu-webmonitor "$Path/virtualrtu-webmonitor" --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
 	}
 	
    
@@ -892,7 +892,7 @@ function New-WebMonitorDeploy
 
         Update-Step -Step $step -Message "Add cert manager for Let's Encrypt" -Start $start
         $step++
-        Add-CertManager2 -Namespace "cert-manager2"
+        Add-CertManager2
         Set-Timer -Message "...waiting 45 seconds for cert-manager to initialize" -Seconds 45
 
         Update-Step -Step $step -Message "Add cert issuer for Lets Encrypt" -Start $start
@@ -936,7 +936,8 @@ function New-WebMonitorDeploy
     $step++
     $domain = "$Domain.onmicrosoft.com"
     $hostname = $PiraeusHostname 
-    helm install "$Path/virtualrtu-webmonitor" --name virtualrtu-webmonitor --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
+    helm install virtualrtu-webmonitor "$Path/virtualrtu-webmonitor" --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
+    
 	if($LASTEXITCODE -ne 0 )
 	{
         Update-Step -Step $step -Message "Waiting for Kubernetes API Services to start" -Start $start
@@ -945,7 +946,7 @@ function New-WebMonitorDeploy
         
         Update-Step -Step $step -Message "Trying again to install VRTU Monitor from helm chart" -Start $start
         $step++
-		helm install "$Path/virtualrtu-webmonitor" --name virtualrtu-webmonitor --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
+		helm install virtualrtu-webmonitor "$Path/virtualrtu-webmonitor" --namespace "webmon" --set port=$Port --set symmetricKey=$SymmetricKey --set instrumentationKey=$aiKey --set logLevel=$LogLevel --set tenantId=$tenantId --set clientId=$clientId --set domain=$domain --set hostname=$hostname --set location=$Location --set storageConnectionString=$vrtuConnectionString --set tableName=$TableName
 	}
 	
    
@@ -1057,12 +1058,16 @@ function Get-ExternalIPForService
 
 function Add-CertManager2
 {
-	param([string]$Namespace = "cert-manager")
-
-    kubectl label namespace $Namespace certmanager.k8s.io/disable-validation="true"
-    kubectl apply -f "https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml" -n "$Namespace" --validate=false
+	kubectl create namespace "cert-manager"
+	
+	kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.14.1/cert-manager.yaml
     helm repo add jetstack https://charts.jetstack.io
     helm repo update
-    helm install --name cert-manager --namespace $Namespace --version v0.11.0 --set ingressShim.extraArgs='{--default-issuer-name=letsencrypt-prod,--default-issuer-kind=ClusterIssuer}' jetstack/cert-manager --set webhook.enabled=true      
+    
+    #kubectl label namespace $Namespace certmanager.k8s.io/disable-validation="true"
+    #kubectl apply -f "https://raw.githubusercontent.com/jetstack/cert-manager/release-0.11/deploy/manifests/00-crds.yaml" -n "$Namespace" --validate=false
+    #helm repo add jetstack https://charts.jetstack.io
+    #helm repo update
+    #helm install --name cert-manager --namespace $Namespace --version v0.11.0 --set ingressShim.extraArgs='{--default-issuer-name=letsencrypt-prod,--default-issuer-kind=ClusterIssuer}' jetstack/cert-manager --set webhook.enabled=true      
     
 }

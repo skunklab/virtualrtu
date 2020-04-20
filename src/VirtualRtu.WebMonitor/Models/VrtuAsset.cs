@@ -1,7 +1,7 @@
-﻿using VirtualRtu.WebMonitor.Configuration;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using VirtualRtu.WebMonitor.Configuration;
 
 namespace VirtualRtu.WebMonitor.Models
 {
@@ -14,7 +14,7 @@ namespace VirtualRtu.WebMonitor.Models
             Text = node.Id;
             Href = "#" + node.Id;
             Nodes = new List<DevAsset>();
-            foreach(var item in node.Devices)
+            foreach (var item in node.Devices)
             {
                 var asset = new DevAsset(node.Id, item.Id);
                 Nodes.Add(asset);
@@ -23,13 +23,10 @@ namespace VirtualRtu.WebMonitor.Models
             Nodes.Sort();
         }
 
-        [JsonProperty("text")]
-        public string Text { get; set; }
+        [JsonProperty("text")] public string Text { get; set; }
 
-        [JsonProperty("href")]
-        public string Href { get; set; }
+        [JsonProperty("href")] public string Href { get; set; }
 
-        [JsonProperty("nodes")]
-        public List<DevAsset> Nodes{ get;set; }
+        [JsonProperty("nodes")] public List<DevAsset> Nodes { get; set; }
     }
 }

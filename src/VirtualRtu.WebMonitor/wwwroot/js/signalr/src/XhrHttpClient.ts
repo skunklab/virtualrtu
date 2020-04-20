@@ -14,7 +14,7 @@ export class XhrHttpClient extends HttpClient {
     }
 
     /** @inheritDoc */
-    public send(request: HttpRequest): Promise<HttpResponse> {
+    send(request: HttpRequest): Promise<HttpResponse> {
         // Check that abort was not signaled before calling send
         if (request.abortSignal && request.abortSignal.aborted) {
             return Promise.reject(new AbortError());

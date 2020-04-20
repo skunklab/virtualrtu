@@ -9,13 +9,13 @@ import { Subject } from "./Subject";
 
 /** @private */
 export class Arg {
-    public static isRequired(val: any, name: string): void {
+    static isRequired(val: any, name: string): void {
         if (val === null || val === undefined) {
             throw new Error(`The '${name}' argument is required.`);
         }
     }
 
-    public static isIn(val: any, values: any, name: string): void {
+    static isIn(val: any, values: any, name: string): void {
         // TypeScript enums have keys for **both** the name and the value of each enum member on the type itself.
         if (!(val in values)) {
             throw new Error(`Unknown ${name} value: ${val}.`);
@@ -26,15 +26,15 @@ export class Arg {
 /** @private */
 export class Platform {
 
-    public static get isBrowser(): boolean {
+    static get isBrowser(): boolean {
         return typeof window === "object";
     }
 
-    public static get isWebWorker(): boolean {
+    static get isWebWorker(): boolean {
         return typeof self === "object" && "importScripts" in self;
     }
 
-    public static get isNode(): boolean {
+    static get isNode(): boolean {
         return !this.isBrowser && !this.isWebWorker;
     }
 }
@@ -74,15 +74,22 @@ export function formatArrayBuffer(data: ArrayBuffer): string {
 // Also in signalr-protocol-msgpack/Utils.ts
 /** @private */
 export function isArrayBuffer(val: any): val is ArrayBuffer {
-    return val && typeof ArrayBuffer !== "undefined" &&
+    return val &&
+        typeof ArrayBuffer !== "undefined" &&
         (val instanceof ArrayBuffer ||
             // Sometimes we get an ArrayBuffer that doesn't satisfy instanceof
             (val.constructor && val.constructor.name === "ArrayBuffer"));
 }
 
 /** @private */
-export async function sendMessage(logger: ILogger, transportName: string, httpClient: HttpClient, url: string, accessTokenFactory: (() => string | Promise<string>) | undefined, content: string | ArrayBuffer, logMessageContent: boolean): Promise<void> {
-    let headers;
+export async function sendMessage(logger: ILogger,
+    transportName: string,
+    httpClient: HttpClient,
+    url: string,
+    accessTokenFactory: (() => string | Promise<string>) | undefined,
+    content: string | ArrayBuffer,
+    logMessageContent: boolean): Promise<void> {
+    let headers: { Authorization: string };
     if (accessTokenFactory) {
         const token = await accessTokenFactory();
         if (token) {
@@ -92,16 +99,19 @@ export async function sendMessage(logger: ILogger, transportName: string, httpCl
         }
     }
 
-    logger.log(LogLevel.Trace, `(${transportName} transport) sending data. ${getDataDetail(content, logMessageContent)}.`);
+    logger.log(LogLevel.Trace,
+        `(${transportName} transport) sending data. ${getDataDetail(content, logMessageContent)}.`);
 
     const responseType = isArrayBuffer(content) ? "arraybuffer" : "text";
-    const response = await httpClient.post(url, {
-        content,
-        headers,
-        responseType,
-    });
+    const response = await httpClient.post(url,
+        {
+            content,
+            headers,
+            responseType,
+        });
 
-    logger.log(LogLevel.Trace, `(${transportName} transport) request complete. Response status: ${response.statusCode}.`);
+    logger.log(LogLevel.Trace,
+        `(${transportName} transport) request complete. Response status: ${response.statusCode}.`);
 }
 
 /** @private */
@@ -131,14 +141,14 @@ export class SubjectSubscription<T> implements ISubscription<T> {
         this.observer = observer;
     }
 
-    public dispose(): void {
-        const index: number = this.subject.observers.indexOf(this.observer);
+    dispose(): void {
+        const index = this.subject.observers.indexOf(this.observer);
         if (index > -1) {
             this.subject.observers.splice(index, 1);
         }
 
         if (this.subject.observers.length === 0 && this.subject.cancelCallback) {
-            this.subject.cancelCallback().catch((_) => { });
+            this.subject.cancelCallback().catch((_) => {});
         }
     }
 }
@@ -148,7 +158,7 @@ export class ConsoleLogger implements ILogger {
     private readonly minimumLogLevel: LogLevel;
 
     // Public for testing purposes.
-    public outputConsole: {
+    outputConsole: {
         error(message: any): void,
         warn(message: any): void,
         info(message: any): void,
@@ -160,23 +170,23 @@ export class ConsoleLogger implements ILogger {
         this.outputConsole = console;
     }
 
-    public log(logLevel: LogLevel, message: string): void {
+    log(logLevel: LogLevel, message: string): void {
         if (logLevel >= this.minimumLogLevel) {
             switch (logLevel) {
-                case LogLevel.Critical:
-                case LogLevel.Error:
-                    this.outputConsole.error(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                case LogLevel.Warning:
-                    this.outputConsole.warn(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                case LogLevel.Information:
-                    this.outputConsole.info(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
-                default:
-                    // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
-                    this.outputConsole.log(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
-                    break;
+            case LogLevel.Critical:
+            case LogLevel.Error:
+                this.outputConsole.error(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            case LogLevel.Warning:
+                this.outputConsole.warn(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            case LogLevel.Information:
+                this.outputConsole.info(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
+            default:
+                // console.debug only goes to attached debuggers in Node, so we use console.log for Trace and Debug
+                this.outputConsole.log(`[${new Date().toISOString()}] ${LogLevel[logLevel]}: ${message}`);
+                break;
             }
         }
     }

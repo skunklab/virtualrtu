@@ -1,22 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SkunkLab.Channels;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using SkunkLab.Channels;
 using VirtualRtu.Communications.Modbus;
 
 namespace EchoScadaClient
 {
-    class Program
+    internal class Program
     {
         public static IChannel channel;
         public static bool ican;
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
             Console.WriteLine("8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8 8\"\"\"\"8");
             Console.WriteLine("8      8    \" 8    8 8    8 8    8");
@@ -34,15 +31,6 @@ namespace EchoScadaClient
             Console.WriteLine("");
 
 
-            
-
-
-
-
-
-
-
-
             Console.WriteLine("press any key to continue");
             Console.ReadKey();
 
@@ -51,7 +39,7 @@ namespace EchoScadaClient
 
             Console.Write("Enter for default IP (127.0.0.1)? ");
             string inputIpAddress = Console.ReadLine();
-            if(!string.IsNullOrEmpty(inputIpAddress))
+            if (!string.IsNullOrEmpty(inputIpAddress))
             {
                 publicIP = inputIpAddress;
             }
@@ -64,7 +52,7 @@ namespace EchoScadaClient
             Random ran = new Random();
             byte[] buffer = new byte[100];
             ran.NextBytes(buffer);
-            MbapHeader header = new MbapHeader()
+            MbapHeader header = new MbapHeader
             {
                 UnitId = 2,
                 ProtocolId = 1,
@@ -72,15 +60,14 @@ namespace EchoScadaClient
                 Length = 6
             };
 
-            byte[] body = new byte[] { 3, 79, 27, 0, 10 };
-
+            byte[] body = {3, 79, 27, 0, 10};
 
 
             byte[] array = header.Encode();
             byte[] output = new byte[buffer.Length + array.Length];
             Buffer.BlockCopy(array, 0, output, 0, array.Length);
             Buffer.BlockCopy(buffer, 0, output, array.Length, buffer.Length);
-            
+
             byte[] o2 = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
             MbapHeader mh = MbapHeader.Decode(o2);
 
@@ -96,21 +83,21 @@ namespace EchoScadaClient
             channel.OnReceive += Channel_OnReceive;
 
             channel.OpenAsync().GetAwaiter();
-            while(!ican)
+            while (!ican)
             {
                 Task t = Task.Delay(2000);
                 Task.WaitAll(t);
             }
-            
+
             //channel.SendAsync(output).GetAwaiter();
 
             bool test = true;
-            while(test)
+            while (test)
             {
                 Console.Write("Send a message [y/n] ? ");
-                
+
                 string decision = Console.ReadLine();
-                if(decision.ToLowerInvariant() == "y")
+                if (decision.ToLowerInvariant() == "y")
                 {
                     byte[] payload = Convert.FromBase64String("AAEAAAAGAQNPGwAK");
                     //MbapHeader header2 = MbapHeader.Decode(payload);
@@ -119,7 +106,7 @@ namespace EchoScadaClient
                     //byte[] buffer2 = new byte[payload.Length];
                     //Buffer.BlockCopy(headerBytes, 0, buffer2, 0, headerBytes.Length);
                     //Buffer.BlockCopy(payload, headerBytes.Length, buffer2, headerBytes.Length, payload.Length - headerBytes.Length);
-                   
+
                     //dummy++;
                     //payload[1] = dummy;
 
@@ -137,7 +124,6 @@ namespace EchoScadaClient
 
             Console.WriteLine("terminating...");
             Console.ReadKey();
-
         }
 
         private static void Channel_OnReceive(object sender, ChannelReceivedEventArgs e)
@@ -153,8 +139,8 @@ namespace EchoScadaClient
             string ipAddressString = null;
 
             foreach (IPAddress address in entry.AddressList)
-            {                
-                if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork)
                 {
                     Console.WriteLine(address.ToString());
                     if (address.ToString().Contains("172"))
@@ -162,13 +148,10 @@ namespace EchoScadaClient
                         ipAddressString = address.ToString();
                         break;
                     }
-
                 }
             }
 
             return ipAddressString;
-
-
         }
 
 

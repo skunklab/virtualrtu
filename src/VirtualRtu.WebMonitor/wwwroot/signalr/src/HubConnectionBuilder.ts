@@ -14,34 +14,34 @@ import { Arg, ConsoleLogger } from "./Utils";
 /** A builder for configuring {@link @aspnet/signalr.HubConnection} instances. */
 export class HubConnectionBuilder {
     /** @internal */
-    public protocol?: IHubProtocol;
+    protocol?: IHubProtocol;
     /** @internal */
-    public httpConnectionOptions?: IHttpConnectionOptions;
+    httpConnectionOptions?: IHttpConnectionOptions;
     /** @internal */
-    public url?: string;
+    url?: string;
     /** @internal */
-    public logger?: ILogger;
+    logger?: ILogger;
 
     /** Configures console logging for the {@link @aspnet/signalr.HubConnection}.
      *
      * @param {LogLevel} logLevel The minimum level of messages to log. Anything at this level, or a more severe level, will be logged.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public configureLogging(logLevel: LogLevel): HubConnectionBuilder;
+    configureLogging(logLevel: LogLevel): HubConnectionBuilder;
 
     /** Configures custom logging for the {@link @aspnet/signalr.HubConnection}.
      *
      * @param {ILogger} logger An object implementing the {@link @aspnet/signalr.ILogger} interface, which will be used to write all log messages.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public configureLogging(logger: ILogger): HubConnectionBuilder;
+    configureLogging(logger: ILogger): HubConnectionBuilder;
     /** Configures custom logging for the {@link @aspnet/signalr.HubConnection}.
      *
      * @param {LogLevel | ILogger} logging An object implementing the {@link @aspnet/signalr.ILogger} interface or {@link @aspnet/signalr.LogLevel}.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public configureLogging(logging: LogLevel | ILogger): HubConnectionBuilder;
-    public configureLogging(logging: LogLevel | ILogger): HubConnectionBuilder {
+    configureLogging(logging: LogLevel | ILogger): HubConnectionBuilder;
+    configureLogging(logging: LogLevel | ILogger): HubConnectionBuilder {
         Arg.isRequired(logging, "logging");
 
         if (isLogger(logging)) {
@@ -60,7 +60,7 @@ export class HubConnectionBuilder {
      * @param {string} url The URL the connection will use.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public withUrl(url: string): HubConnectionBuilder;
+    withUrl(url: string): HubConnectionBuilder;
 
     /** Configures the {@link @aspnet/signalr.HubConnection} to use the specified HTTP-based transport to connect to the specified URL.
      *
@@ -68,7 +68,7 @@ export class HubConnectionBuilder {
      * @param {HttpTransportType} transportType The specific transport to use.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public withUrl(url: string, transportType: HttpTransportType): HubConnectionBuilder;
+    withUrl(url: string, transportType: HttpTransportType): HubConnectionBuilder;
 
     /** Configures the {@link @aspnet/signalr.HubConnection} to use HTTP-based transports to connect to the specified URL.
      *
@@ -76,8 +76,8 @@ export class HubConnectionBuilder {
      * @param {IHttpConnectionOptions} options An options object used to configure the connection.
      * @returns The {@link @aspnet/signalr.HubConnectionBuilder} instance, for chaining.
      */
-    public withUrl(url: string, options: IHttpConnectionOptions): HubConnectionBuilder;
-    public withUrl(url: string, transportTypeOrOptions?: IHttpConnectionOptions | HttpTransportType): HubConnectionBuilder {
+    withUrl(url: string, options: IHttpConnectionOptions): HubConnectionBuilder;
+    withUrl(url: string, transportTypeOrOptions?: IHttpConnectionOptions | HttpTransportType): HubConnectionBuilder {
         Arg.isRequired(url, "url");
 
         this.url = url;
@@ -99,7 +99,7 @@ export class HubConnectionBuilder {
      *
      * @param {IHubProtocol} protocol The {@link @aspnet/signalr.IHubProtocol} implementation to use.
      */
-    public withHubProtocol(protocol: IHubProtocol): HubConnectionBuilder {
+    withHubProtocol(protocol: IHubProtocol): HubConnectionBuilder {
         Arg.isRequired(protocol, "protocol");
 
         this.protocol = protocol;
@@ -110,7 +110,7 @@ export class HubConnectionBuilder {
      *
      * @returns {HubConnection} The configured {@link @aspnet/signalr.HubConnection}.
      */
-    public build(): HubConnection {
+    build(): HubConnection {
         // If httpConnectionOptions has a logger, use it. Otherwise, override it with the one
         // provided to configureLogger
         const httpConnectionOptions = this.httpConnectionOptions || {};

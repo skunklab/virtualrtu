@@ -4,12 +4,12 @@ namespace VirtualRtu.Communications.Pipelines
 {
     public class OutputMapFilter : IFilter
     {
+        private readonly MbapMapper mapper;
+
         public OutputMapFilter(MbapMapper mapper)
         {
             this.mapper = mapper;
         }
-
-        private MbapMapper mapper;
 
         public byte[] Execute(byte[] message, byte? alias = null)
         {

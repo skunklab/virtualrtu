@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SkunkLab.Channels;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using VirtualRtu.Communications.Channels;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Communications.Tcp;
@@ -19,19 +17,33 @@ namespace VirtualRtu.Gateway.Controllers
     [ApiController]
     public class RtuController : ControllerBase
     {
+        private readonly WaitHandle[] waitHandles =
+        {
+            new AutoResetEvent(false)
+        };
+
+        private readonly IChannel channel;
+        private readonly ILogger logger;
+
+
+        private readonly MbapMapper mapper;
+
+        private byte[] result;
+
         public RtuController(ModuleConfig config, ILogger logger = null)
         {
-            this.channel = ModuleTcpChannel.CreateSingleton(config, logger);
-            if(!this.channel.IsConnected)
+            channel = ModuleTcpChannel.CreateSingleton(config, logger);
+            if (!channel.IsConnected)
             {
-                this.channel.OpenAsync().GetAwaiter();
+                channel.OpenAsync().GetAwaiter();
             }
+
             this.logger = logger;
         }
 
         public RtuController(ModuleConfig config, ModuleTcpChannel channel, ILogger logger = null)
         {
-            if(channel == null)
+            if (channel == null)
             {
                 this.channel = ModuleTcpChannel.CreateSingleton(config, logger);
                 if (!this.channel.IsConnected)
@@ -43,25 +55,12 @@ namespace VirtualRtu.Gateway.Controllers
             {
                 this.channel = channel;
             }
-            
+
             this.logger = logger;
             mapper = new MbapMapper(Guid.NewGuid().ToString());
         }
 
-        
-
-        private MbapMapper mapper;
-        private ILogger logger;
-        private IChannel channel;
-
-        private delegate void HttpResponseObserverHandler(object sender, TcpReceivedEventArgs args);
         private event HttpResponseObserverHandler OnMessage;
-        private readonly WaitHandle[] waitHandles = new WaitHandle[]
-        {
-            new AutoResetEvent(false)
-        };
-
-        private byte[] result;
 
         [HttpPost]
         [Produces("application/octet-stream")]
@@ -70,18 +69,16 @@ namespace VirtualRtu.Gateway.Controllers
             channel.OnReceive += Channel_OnReceive;
             mapper.MapIn(message);
             await channel.AddMessageAsync(message);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(Listen), waitHandles[0]);
+            ThreadPool.QueueUserWorkItem(Listen, waitHandles[0]);
             WaitHandle.WaitAll(waitHandles);
             if (result != null)
             {
                 logger?.LogDebug("API returned response.");
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new ByteArrayContent(result) };
+                return new HttpResponseMessage(HttpStatusCode.OK) {Content = new ByteArrayContent(result)};
             }
-            else
-            {
-                logger?.LogWarning("API returned no response from RTU.");
-                return new HttpResponseMessage(System.Net.HttpStatusCode.InternalServerError);
-            }
+
+            logger?.LogWarning("API returned no response from RTU.");
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
         }
 
         private void Channel_OnReceive(object sender, ChannelReceivedEventArgs e)
@@ -91,7 +88,7 @@ namespace VirtualRtu.Gateway.Controllers
 
         private void Listen(object state)
         {
-            AutoResetEvent are = (AutoResetEvent)state;
+            AutoResetEvent are = (AutoResetEvent) state;
             OnMessage += (o, a) =>
             {
                 byte[] msg = mapper.MapOut(a.Message);
@@ -102,5 +99,7 @@ namespace VirtualRtu.Gateway.Controllers
                 }
             };
         }
+
+        private delegate void HttpResponseObserverHandler(object sender, TcpReceivedEventArgs args);
     }
 }

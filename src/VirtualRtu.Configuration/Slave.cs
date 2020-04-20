@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Newtonsoft.Json;
 using VirtualRtu.Configuration.Vrtu;
 
 namespace VirtualRtu.Configuration
@@ -22,20 +21,15 @@ namespace VirtualRtu.Configuration
             Alias = alias;
         }
 
-        [JsonProperty("unitId")]
-        public byte UnitId { get; set; }
+        [JsonProperty("unitId")] public byte UnitId { get; set; }
 
-        [JsonProperty("ipAddress")]
-        public string IPAddress { get; set; }
+        [JsonProperty("ipAddress")] public string IPAddress { get; set; }
 
-        [JsonProperty("port")]
-        public int Port { get; set; }
+        [JsonProperty("port")] public int Port { get; set; }
 
-        [JsonProperty("alias")]
-        public byte? Alias { get; set; }
+        [JsonProperty("alias")] public byte? Alias { get; set; }
 
-        [JsonProperty("constraints")]
-        public List<Constraint> Constraints { get; set; }
+        [JsonProperty("constraints")] public List<Constraint> Constraints { get; set; }
 
         public void RemoveConstraints()
         {

@@ -13,7 +13,8 @@ export class NodeHttpClient extends HttpClient {
         super();
     }
 
-    public send(): Promise<HttpResponse> {
-        return Promise.reject(new Error("If using Node either provide an XmlHttpRequest polyfill or consume the cjs or esm script instead of the browser/signalr.js one."));
+    send(): Promise<HttpResponse> {
+        return Promise.reject(new Error(
+            "If using Node either provide an XmlHttpRequest polyfill or consume the cjs or esm script instead of the browser/signalr.js one."));
     }
 }

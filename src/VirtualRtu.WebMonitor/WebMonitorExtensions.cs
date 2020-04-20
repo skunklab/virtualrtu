@@ -1,27 +1,24 @@
-﻿using VirtualRtu.WebMonitor.Configuration;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using VirtualRtu.WebMonitor.Configuration;
 
 namespace VirtualRtu.WebMonitor
 {
     public static class WebMonitorExtensions
     {
-        public static IServiceCollection AddConfiguration(this IServiceCollection services, out MonitorConfig monitorConfig)
+        public static IServiceCollection AddConfiguration(this IServiceCollection services,
+            out MonitorConfig monitorConfig)
         {
             var builder = new ConfigurationBuilder()
-                    .AddJsonFile("./secrets.json")
-                    .AddEnvironmentVariables("WM_");
+                .AddJsonFile("./secrets.json")
+                .AddEnvironmentVariables("WM_");
 
             IConfigurationRoot root = builder.Build();
 
             var config = new MonitorConfig();
-            ConfigurationBinder.Bind(root, config);
+            root.Bind(config);
 
-            services.AddSingleton<MonitorConfig>(config);
+            services.AddSingleton(config);
             monitorConfig = config;
             return services;
         }

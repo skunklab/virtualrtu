@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Gateway
@@ -30,8 +27,8 @@ namespace VirtualRtu.Gateway
                 .AddEnvironmentVariables("VRTU_");
             IConfigurationRoot root = builder.Build();
             config = new VrtuConfig();
-            ConfigurationBinder.Bind(root, config);
-            services.AddSingleton<VrtuConfig>(config);
+            root.Bind(config);
+            services.AddSingleton(config);
 
             return services;
         }

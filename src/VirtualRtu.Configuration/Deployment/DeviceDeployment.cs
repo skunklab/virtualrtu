@@ -1,15 +1,18 @@
-﻿using Microsoft.Azure.Devices;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Shared;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace VirtualRtu.Configuration.Deployment
 {
     public class DeviceDeployment
     {
+        private readonly string hubName;
+
+        private readonly RegistryManager manager;
+        private readonly string template;
+
         public DeviceDeployment(string iotHubConnectionString, string deploymentTemplate)
         {
             manager = RegistryManager.CreateFromConnectionString(iotHubConnectionString);
@@ -17,10 +20,6 @@ namespace VirtualRtu.Configuration.Deployment
             IotHubConnectionStringBuilder builder = IotHubConnectionStringBuilder.Create(iotHubConnectionString);
             hubName = builder.IotHubName;
         }
-
-        private RegistryManager manager;
-        private string template;
-        private string hubName;
 
         public async Task<Device> GetDevice(string deviceId)
         {
@@ -37,17 +36,18 @@ namespace VirtualRtu.Configuration.Deployment
             }
 
             device = new Device(deviceId);
-            device.Capabilities = new DeviceCapabilities() { IotEdge = true };
+            device.Capabilities = new DeviceCapabilities {IotEdge = true};
             device = await manager.AddDeviceAsync(device);
             var config = JsonConvert.DeserializeObject<ConfigurationContent>(template);
             await manager.ApplyConfigurationContentOnDeviceAsync(deviceId, config);
-            
+
             return device;
         }
 
         public string GetDeviceConnectionString(Device device)
         {
-            return String.Format($"HostName={hubName}.azure-devices.net;DeviceId={device.Id};SharedAccessKey={device.Authentication.SymmetricKey.PrimaryKey}");
+            return string.Format(
+                $"HostName={hubName}.azure-devices.net;DeviceId={device.Id};SharedAccessKey={device.Authentication.SymmetricKey.PrimaryKey}");
         }
 
         public async Task UpdateModuleAsync(Device device, string moduleId, List<KeyValuePair<string, string>> desired)
@@ -56,10 +56,7 @@ namespace VirtualRtu.Configuration.Deployment
             if (module != null)
             {
                 Twin twin = await manager.GetTwinAsync(device.Id, moduleId);
-                foreach (var item in desired)
-                {
-                    twin.Properties.Desired[item.Key] = item.Value;
-                }
+                foreach (var item in desired) twin.Properties.Desired[item.Key] = item.Value;
 
                 await manager.UpdateTwinAsync(device.Id, moduleId, twin, twin.ETag);
             }

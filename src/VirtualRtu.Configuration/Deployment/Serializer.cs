@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.Configuration.Deployment
 {
@@ -19,14 +19,11 @@ namespace VirtualRtu.Configuration.Deployment
             }
             else if (contentType == "application/xml" || contentType == "text/xml")
             {
-                XmlWriterSettings settings = new XmlWriterSettings() { OmitXmlDeclaration = true };
+                XmlWriterSettings settings = new XmlWriterSettings {OmitXmlDeclaration = true};
                 XmlSerializer xs = new XmlSerializer(typeof(T));
                 using (MemoryStream stream = new MemoryStream())
                 {
-                    using (XmlWriter writer = XmlWriter.Create(stream, settings))
-                    {
-                        xs.Serialize(writer, body);
-                    }
+                    using (XmlWriter writer = XmlWriter.Create(stream, settings)) xs.Serialize(writer, body);
                     stream.Position = 0;
                     result = stream.ToArray();
                 }
@@ -49,7 +46,7 @@ namespace VirtualRtu.Configuration.Deployment
 
         public static T Deserialize<T>(string contentType, byte[] body)
         {
-            T result = default(T);
+            T result = default;
             if (contentType == "application/json")
             {
                 string jsonString = Encoding.UTF8.GetString(body);
@@ -61,16 +58,16 @@ namespace VirtualRtu.Configuration.Deployment
                 using (MemoryStream stream = new MemoryStream(body))
                 {
                     stream.Position = 0;
-                    result = (T)xs.Deserialize(stream);
+                    result = (T) xs.Deserialize(stream);
                 }
             }
             else if (contentType == "text/plain")
             {
-                result = (T)Convert.ChangeType(Encoding.UTF8.GetString(body), typeof(T));
+                result = (T) Convert.ChangeType(Encoding.UTF8.GetString(body), typeof(T));
             }
             else if (contentType == "application/octet-stream")
             {
-                result = (T)Convert.ChangeType(body, typeof(T));
+                result = (T) Convert.ChangeType(body, typeof(T));
             }
             else
             {

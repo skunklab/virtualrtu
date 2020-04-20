@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace VirtualRtu.Gateway.Formatters
 {
@@ -30,7 +30,5 @@ namespace VirtualRtu.Gateway.Formatters
         {
             await Task.CompletedTask;
         }
-
-
     }
 }

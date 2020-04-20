@@ -1,13 +1,12 @@
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Build.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace VirtualRtu.Configuration.Function
 {
@@ -17,48 +16,47 @@ namespace VirtualRtu.Configuration.Function
 
         [FunctionName("ConfigurationFunction")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]
+            HttpRequest req,
             ExecutionContext context)
         {
-
             ILogger log = null;
             config = new FunctionConfig();
 
-            if (File.Exists(String.Format($"{context.FunctionAppDirectory}/secrets.json")))
+            if (File.Exists(string.Format($"{context.FunctionAppDirectory}/secrets.json")))
             {
                 //secrets.json exists use it and environment variables
                 var builder = new ConfigurationBuilder()
                     .SetBasePath(context.FunctionAppDirectory)
-                    .AddJsonFile("secrets.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("secrets.json", true, true)
                     .AddEnvironmentVariables("FUNC_");
 
                 IConfigurationRoot root = builder.Build();
-                ConfigurationBinder.Bind(root, config);
-
+                root.Bind(config);
             }
-            else if (File.Exists(String.Format("{0}/{1}", context.FunctionAppDirectory, "local.settings.json")))
+            else if (File.Exists(string.Format("{0}/{1}", context.FunctionAppDirectory, "local.settings.json")))
             {
                 //use for local testing...do not use in production
                 //remember to add the storage connection string
                 var builder = new ConfigurationBuilder()
                     .SetBasePath(context.FunctionAppDirectory)
-                    .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("local.settings.json", true, true)
                     .AddEnvironmentVariables("FUNC_");
 
                 IConfigurationRoot root = builder.Build();
-                ConfigurationBinder.Bind(root, config);
+                root.Bind(config);
 
                 config.StorageConnectionString = root.GetConnectionString("StorageConnectionString");
             }
             else
             {
-                //no secrets or local.settings.json files...use only environment variables 
+                //no secrets or local.settings.json files...use only environment variables
                 var builder = new ConfigurationBuilder()
                     .AddEnvironmentVariables("FUNC_");
 
 
                 IConfigurationRoot root = builder.Build();
-                ConfigurationBinder.Bind(root, config);
+                root.Bind(config);
             }
 
             string luss = req.Query["luss"];
@@ -75,8 +73,8 @@ namespace VirtualRtu.Configuration.Function
 
                 foreach (var slave in moduleConfig.Slaves)
                     slave.RemoveConstraints();
-                
-                return (ActionResult)new OkObjectResult(moduleConfig);
+
+                return new OkObjectResult(moduleConfig);
             }
             catch (Exception ex)
             {

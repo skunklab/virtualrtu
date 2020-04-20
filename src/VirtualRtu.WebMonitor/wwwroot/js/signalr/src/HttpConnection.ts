@@ -66,11 +66,11 @@ export class HttpConnection implements IConnection {
     private accessTokenFactory?: () => string | Promise<string>;
     private sendQueue?: TransportSendQueue;
 
-    public readonly features: any = {};
-    public baseUrl: string;
-    public connectionId?: string;
-    public onreceive: ((data: string | ArrayBuffer) => void) | null;
-    public onclose: ((e?: Error) => void) | null;
+    readonly features: any = {};
+    baseUrl: string;
+    connectionId?: string;
+    onreceive: ((data: string | ArrayBuffer) => void) | null;
+    onclose: ((e?: Error) => void) | null;
 
     private readonly negotiateVersion: number = 1;
 
@@ -108,14 +108,15 @@ export class HttpConnection implements IConnection {
         this.onclose = null;
     }
 
-    public start(): Promise<void>;
-    public start(transferFormat: TransferFormat): Promise<void>;
-    public async start(transferFormat?: TransferFormat): Promise<void> {
+    start(): Promise<void>;
+    start(transferFormat: TransferFormat): Promise<void>;
+    async start(transferFormat?: TransferFormat): Promise<void> {
         transferFormat = transferFormat || TransferFormat.Binary;
 
         Arg.isIn(transferFormat, TransferFormat, "transferFormat");
 
-        this.logger.log(LogLevel.Debug, `Starting connection with transfer format '${TransferFormat[transferFormat]}'.`);
+        this.logger.log(LogLevel.Debug,
+            `Starting connection with transfer format '${TransferFormat[transferFormat]}'.`);
 
         if (this.connectionState !== ConnectionState.Disconnected) {
             return Promise.reject(new Error("Cannot start an HttpConnection that is not in the 'Disconnected' state."));
@@ -138,7 +139,8 @@ export class HttpConnection implements IConnection {
             return Promise.reject(new Error(message));
         } else if (this.connectionState as any !== ConnectionState.Connected) {
             // stop() was called and transitioned the client into the Disconnecting state.
-            const message = "HttpConnection.startInternal completed gracefully but didn't enter the connection into the connected state!";
+            const message =
+                "HttpConnection.startInternal completed gracefully but didn't enter the connection into the connected state!";
             this.logger.log(LogLevel.Error, message);
             return Promise.reject(new Error(message));
         }
@@ -146,7 +148,7 @@ export class HttpConnection implements IConnection {
         this.connectionStarted = true;
     }
 
-    public send(data: string | ArrayBuffer): Promise<void> {
+    send(data: string | ArrayBuffer): Promise<void> {
         if (this.connectionState !== ConnectionState.Connected) {
             return Promise.reject(new Error("Cannot send data if the connection is not in the 'Connected' State."));
         }
@@ -159,14 +161,18 @@ export class HttpConnection implements IConnection {
         return this.sendQueue.send(data);
     }
 
-    public async stop(error?: Error): Promise<void> {
+    async stop(error?: Error): Promise<void> {
         if (this.connectionState === ConnectionState.Disconnected) {
-            this.logger.log(LogLevel.Debug, `Call to HttpConnection.stop(${error}) ignored because the connection is already in the disconnected state.`);
+            this.logger.log(LogLevel.Debug,
+                `Call to HttpConnection.stop(${error
+                }) ignored because the connection is already in the disconnected state.`);
             return Promise.resolve();
         }
 
         if (this.connectionState === ConnectionState.Disconnecting) {
-            this.logger.log(LogLevel.Debug, `Call to HttpConnection.stop(${error}) ignored because the connection is already in the disconnecting state.`);
+            this.logger.log(LogLevel.Debug,
+                `Call to HttpConnection.stop(${error
+                }) ignored because the connection is already in the disconnecting state.`);
             return this.stopPromise;
         }
 
@@ -216,7 +222,8 @@ export class HttpConnection implements IConnection {
 
             this.transport = undefined;
         } else {
-            this.logger.log(LogLevel.Debug, "HttpConnection.transport is undefined in HttpConnection.stop() because start() failed.");
+            this.logger.log(LogLevel.Debug,
+                "HttpConnection.transport is undefined in HttpConnection.stop() because start() failed.");
             this.stopConnection();
         }
     }
@@ -245,7 +252,8 @@ export class HttpConnection implements IConnection {
                 do {
                     negotiateResponse = await this.getNegotiationResponse(url);
                     // the user tries to stop the connection when it is being started
-                    if (this.connectionState === ConnectionState.Disconnecting || this.connectionState === ConnectionState.Disconnected) {
+                    if (this.connectionState === ConnectionState.Disconnecting ||
+                        this.connectionState === ConnectionState.Disconnected) {
                         throw new Error("The connection was stopped during negotiation.");
                     }
 
@@ -254,7 +262,8 @@ export class HttpConnection implements IConnection {
                     }
 
                     if ((negotiateResponse as any).ProtocolVersion) {
-                        throw new Error("Detected a connection attempt to an ASP.NET SignalR Server. This client only supports connecting to an ASP.NET Core SignalR Server. See https://aka.ms/signalr-core-differences for details.");
+                        throw new Error(
+                            "Detected a connection attempt to an ASP.NET SignalR Server. This client only supports connecting to an ASP.NET Core SignalR Server. See https://aka.ms/signalr-core-differences for details.");
                     }
 
                     if (negotiateResponse.url) {
@@ -269,8 +278,7 @@ export class HttpConnection implements IConnection {
                     }
 
                     redirects++;
-                }
-                while (negotiateResponse.url && redirects < MAX_REDIRECTS);
+                } while (negotiateResponse.url && redirects < MAX_REDIRECTS);
 
                 if (redirects === MAX_REDIRECTS && negotiateResponse.url) {
                     throw new Error("Negotiate redirection limit exceeded.");
@@ -294,7 +302,7 @@ export class HttpConnection implements IConnection {
             // This is the only case startInternal can exit in neither the connected nor disconnected state because stopConnection()
             // will transition to the disconnected state. start() will wait for the transition using the stopPromise.
         } catch (e) {
-            this.logger.log(LogLevel.Error, "Failed to start the connection: " + e);
+            this.logger.log(LogLevel.Error, `Failed to start the connection: ${e}`);
             this.connectionState = ConnectionState.Disconnected;
             this.transport = undefined;
             return Promise.reject(e);
@@ -302,7 +310,7 @@ export class HttpConnection implements IConnection {
     }
 
     private async getNegotiationResponse(url: string): Promise<INegotiateResponse> {
-        let headers;
+        let headers: { Authorization: string };
         if (this.accessTokenFactory) {
             const token = await this.accessTokenFactory();
             if (token) {
@@ -315,13 +323,15 @@ export class HttpConnection implements IConnection {
         const negotiateUrl = this.resolveNegotiateUrl(url);
         this.logger.log(LogLevel.Debug, `Sending negotiation request: ${negotiateUrl}.`);
         try {
-            const response = await this.httpClient.post(negotiateUrl, {
-                content: "",
-                headers,
-            });
+            const response = await this.httpClient.post(negotiateUrl,
+                {
+                    content: "",
+                    headers,
+                });
 
             if (response.statusCode !== 200) {
-                return Promise.reject(new Error(`Unexpected status code returned from negotiate ${response.statusCode}`));
+                return Promise.reject(
+                    new Error(`Unexpected status code returned from negotiate ${response.statusCode}`));
             }
 
             const negotiateResponse = JSON.parse(response.content as string) as INegotiateResponse;
@@ -332,7 +342,7 @@ export class HttpConnection implements IConnection {
             }
             return negotiateResponse;
         } catch (e) {
-            this.logger.log(LogLevel.Error, "Failed to complete negotiation with the server: " + e);
+            this.logger.log(LogLevel.Error, `Failed to complete negotiation with the server: ${e}`);
             return Promise.reject(e);
         }
     }
@@ -345,7 +355,10 @@ export class HttpConnection implements IConnection {
         return url + (url.indexOf("?") === -1 ? "?" : "&") + `id=${connectionToken}`;
     }
 
-    private async createTransport(url: string, requestedTransport: HttpTransportType | ITransport | undefined, negotiateResponse: INegotiateResponse, requestedTransferFormat: TransferFormat): Promise<void> {
+    private async createTransport(url: string,
+        requestedTransport: HttpTransportType | ITransport | undefined,
+        negotiateResponse: INegotiateResponse,
+        requestedTransferFormat: TransferFormat): Promise<void> {
         let connectUrl = this.createConnectUrl(url, negotiateResponse.connectionToken);
         if (this.isITransport(requestedTransport)) {
             this.logger.log(LogLevel.Debug, "Connection was provided an instance of ITransport, using that directly.");
@@ -358,9 +371,10 @@ export class HttpConnection implements IConnection {
 
         const transportExceptions: any[] = [];
         const transports = negotiateResponse.availableTransports || [];
-        let negotiate: INegotiateResponse | undefined = negotiateResponse;
+        let negotiate = negotiateResponse;
         for (const endpoint of transports) {
-            const transportOrError = this.resolveTransportOrError(endpoint, requestedTransport, requestedTransferFormat);
+            const transportOrError =
+                this.resolveTransportOrError(endpoint, requestedTransport, requestedTransferFormat);
             if (transportOrError instanceof Error) {
                 // Store the error and continue, we don't want to cause a re-negotiate in these cases
                 transportExceptions.push(`${endpoint.transport} failed: ${transportOrError}`);
@@ -393,27 +407,40 @@ export class HttpConnection implements IConnection {
         }
 
         if (transportExceptions.length > 0) {
-            return Promise.reject(new Error(`Unable to connect to the server with any of the available transports. ${transportExceptions.join(" ")}`));
+            return Promise.reject(new Error(
+                `Unable to connect to the server with any of the available transports. ${transportExceptions.join(" ")
+                }`));
         }
         return Promise.reject(new Error("None of the transports supported by the client are supported by the server."));
     }
 
     private constructTransport(transport: HttpTransportType): ITransport {
         switch (transport) {
-            case HttpTransportType.WebSockets:
-                if (!this.options.WebSocket) {
-                    throw new Error("'WebSocket' is not supported in your environment.");
-                }
-                return new WebSocketTransport(this.httpClient, this.accessTokenFactory, this.logger, this.options.logMessageContent || false, this.options.WebSocket);
-            case HttpTransportType.ServerSentEvents:
-                if (!this.options.EventSource) {
-                    throw new Error("'EventSource' is not supported in your environment.");
-                }
-                return new ServerSentEventsTransport(this.httpClient, this.accessTokenFactory, this.logger, this.options.logMessageContent || false, this.options.EventSource);
-            case HttpTransportType.LongPolling:
-                return new LongPollingTransport(this.httpClient, this.accessTokenFactory, this.logger, this.options.logMessageContent || false);
-            default:
-                throw new Error(`Unknown transport: ${transport}.`);
+        case HttpTransportType.WebSockets:
+            if (!this.options.WebSocket) {
+                throw new Error("'WebSocket' is not supported in your environment.");
+            }
+            return new WebSocketTransport(this.httpClient,
+                this.accessTokenFactory,
+                this.logger,
+                this.options.logMessageContent || false,
+                this.options.WebSocket);
+        case HttpTransportType.ServerSentEvents:
+            if (!this.options.EventSource) {
+                throw new Error("'EventSource' is not supported in your environment.");
+            }
+            return new ServerSentEventsTransport(this.httpClient,
+                this.accessTokenFactory,
+                this.logger,
+                this.options.logMessageContent || false,
+                this.options.EventSource);
+        case HttpTransportType.LongPolling:
+            return new LongPollingTransport(this.httpClient,
+                this.accessTokenFactory,
+                this.logger,
+                this.options.logMessageContent || false);
+        default:
+            throw new Error(`Unknown transport: ${transport}.`);
         }
     }
 
@@ -423,10 +450,13 @@ export class HttpConnection implements IConnection {
         return this.transport!.connect(url, transferFormat);
     }
 
-    private resolveTransportOrError(endpoint: IAvailableTransport, requestedTransport: HttpTransportType | undefined, requestedTransferFormat: TransferFormat): ITransport | Error {
+    private resolveTransportOrError(endpoint: IAvailableTransport,
+        requestedTransport: HttpTransportType | undefined,
+        requestedTransferFormat: TransferFormat): ITransport | Error {
         const transport = HttpTransportType[endpoint.transport];
         if (transport === null || transport === undefined) {
-            this.logger.log(LogLevel.Debug, `Skipping transport '${endpoint.transport}' because it is not supported by this client.`);
+            this.logger.log(LogLevel.Debug,
+                `Skipping transport '${endpoint.transport}' because it is not supported by this client.`);
             return new Error(`Skipping transport '${endpoint.transport}' because it is not supported by this client.`);
         } else {
             if (transportMatches(requestedTransport, transport)) {
@@ -434,7 +464,9 @@ export class HttpConnection implements IConnection {
                 if (transferFormats.indexOf(requestedTransferFormat) >= 0) {
                     if ((transport === HttpTransportType.WebSockets && !this.options.WebSocket) ||
                         (transport === HttpTransportType.ServerSentEvents && !this.options.EventSource)) {
-                        this.logger.log(LogLevel.Debug, `Skipping transport '${HttpTransportType[transport]}' because it is not supported in your environment.'`);
+                        this.logger.log(LogLevel.Debug,
+                            `Skipping transport '${HttpTransportType[transport]
+                            }' because it is not supported in your environment.'`);
                         return new Error(`'${HttpTransportType[transport]}' is not supported in your environment.`);
                     } else {
                         this.logger.log(LogLevel.Debug, `Selecting transport '${HttpTransportType[transport]}'.`);
@@ -445,11 +477,17 @@ export class HttpConnection implements IConnection {
                         }
                     }
                 } else {
-                    this.logger.log(LogLevel.Debug, `Skipping transport '${HttpTransportType[transport]}' because it does not support the requested transfer format '${TransferFormat[requestedTransferFormat]}'.`);
-                    return new Error(`'${HttpTransportType[transport]}' does not support ${TransferFormat[requestedTransferFormat]}.`);
+                    this.logger.log(LogLevel.Debug,
+                        `Skipping transport '${HttpTransportType[transport]
+                        }' because it does not support the requested transfer format '${TransferFormat[
+                            requestedTransferFormat]}'.`);
+                    return new Error(
+                        `'${HttpTransportType[transport]}' does not support ${TransferFormat[requestedTransferFormat]
+                        }.`);
                 }
             } else {
-                this.logger.log(LogLevel.Debug, `Skipping transport '${HttpTransportType[transport]}' because it was disabled by the client.`);
+                this.logger.log(LogLevel.Debug,
+                    `Skipping transport '${HttpTransportType[transport]}' because it was disabled by the client.`);
                 return new Error(`'${HttpTransportType[transport]}' is disabled by the client.`);
             }
         }
@@ -460,7 +498,8 @@ export class HttpConnection implements IConnection {
     }
 
     private stopConnection(error?: Error): void {
-        this.logger.log(LogLevel.Debug, `HttpConnection.stopConnection(${error}) called while in state ${this.connectionState}.`);
+        this.logger.log(LogLevel.Debug,
+            `HttpConnection.stopConnection(${error}) called while in state ${this.connectionState}.`);
 
         this.transport = undefined;
 
@@ -469,12 +508,16 @@ export class HttpConnection implements IConnection {
         this.stopError = undefined;
 
         if (this.connectionState === ConnectionState.Disconnected) {
-            this.logger.log(LogLevel.Debug, `Call to HttpConnection.stopConnection(${error}) was ignored because the connection is already in the disconnected state.`);
+            this.logger.log(LogLevel.Debug,
+                `Call to HttpConnection.stopConnection(${error
+                }) was ignored because the connection is already in the disconnected state.`);
             return;
         }
 
         if (this.connectionState === ConnectionState.Connecting) {
-            this.logger.log(LogLevel.Warning, `Call to HttpConnection.stopConnection(${error}) was ignored because the connection hasn't yet left the in the connecting state.`);
+            this.logger.log(LogLevel.Warning,
+                `Call to HttpConnection.stopConnection(${error
+                }) was ignored because the connection hasn't yet left the in the connecting state.`);
             return;
         }
 
@@ -537,7 +580,7 @@ export class HttpConnection implements IConnection {
 
         if (negotiateUrl.indexOf("negotiateVersion") === -1) {
             negotiateUrl += index === -1 ? "?" : "&";
-            negotiateUrl += "negotiateVersion=" + this.negotiateVersion;
+            negotiateUrl += `negotiateVersion=${this.negotiateVersion}`;
         }
         return negotiateUrl;
     }
@@ -562,7 +605,7 @@ export class TransportSendQueue {
         this.sendLoopPromise = this.sendLoop();
     }
 
-    public send(data: string | ArrayBuffer): Promise<void> {
+    send(data: string | ArrayBuffer): Promise<void> {
         this.bufferData(data);
         if (!this.transportResult) {
             this.transportResult = new PromiseSource();
@@ -570,7 +613,7 @@ export class TransportSendQueue {
         return this.transportResult.promise;
     }
 
-    public stop(): Promise<void> {
+    stop(): Promise<void> {
         this.executing = false;
         this.sendBufferedData.resolve();
         return this.sendLoopPromise;
@@ -602,9 +645,9 @@ export class TransportSendQueue {
             const transportResult = this.transportResult!;
             this.transportResult = undefined;
 
-            const data = typeof(this.buffer[0]) === "string" ?
-                this.buffer.join("") :
-                TransportSendQueue.concatBuffers(this.buffer);
+            const data = typeof(this.buffer[0]) === "string"
+                ? this.buffer.join("")
+                : TransportSendQueue.concatBuffers(this.buffer);
 
             this.buffer.length = 0;
 
@@ -633,17 +676,17 @@ export class TransportSendQueue {
 class PromiseSource {
     private resolver?: () => void;
     private rejecter!: (reason?: any) => void;
-    public promise: Promise<void>;
+    promise: Promise<void>;
 
     constructor() {
         this.promise = new Promise((resolve, reject) => [this.resolver, this.rejecter] = [resolve, reject]);
     }
 
-    public resolve(): void {
+    resolve(): void {
         this.resolver!();
     }
 
-    public reject(reason?: any): void {
+    reject(reason?: any): void {
         this.rejecter!(reason);
     }
 }

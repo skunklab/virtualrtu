@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
 using VirtualRtu.Communications.Logging;
 using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Gateway
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.WriteLine("ee   e eeeee eeeee e   e ");
             Console.WriteLine("88   8 8   8   8   8   8");
@@ -21,21 +21,21 @@ namespace VirtualRtu.Gateway
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.AddModuleConfiguration(out VrtuConfig config);
-
-                services.AddLogging(builder =>
+        private static IHostBuilder CreateHostBuilder(string[] args) {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
                 {
-                    builder.AddConsole();
-                    builder.SetMinimumLevel(config.LoggingLevel);
+                    services.AddModuleConfiguration(out VrtuConfig config);
+
+                    services.AddLogging(builder =>
+                    {
+                        builder.AddConsole();
+                        builder.SetMinimumLevel(config.LoggingLevel);
+                    });
+                    services.AddLogging(builder => builder.AddLogging(config));
+                    services.AddSingleton<Logger>(); //add the logger
+                    services.AddHostedService<VirtualRtuService>();
                 });
-                services.AddLogging(builder => builder.AddLogging(config));
-                services.AddSingleton<Logger>();    //add the logger
-                services.AddHostedService<VirtualRtuService>();
-            });
-            
+        }
     }
 }

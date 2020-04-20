@@ -8,7 +8,7 @@ export class HttpError extends Error {
     private __proto__: Error;
 
     /** The HTTP status code represented by this error. */
-    public statusCode: number;
+    statusCode: number;
 
     /** Constructs a new instance of {@link @aspnet/signalr.HttpError}.
      *

@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Configuration;
 
@@ -9,14 +9,20 @@ namespace VirtualRtu.Communications.Tcp
 {
     public class TcpManager
     {
+        private readonly ModuleConfig config;
+        private readonly Dictionary<byte, Tuple<TcpConnection, byte?>> connections;
+        private readonly ILogger logger;
+        private readonly MbapMapper mapper;
+        private Dictionary<string, Slave> slaves;
+
         public TcpManager(ModuleConfig config, ILogger logger = null)
         {
             this.config = config;
             this.config.OnChanged += Config_OnChanged;
             this.logger = logger;
-            this.slaves = new Dictionary<string, Slave>();
-            this.connections = new Dictionary<byte, Tuple<TcpConnection, byte?>>();
-            this.mapper = new MbapMapper("rtumapper");
+            slaves = new Dictionary<string, Slave>();
+            connections = new Dictionary<byte, Tuple<TcpConnection, byte?>>();
+            mapper = new MbapMapper("rtumapper");
             RunAsync().GetAwaiter();
         }
 
@@ -25,12 +31,7 @@ namespace VirtualRtu.Communications.Tcp
             RunAsync().GetAwaiter();
         }
 
-        public event System.EventHandler<TcpReceivedEventArgs> OnReceived;
-        private ModuleConfig config;
-        private ILogger logger;
-        private Dictionary<string, Slave> slaves;
-        private Dictionary<byte, Tuple<TcpConnection, byte?>> connections;
-        private MbapMapper mapper;
+        public event EventHandler<TcpReceivedEventArgs> OnReceived;
 
         public async Task RunAsync()
         {

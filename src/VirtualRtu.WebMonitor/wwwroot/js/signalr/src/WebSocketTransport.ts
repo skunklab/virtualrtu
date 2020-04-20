@@ -16,11 +16,14 @@ export class WebSocketTransport implements ITransport {
     private readonly httpClient: HttpClient;
     private webSocket?: WebSocket;
 
-    public onreceive: ((data: string | ArrayBuffer) => void) | null;
-    public onclose: ((error?: Error) => void) | null;
+    onreceive: ((data: string | ArrayBuffer) => void) | null;
+    onclose: ((error?: Error) => void) | null;
 
-    constructor(httpClient: HttpClient, accessTokenFactory: (() => string | Promise<string>) | undefined, logger: ILogger,
-                logMessageContent: boolean, webSocketConstructor: WebSocketConstructor) {
+    constructor(httpClient: HttpClient,
+        accessTokenFactory: (() => string | Promise<string>) | undefined,
+        logger: ILogger,
+        logMessageContent: boolean,
+        webSocketConstructor: WebSocketConstructor) {
         this.logger = logger;
         this.accessTokenFactory = accessTokenFactory;
         this.logMessageContent = logMessageContent;
@@ -31,7 +34,7 @@ export class WebSocketTransport implements ITransport {
         this.onclose = null;
     }
 
-    public async connect(url: string, transferFormat: TransferFormat): Promise<void> {
+    async connect(url: string, transferFormat: TransferFormat): Promise<void> {
         Arg.isRequired(url, "url");
         Arg.isRequired(transferFormat, "transferFormat");
         Arg.isIn(transferFormat, TransferFormat, "transferFormat");
@@ -53,11 +56,13 @@ export class WebSocketTransport implements ITransport {
 
             if (Platform.isNode && cookies) {
                 // Only pass cookies when in non-browser environments
-                webSocket = new this.webSocketConstructor(url, undefined, {
-                    headers: {
-                        Cookie: `${cookies}`,
-                    },
-                });
+                webSocket = new this.webSocketConstructor(url,
+                    undefined,
+                    {
+                        headers: {
+                            Cookie: `${cookies}`,
+                        },
+                    });
             }
 
             if (!webSocket) {
@@ -90,7 +95,8 @@ export class WebSocketTransport implements ITransport {
             };
 
             webSocket.onmessage = (message: MessageEvent) => {
-                this.logger.log(LogLevel.Trace, `(WebSockets transport) data received. ${getDataDetail(message.data, this.logMessageContent)}.`);
+                this.logger.log(LogLevel.Trace,
+                    `(WebSockets transport) data received. ${getDataDetail(message.data, this.logMessageContent)}.`);
                 if (this.onreceive) {
                     this.onreceive(message.data);
                 }
@@ -116,9 +122,10 @@ export class WebSocketTransport implements ITransport {
         });
     }
 
-    public send(data: any): Promise<void> {
+    send(data: any): Promise<void> {
         if (this.webSocket && this.webSocket.readyState === this.webSocketConstructor.OPEN) {
-            this.logger.log(LogLevel.Trace, `(WebSockets transport) sending data. ${getDataDetail(data, this.logMessageContent)}.`);
+            this.logger.log(LogLevel.Trace,
+                `(WebSockets transport) sending data. ${getDataDetail(data, this.logMessageContent)}.`);
             this.webSocket.send(data);
             return Promise.resolve();
         }
@@ -126,7 +133,7 @@ export class WebSocketTransport implements ITransport {
         return Promise.reject("WebSocket is not in the OPEN state");
     }
 
-    public stop(): Promise<void> {
+    stop(): Promise<void> {
         if (this.webSocket) {
             // Clear websocket handlers because we are considering the socket closed now
             this.webSocket.onclose = () => {};

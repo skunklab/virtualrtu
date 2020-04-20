@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace VirtualRtu.WebMonitor.Models
 {
@@ -14,19 +14,18 @@ namespace VirtualRtu.WebMonitor.Models
             Href = $"#{vrtuId}-{deviceId}";
         }
 
-        [JsonProperty("text")]
-        public string Text { get; set; }
+        [JsonProperty("text")] public string Text { get; set; }
 
-        [JsonProperty("href")]
-        public string Href { get; set; }
+        [JsonProperty("href")] public string Href { get; set; }
 
         public int CompareTo([AllowNull] DevAsset other)
         {
             if (other == null)
+            {
                 return 1;
+            }
 
-            else
-                return this.Text.CompareTo(other.Text);
+            return Text.CompareTo(other.Text);
         }
     }
 }

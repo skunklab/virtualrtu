@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace VirtualRtu.Communications.Tcp
 {
@@ -8,8 +6,8 @@ namespace VirtualRtu.Communications.Tcp
     {
         public TcpReceivedEventArgs(string id, byte[] message)
         {
-            this.Id = id;
-            this.Message = message;
+            Id = id;
+            Message = message;
         }
 
         public string Id { get; set; }

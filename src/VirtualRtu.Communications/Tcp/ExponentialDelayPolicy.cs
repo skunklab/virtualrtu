@@ -1,12 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace VirtualRtu.Communications.Tcp
 {
     public class ExponentialDelayPolicy
     {
+        private readonly int entropy;
+        private int index;
+
+        private readonly int max;
+        private readonly Random ran;
+        private readonly bool randomize;
+
         public ExponentialDelayPolicy(int maxSeconds, int entropy = 5, bool randomness = true)
         {
             max = maxSeconds;
@@ -17,12 +22,6 @@ namespace VirtualRtu.Communications.Tcp
                 ran = new Random();
             }
         }
-
-        private int max;
-        private bool randomize;
-        private int entropy;
-        private int index;
-        private Random ran;
 
         public void Delay()
         {
@@ -42,6 +41,5 @@ namespace VirtualRtu.Communications.Tcp
             index++;
             Task.Delay(TimeSpan.FromSeconds(delay)).Wait();
         }
-
     }
 }

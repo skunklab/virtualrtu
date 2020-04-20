@@ -1,39 +1,38 @@
-﻿using Microsoft.Extensions.Logging;
-using SkunkLab.Channels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SkunkLab.Channels;
 using VirtualRtu.Communications.Channels;
 using VirtualRtu.Communications.Modbus;
 using VirtualRtu.Communications.Pipelines;
 using VirtualRtu.Configuration;
-using VirtualRtu.Configuration.Vrtu;
 
 namespace VirtualRtu.Communications.Tcp
 {
     public class ScadaClientListener
     {
+        private readonly VrtuConfig config;
+        private TcpListener listener;
+        private readonly ILogger logger;
+        private Dictionary<string, Pipeline> pipelines;
+
         public ScadaClientListener(VrtuConfig config, ILogger logger = null)
         {
             this.config = config;
             this.logger = logger;
-            this.pipelines = new Dictionary<string, Pipeline>();
+            pipelines = new Dictionary<string, Pipeline>();
         }
-
-        private VrtuConfig config;
-        private ILogger logger;
-        private Dictionary<string, Pipeline> pipelines;
-        private TcpListener listener;
 
         public async Task RunAsync()
         {
 #if DEBUG
             listener = new TcpListener(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 502));
 #else
-            listener = new TcpListener(new IPEndPoint(GetIPAddress(System.Net.Dns.GetHostName()), 502));
+            listener = new TcpListener(new IPEndPoint(GetIPAddress(Dns.GetHostName()), 502));
 #endif
 
             listener.ExclusiveAddressUse = false;
@@ -48,13 +47,13 @@ namespace VirtualRtu.Communications.Tcp
                     tcpClient.LingerState = new LingerOption(true, 0);
                     tcpClient.NoDelay = true;
                     tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                    
+
                     CancellationTokenSource cts = new CancellationTokenSource();
                     logger?.LogDebug("SCADA client connection acquired.");
 
                     IChannel inputChannel = ChannelFactory.Create(false, tcpClient, 1024, 1024 * 100, cts.Token);
                     logger?.LogDebug("SCADA client created TCP input channel");
-                    
+
                     IChannel outputChannel = new VirtualRtuChannel(config, logger);
                     logger?.LogDebug("SCADA client created VRTU output channel");
 
@@ -73,7 +72,7 @@ namespace VirtualRtu.Communications.Tcp
                     pipeline.Execute();
                     logger?.LogDebug("SCADA client pipeline executed.");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger?.LogError(ex, "Fault creating pipeline.");
                 }
@@ -88,7 +87,7 @@ namespace VirtualRtu.Communications.Tcp
                 pipelines = null;
                 listener = null;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, "Not so gracefull scada client listener shutdown.");
             }
@@ -111,8 +110,8 @@ namespace VirtualRtu.Communications.Tcp
         }
 
         private void Pipeline_OnPipelineError(object sender, PipelineErrorEventArgs e)
-        {            
-            if(e.Error != null)
+        {
+            if (e.Error != null)
             {
                 logger?.LogError(e.Error, "Pipe error.");
                 logger?.LogWarning("Disposing pipeline.");
@@ -126,7 +125,7 @@ namespace VirtualRtu.Communications.Tcp
                 {
                     pipeline.Dispose();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger?.LogError(ex, "Fault disposing pipeline.");
                 }
@@ -136,8 +135,5 @@ namespace VirtualRtu.Communications.Tcp
                 logger?.LogWarning("Pipeline not identified to dispose.");
             }
         }
-
-
-    
     }
 }

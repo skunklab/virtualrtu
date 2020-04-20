@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
 using VirtualRtu.WebMonitor.Configuration;
 using VirtualRtu.WebMonitor.Models;
 
@@ -11,6 +10,8 @@ namespace VirtualRtu.WebMonitor.Pages
 {
     public class IndexModel : PageModel
     {
+        private readonly MonitorConfig config;
+
         //private readonly UserManager<ApplicationUser> userManager;
         //private readonly IHttpContextAccessor context;
         public IndexModel(MonitorConfig config)
@@ -23,7 +24,6 @@ namespace VirtualRtu.WebMonitor.Pages
         public string Data { get; set; }
         public string Name { get; set; }
 
-        private MonitorConfig config;
         public void OnGet()
         {
             Console.WriteLine("GET called in index page.");
@@ -32,17 +32,14 @@ namespace VirtualRtu.WebMonitor.Pages
                 GraphAssets assets = AssetConfiguration.Load(config.TableName, config.StorageConnectionString);
                 List<VrtuAsset> list = new List<VrtuAsset>();
 
-                foreach (var item in assets.VirtualRtus)
-                {
-                    list.Add(new VrtuAsset(item));
-                }
+                foreach (var item in assets.VirtualRtus) list.Add(new VrtuAsset(item));
 
                 list.Sort();
 
 
                 Data = JsonConvert.SerializeObject(list);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine($"Exception getting assets - {ex.Message}");
             }

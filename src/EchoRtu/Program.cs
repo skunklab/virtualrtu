@@ -1,17 +1,18 @@
-﻿using SkunkLab.Channels;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using SkunkLab.Channels;
 
 namespace EchoRtu
 {
-    class Program
+    internal class Program
     {
         private static TcpListener listener;
 
         private static IChannel channel;
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
             Console.WriteLine("8\"\"\"\"                    8\"\"\"8 \"\"8\"\" 8   8 ");
             Console.WriteLine("8     eeee e   e eeeee   8   8   8   8   8 ");
@@ -23,12 +24,12 @@ namespace EchoRtu
 
             CancellationTokenSource cts = new CancellationTokenSource();
             IPAddress publicIP = GetIPAddress("localhost");
-           
+
             listener = new TcpListener(publicIP, 503);
             listener.ExclusiveAddressUse = false;
             listener.Start();
 
-            while(true)
+            while (true)
             {
                 TcpClient client = listener.AcceptTcpClientAsync().GetAwaiter().GetResult();
                 client.LingerState = new LingerOption(false, 0);
@@ -41,11 +42,8 @@ namespace EchoRtu
                 channel.OnOpen += Channel_OnOpen;
                 channel.OnReceive += Channel_OnReceive;
                 channel.OpenAsync().GetAwaiter();
-
             }
 
-
-            
 
             //Console.WriteLine("Press any key to terminiate...");
             //Console.ReadKey();
@@ -71,7 +69,7 @@ namespace EchoRtu
 
         private static void Channel_OnClose(object sender, ChannelCloseEventArgs e)
         {
-            Console.WriteLine($"Closed connection");
+            Console.WriteLine("Closed connection");
         }
 
         private static IPAddress GetIPAddress(string hostname)

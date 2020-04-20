@@ -1,4 +1,5 @@
 import { TransferFormat } from "./ITransport";
+
 /** @private */
 export interface IConnection {
     readonly features: any;

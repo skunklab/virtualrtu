@@ -1,17 +1,23 @@
-﻿using Microsoft.Extensions.Logging;
-using SkunkLab.Channels;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net;
-using System.ServiceModel;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using SkunkLab.Channels;
 
 namespace VirtualRtu.Communications.Tcp
 {
     public class TcpConnection
     {
+        private readonly string address;
+        private IChannel channel;
+        private CancellationTokenSource cts;
+
+        private readonly string id;
+        private readonly ILogger logger;
+        private readonly ExponentialDelayPolicy policy;
+        private readonly int port;
+
         public TcpConnection(string id, string address, int port, ExponentialDelayPolicy policy, ILogger logger = null)
         {
             this.id = id;
@@ -21,26 +27,19 @@ namespace VirtualRtu.Communications.Tcp
             this.logger = logger;
         }
 
-        public event System.EventHandler<TcpReceivedEventArgs> OnReceived;
-        
-        private string id;
-        private string address;
-        private int port;
-        private ExponentialDelayPolicy policy;
-        private ILogger logger;
-        private IChannel channel;
-        private CancellationTokenSource cts;
+        public event EventHandler<TcpReceivedEventArgs> OnReceived;
 
         public async Task OpenAsync()
         {
             cts = new CancellationTokenSource();
-            channel = SkunkLab.Channels.ChannelFactory.Create(false, new IPEndPoint(IPAddress.Parse(address), port), 1024, 102400, cts.Token);
+            channel = ChannelFactory.Create(false, new IPEndPoint(IPAddress.Parse(address), port), 1024, 102400,
+                cts.Token);
             channel.OnClose += Channel_OnClose;
             channel.OnError += Channel_OnError;
             channel.OnReceive += Channel_OnReceive;
             channel.OnOpen += Channel_OnOpen;
             channel.OnStateChange += Channel_OnStateChange;
-            
+
             await channel.OpenAsync();
         }
 
@@ -51,14 +50,14 @@ namespace VirtualRtu.Communications.Tcp
 
         public async Task SendAsync(byte[] message)
         {
-            if(channel.State == ChannelState.Open)
+            if (channel.State == ChannelState.Open)
             {
                 try
                 {
                     await channel.SendAsync(message);
                     logger?.LogDebug($"Channel '{channel.Id}' sent message");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     logger?.LogError(ex, $"Channel '{channel.Id}' fault during send.");
                 }
@@ -71,7 +70,7 @@ namespace VirtualRtu.Communications.Tcp
 
         public async Task CloseAsync()
         {
-            if(channel != null)
+            if (channel != null)
             {
                 await channel.CloseAsync();
                 channel.Dispose();
@@ -87,7 +86,7 @@ namespace VirtualRtu.Communications.Tcp
 
         private void Channel_OnReceive(object sender, ChannelReceivedEventArgs e)
         {
-            OnReceived?.Invoke(this, new TcpReceivedEventArgs(this.id, e.Message));
+            OnReceived?.Invoke(this, new TcpReceivedEventArgs(id, e.Message));
             logger?.LogDebug($"Channel '{e.ChannelId}' received message.");
         }
 
@@ -98,7 +97,7 @@ namespace VirtualRtu.Communications.Tcp
             {
                 await channel.CloseAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, $"TCP channel '{e.ChannelId}' error attempting close after error.");
             }
@@ -112,9 +111,9 @@ namespace VirtualRtu.Communications.Tcp
                 channel.Dispose();
                 channel = null;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                logger?.LogError(ex, $"TCP channel fault attempt closed and dispose.");
+                logger?.LogError(ex, "TCP channel fault attempt closed and dispose.");
             }
 
             policy.Delay();

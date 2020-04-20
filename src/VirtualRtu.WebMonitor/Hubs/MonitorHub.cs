@@ -1,13 +1,20 @@
-﻿using VirtualRtu.WebMonitor.Configuration;
-using Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using VirtualRtu.WebMonitor.Configuration;
 
 namespace VirtualRtu.WebMonitor.Hubs
 {
     public class MonitorHub : Hub
     {
+        private readonly HashSet<string> appSubscriptions;
+
+
+        private readonly MonitorConfig config;
+        private readonly ILogStream logStream;
+        private readonly HashSet<string> moduleSubcriptions;
+
         public MonitorHub(MonitorConfig config, ILogStream logStream)
         {
             this.config = config;
@@ -16,20 +23,15 @@ namespace VirtualRtu.WebMonitor.Hubs
             appSubscriptions = new HashSet<string>();
         }
 
-       
-        private MonitorConfig config;
-        private ILogStream logStream;
-        private HashSet<string> moduleSubcriptions;
-        private HashSet<string> appSubscriptions;
-
 
         public override Task OnConnectedAsync()
-        {           
+        {
             return base.OnConnectedAsync();
         }
+
         public override async Task OnDisconnectedAsync(Exception exception)
         {
-            foreach(var item in moduleSubcriptions)
+            foreach (var item in moduleSubcriptions)
                 await logStream.SubscribeAsync(item, false);
 
             foreach (var item in appSubscriptions)
@@ -37,27 +39,37 @@ namespace VirtualRtu.WebMonitor.Hubs
 
             await base.OnDisconnectedAsync(exception);
         }
+
         public async Task Subscribe(string resource, bool monitor)
         {
-            if(monitor && !moduleSubcriptions.Contains(resource))
+            if (monitor && !moduleSubcriptions.Contains(resource))
+            {
                 moduleSubcriptions.Add(resource);
+            }
+
             if (!monitor && moduleSubcriptions.Contains(resource))
+            {
                 moduleSubcriptions.Remove(resource);
+            }
 
             await logStream.SubscribeAsync(resource, monitor);
-
         }
 
         public async Task SubscribeAppInsights(string resource, bool monitor)
         {
             if (monitor && !moduleSubcriptions.Contains(resource))
+            {
                 appSubscriptions.Add(resource);
+            }
+
             if (!monitor && moduleSubcriptions.Contains(resource))
+            {
                 appSubscriptions.Remove(resource);
+            }
 
             await logStream.SubscribeAppInsightsAsync(resource, monitor);
         }
-      
+
 
         private string Decode(string resourceUriString)
         {
@@ -67,7 +79,8 @@ namespace VirtualRtu.WebMonitor.Hubs
 
             if (uriNext.Segments.Length == 4)
             {
-                id = $"{uriNext.Segments[1].Replace("/", "-")}{uriNext.Segments[2].Replace("/", "-")}{uriNext.Segments[3]}";
+                id =
+                    $"{uriNext.Segments[1].Replace("/", "-")}{uriNext.Segments[2].Replace("/", "-")}{uriNext.Segments[3]}";
             }
 
             if (uriNext.Segments.Length == 2)
@@ -77,6 +90,5 @@ namespace VirtualRtu.WebMonitor.Hubs
 
             return id;
         }
-
     }
 }

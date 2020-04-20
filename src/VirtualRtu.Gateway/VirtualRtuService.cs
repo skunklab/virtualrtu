@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using VirtualRtu.Communications.Logging;
 using VirtualRtu.Communications.Tcp;
 using VirtualRtu.Configuration;
@@ -11,15 +11,15 @@ namespace VirtualRtu.Gateway
 {
     public class VirtualRtuService : IHostedService
     {
+        private readonly VrtuConfig config;
+        private ScadaClientListener listener;
+        private readonly ILogger logger;
+
         public VirtualRtuService(VrtuConfig config, Logger logger = null)
         {
             this.config = config;
             this.logger = logger;
         }
-
-        private VrtuConfig config;
-        private ILogger logger;
-        private ScadaClientListener listener;
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
@@ -29,7 +29,7 @@ namespace VirtualRtu.Gateway
                 listener = new ScadaClientListener(config, logger);
                 await listener.RunAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, "Fault on startup.");
             }
@@ -41,7 +41,7 @@ namespace VirtualRtu.Gateway
             {
                 await listener.Shutdown();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger?.LogError(ex, "Fault shutting down.");
             }

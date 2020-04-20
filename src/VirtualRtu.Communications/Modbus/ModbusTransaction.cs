@@ -2,17 +2,8 @@
 {
     public class ModbusTransaction
     {
-        private ushort id;
         private static ModbusTransaction instance;
-        public static ModbusTransaction Create()
-        {
-            if (instance == null)
-            {
-                instance = new ModbusTransaction();
-            }
-
-            return instance;
-        }
+        private ushort id;
 
         public ushort Id
         {
@@ -26,6 +17,16 @@
 
                 return id;
             }
+        }
+
+        public static ModbusTransaction Create()
+        {
+            if (instance == null)
+            {
+                instance = new ModbusTransaction();
+            }
+
+            return instance;
         }
     }
 }

@@ -1,19 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace VirtualRtu.Gateway.Formatters
 {
     public class BinaryInputFormatter : InputFormatter
     {
         private const string CONTENT_TYPE = "application/octet-stream";
+
         public BinaryInputFormatter()
         {
             SupportedMediaTypes.Add(CONTENT_TYPE);
         }
 
-        public override Boolean CanRead(InputFormatterContext context)
+        public override bool CanRead(InputFormatterContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -36,7 +37,5 @@ namespace VirtualRtu.Gateway.Formatters
 
             return await InputFormatterResult.FailureAsync();
         }
-
-
     }
 }
