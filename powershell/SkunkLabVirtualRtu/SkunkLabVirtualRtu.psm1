@@ -333,18 +333,18 @@ function Add-VrtuVnetDeploy
     $step++
     az aks get-credentials --resource-group $ResourceGroupName --name $ClusterName
 
-    Update-Step -Step $step -Message "Applying Helm RBAC" -Start $start
-    $step++
-    kubectl apply -f "./helm-rbac.yaml"
+    #Update-Step -Step $step -Message "Applying Helm RBAC" -Start $start
+    #$step++
+    #kubectl apply -f "./helm-rbac.yaml"
 
-    Update-Step -Step $step -Message "Starting Tiller" -Start $start
-    $step++
-    helm init --service-account tiller
-    Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
+    #Update-Step -Step $step -Message "Starting Tiller" -Start $start
+    #$step++
+    #helm init --service-account tiller
+    #Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
 
     Update-Step -Step $step -Message "Deploying helm chart for VRTU VNET" -Start $start
     $step++
-    helm install "$Path/virtualrtu-vnet" --name virtualrtu --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$ltm --set symmetricKey=$SymmetricKey --set hostname=$Hostname --set storageConnectionString="$storageConnectionString" --set container=$BlobContainerName --set filename=$filename --set virtualRtuId=$VirtualRtuId --set instrumentationKey=$instrumentationKey --set logLevel=$LogLevel
+    helm install virtualrtu "$Path/virtualrtu-vnet" --namespace kube-system --set claimTypes=$claimTypes --set claimValues=$claimValues --set issuer=$issuer --set audience=$audience --set lifetimeMinutes=$ltm --set symmetricKey=$SymmetricKey --set hostname=$Hostname --set storageConnectionString="$storageConnectionString" --set container=$BlobContainerName --set filename=$filename --set virtualRtuId=$VirtualRtuId --set instrumentationKey=$instrumentationKey --set logLevel=$LogLevel
 
     Write-Host "-- Step $step - Geting IP for Subnet communications" -ForegroundColor Green
     $ip = Get-ExternalIPForService -AppName "vrtu"
@@ -539,14 +539,14 @@ function New-VrtuVnetDeploy
     $step++
     az aks get-credentials --resource-group $ResourceGroupName --name $ClusterName
 
-    Update-Step -Step $step -Message "Applying Helm RBAC" -Start $start
-    $step++
-    kubectl apply -f "./helm-rbac.yaml"
+    #Update-Step -Step $step -Message "Applying Helm RBAC" -Start $start
+    #$step++
+    #kubectl apply -f "./helm-rbac.yaml"
 
-    Update-Step -Step $step -Message "Starting Tiller" -Start $start
-    $step++
-    helm init --service-account tiller
-    Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
+    #Update-Step -Step $step -Message "Starting Tiller" -Start $start
+    #$step++
+    #helm init --service-account tiller
+    #Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
 
     Update-Step -Step $step -Message "Deploying helm chart for VRTU VNET" -Start $start
     $step++ 
@@ -698,14 +698,14 @@ function Add-WedMonitorDeploy
         $step++
         Get-AksCredentials -ClusterName $ClusterName -ResourceGroupName $ResourceGroupName
 		
-        Update-Step -Step $step -Message "Apply HELM RBAC" -Start $start
-        $step++
-        New-KubectlApply -Filename "$Path/helm-rbac.yaml" -Namespace "kube-system"
+        #Update-Step -Step $step -Message "Apply HELM RBAC" -Start $start
+        #$step++
+        #New-KubectlApply -Filename "$Path/helm-rbac.yaml" -Namespace "kube-system"
 
-        Update-Step -Step $step -Message "Start Tiller" -Start $start
-        $step++
-        helm init --service-account tiller
-        Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
+        #Update-Step -Step $step -Message "Start Tiller" -Start $start
+        #$step++
+        #helm init --service-account tiller
+        #Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
 
         Update-Step -Step $step -Message "Add cert manager for Let's Encrypt" -Start $start
         $step++
@@ -881,14 +881,14 @@ function New-WebMonitorDeploy
         $step++
         Get-AksCredentials -ClusterName $ClusterName -ResourceGroupName $ResourceGroupName
 		
-        Update-Step -Step $step -Message "Apply HELM RBAC" -Start $start
-        $step++
-        New-KubectlApply -Filename "$Path/helm-rbac.yaml" -Namespace "kube-system"
+        #Update-Step -Step $step -Message "Apply HELM RBAC" -Start $start
+        #$step++
+        #New-KubectlApply -Filename "$Path/helm-rbac.yaml" -Namespace "kube-system"
 
-        Update-Step -Step $step -Message "Start Tiller" -Start $start
-        $step++
-        helm init --service-account tiller
-        Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
+        #Update-Step -Step $step -Message "Start Tiller" -Start $start
+        #$step++
+        #helm init --service-account tiller
+        #Set-Timer -Message "...waiting 45 seconds for Tiller to start" -Seconds 45
 
         Update-Step -Step $step -Message "Add cert manager for Let's Encrypt" -Start $start
         $step++

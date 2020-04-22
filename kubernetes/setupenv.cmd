@@ -6,3 +6,4 @@ powershell.exe Install-PackageProvider -Name NuGet -Force
 powershell.exe Install-Module -Name PowerShellGet -Force
 powershell.exe Update-Module -Name PowerShellGet
 start /wait cmd /c powershell.exe iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+powershell.exe Invoke-WebRequest -Uri https://github.com/PowerShell/PowerShell/releases/download/v7.0.0/PowerShell-7.0.0-win-x86.msi -OutFile .\PowerShell-7.0.0-win-x86.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I PowerShell-7.0.0-win-x86.msi /quiet'
