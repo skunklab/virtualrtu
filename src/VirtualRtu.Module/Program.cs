@@ -10,10 +10,12 @@ using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Module
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
+<<<<<<< HEAD
+=======
             /*
              *
 
@@ -28,6 +30,7 @@ namespace VirtualRtu.Module
 
 
              */
+>>>>>>> vnext
             Console.WriteLine("eeee e  eeee e     eeeee");
             Console.WriteLine("8    8  8    8     8   8");
             Console.WriteLine("8eee 8e 8eee 8e    8e  8");
@@ -44,39 +47,39 @@ namespace VirtualRtu.Module
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureServices((hostContext, services) =>
-            {
-                services.AddModuleConfiguration(out ModuleConfig config);
-
-                services.AddLogging(builder =>
+        private static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureServices((hostContext, services) =>
                 {
-                    builder.AddConsole();
-                    builder.SetMinimumLevel(config.LoggingLevel);
-                });
-                services.AddLogging(builder => builder.AddLogging(config));
-                services.AddSingleton<Logger>();    //add the logger
-                services.AddSingleton<ModuleTcpChannel>();
-                services.AddHostedService<ModuleService>();
-            })
-            .ConfigureWebHost((options) =>
-            {
-                options.UseStartup<Startup>();
-                options.UseKestrel();
-                options.ConfigureKestrel(options =>
+                    services.AddModuleConfiguration(out ModuleConfig config);
+
+                    services.AddLogging(builder =>
+                    {
+                        builder.AddConsole();
+                        builder.SetMinimumLevel(config.LoggingLevel);
+                    });
+                    services.AddLogging(builder => builder.AddLogging(config));
+                    services.AddSingleton<Logger>(); //add the logger
+                    services.AddSingleton<ModuleTcpChannel>();
+                    services.AddHostedService<ModuleService>();
+                })
+                .ConfigureWebHost(options =>
                 {
-                    options.Limits.MaxConcurrentConnections = 10000;
-                    options.Limits.MaxConcurrentUpgradedConnections = 10000;
-                    options.Limits.MaxRequestBodySize = 100000;
-                    options.Limits.MinRequestBodyDataRate =
-                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
-                    options.Limits.MinResponseDataRate =
-                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
-                    options.ListenAnyIP(8888);
+                    options.UseStartup<Startup>();
+                    options.UseKestrel();
+                    options.ConfigureKestrel(options =>
+                    {
+                        options.Limits.MaxConcurrentConnections = 10000;
+                        options.Limits.MaxConcurrentUpgradedConnections = 10000;
+                        options.Limits.MaxRequestBodySize = 100000;
+                        options.Limits.MinRequestBodyDataRate =
+                            new MinDataRate(100, TimeSpan.FromSeconds(10));
+                        options.Limits.MinResponseDataRate =
+                            new MinDataRate(100, TimeSpan.FromSeconds(10));
+                        options.ListenAnyIP(8888);
+                    });
                 });
-            });
-
-
+        }
     }
 }
