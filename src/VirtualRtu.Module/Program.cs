@@ -1,19 +1,33 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using VirtualRtu.Communications.Channels;
 using VirtualRtu.Communications.Logging;
 using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Module
 {
-    internal class Program
+    class Program
     {
-        private static void Main(string[] args)
+        static void Main(string[] args)
         {
+            /*
+             *
+
+
+
+
+
+
+
+
+
+
+
+             */
             Console.WriteLine("eeee e  eeee e     eeeee");
             Console.WriteLine("8    8  8    8     8   8");
             Console.WriteLine("8eee 8e 8eee 8e    8e  8");
@@ -27,43 +41,42 @@ namespace VirtualRtu.Module
             Console.WriteLine("88ee8 88  8   88  88ee 88ee8ee8 88  8   88");
             Console.WriteLine("");
 
-
             CreateHostBuilder(args).Build().Run();
         }
 
-        private static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddModuleConfiguration(out ModuleConfig config);
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+            .ConfigureServices((hostContext, services) =>
+            {
+                services.AddModuleConfiguration(out ModuleConfig config);
 
-                    services.AddLogging(builder =>
-                    {
-                        builder.AddConsole();
-                        builder.SetMinimumLevel(config.LoggingLevel);
-                    });
-                    services.AddLogging(builder => builder.AddLogging(config));
-                    services.AddSingleton<Logger>(); //add the logger
-                    services.AddSingleton<ModuleTcpChannel>();
-                    services.AddHostedService<ModuleService>();
-                })
-                .ConfigureWebHost(options =>
+                services.AddLogging(builder =>
                 {
-                    options.UseStartup<Startup>();
-                    options.UseKestrel();
-                    options.ConfigureKestrel(options =>
-                    {
-                        options.Limits.MaxConcurrentConnections = 10000;
-                        options.Limits.MaxConcurrentUpgradedConnections = 10000;
-                        options.Limits.MaxRequestBodySize = 100000;
-                        options.Limits.MinRequestBodyDataRate =
-                            new MinDataRate(100, TimeSpan.FromSeconds(10));
-                        options.Limits.MinResponseDataRate =
-                            new MinDataRate(100, TimeSpan.FromSeconds(10));
-                        options.ListenAnyIP(8888);
-                    });
+                    builder.AddConsole();
+                    builder.SetMinimumLevel(config.LoggingLevel);
                 });
-        }
+                services.AddLogging(builder => builder.AddLogging(config));
+                services.AddSingleton<Logger>();    //add the logger
+                services.AddSingleton<ModuleTcpChannel>();
+                services.AddHostedService<ModuleService>();
+            })
+            .ConfigureWebHost((options) =>
+            {
+                options.UseStartup<Startup>();
+                options.UseKestrel();
+                options.ConfigureKestrel(options =>
+                {
+                    options.Limits.MaxConcurrentConnections = 10000;
+                    options.Limits.MaxConcurrentUpgradedConnections = 10000;
+                    options.Limits.MaxRequestBodySize = 100000;
+                    options.Limits.MinRequestBodyDataRate =
+                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    options.Limits.MinResponseDataRate =
+                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    options.ListenAnyIP(8888);
+                });
+            });
+
+
     }
 }
