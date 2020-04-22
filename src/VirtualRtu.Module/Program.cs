@@ -15,18 +15,18 @@ namespace VirtualRtu.Module
         static void Main(string[] args)
         {
             /*
-             *                     
-                     
-                     
-                    
-                     
-                                             
-                                             
- 
- 
- 
-  
-  
+             *
+
+
+
+
+
+
+
+
+
+
+
              */
             Console.WriteLine("eeee e  eeee e     eeeee");
             Console.WriteLine("8    8  8    8     8   8");
@@ -40,7 +40,6 @@ namespace VirtualRtu.Module
             Console.WriteLine("88 \"8 88  8   88  88   88  8  8 88  8   88 ");
             Console.WriteLine("88ee8 88  8   88  88ee 88ee8ee8 88  8   88");
             Console.WriteLine("");
-
 
             CreateHostBuilder(args).Build().Run();
         }
