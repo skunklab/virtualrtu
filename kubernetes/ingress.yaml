@@ -24,3 +24,4 @@ spec:
         backend:
           serviceName: websocket
           servicePort: 8081
+      

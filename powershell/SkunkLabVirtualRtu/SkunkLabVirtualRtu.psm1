@@ -684,15 +684,14 @@ function Add-WedMonitorDeploy
         Update-Step -Step $step -Message "Updating ingress DNS and Location" -Start $start
         $step++
         #Update-MonitorIngressDns -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-$Dns.yaml"
-	Set-Ingress -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-copy.yaml"
+		Set-Ingress -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-copy.yaml"
     }
     else
     {
-        kubectl create namespace "webmon"
         Update-Step -Step $step -Message "Creating new Monitor AKS cluster" -Start $start
         $step++
         New-AksCluster -ClusterName $ClusterName -ResourceGroupName $ResourceGroupName -AppId "$spnAppId" -Password "$spnPwd" -VmSize $VmSize -NodeCount $NodeCount
-	kubectl config use-context $ClusterName
+		kubectl config use-context $ClusterName
 		
         Update-Step -Step $step -Message "Get AKS credentials" -Start $start
         $step++
@@ -717,9 +716,9 @@ function Add-WedMonitorDeploy
         Add-Issuer -Email $Email -IssuerPath "$Path/issuer2.yaml" -IssuerDestination "$Path/issuer2-copy.yaml" -Namespace "webmon"
         Set-Timer -Message "...waiting 30 seconds for issuer to initialize" -Seconds 30
    	
-	Update-Step -Step $step -Message "Upate local HELM repo" -Start $start
-	$step++
-	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+		Update-Step -Step $step -Message "Upate local HELM repo" -Start $start
+		$step++
+		helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	
         Update-Step -Step $step -Message "Add NGINX" -Start $start
         $step++
@@ -867,15 +866,14 @@ function New-WebMonitorDeploy
         Update-Step -Step $step -Message "Updating ingress DNS and Location" -Start $start
         $step++
         #Update-MonitorIngressDns -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-$Dns.yaml"
-	Set-Ingress -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-copy.yaml"
+		Set-Ingress -Dns $Dns -Location $Location -Path "$Path/ingress-webmonitor.yaml" -Destination "$Path/ingress-webmonitor-copy.yaml"
     }
     else
     {
-        kubectl create namespace "webmon"
         Update-Step -Step $step -Message "Creating new Monitor AKS cluster" -Start $start
         $step++
         New-AksCluster -ClusterName $ClusterName -ResourceGroupName $ResourceGroupName -AppId "$spnAppId" -Password "$spnPwd" -VmSize $VmSize -NodeCount $NodeCount
-	kubectl config use-context $ClusterName
+		kubectl config use-context $ClusterName
 		
         Update-Step -Step $step -Message "Get AKS credentials" -Start $start
         $step++
@@ -900,12 +898,13 @@ function New-WebMonitorDeploy
         Add-Issuer -Email $Email -IssuerPath "$Path/issuer2.yaml" -IssuerDestination "$Path/issuer2-copy.yaml" -Namespace "webmon"
         Set-Timer -Message "...waiting 30 seconds for issuer to initialize" -Seconds 30
    	
-	Update-Step -Step $step -Message "Upate local HELM repo" -Start $start
-	$step++
-	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+		Update-Step -Step $step -Message "Upate local HELM repo" -Start $start
+		$step++
+		helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	
         Update-Step -Step $step -Message "Add NGINX" -Start $start
         $step++
+               
         Add-NGINX -Namespace "webmon"
         Set-Timer "...waiting 45 seconds for nginx to initialize" -Seconds 45
 
@@ -1058,7 +1057,11 @@ function Get-ExternalIPForService
 
 function Add-CertManager2
 {
-	kubectl create namespace "cert-manager"
+	kubectl get namespace "cert-manager"
+	if($LASTEXITCODE -ne 0 )
+	{
+		kubectl create namespace "cert-manager"
+	}
 	
 	kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.14.1/cert-manager.yaml
     helm repo add jetstack https://charts.jetstack.io

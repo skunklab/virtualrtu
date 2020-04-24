@@ -2,7 +2,7 @@ function New-FunctionApp
 {
 	param([string]$AppName, [string]$StorageAcctName,[string]$Location, [string]$AppInsightsName, [string]$ResourceGroupName)	
 
-    	az functionapp create -n $AppName  --storage-account $StorageAcctName  --consumption-plan-location $Location  --app-insights $AppInsightsName --runtime dotnet -g $ResourceGroupName
+    	az functionapp create -n $AppName  --storage-account $StorageAcctName  --consumption-plan-location $Location  --app-insights $AppInsightsName --runtime dotnet -g $ResourceGroupName --functions-version 3
 }
 
 function Get-FunctionCreds

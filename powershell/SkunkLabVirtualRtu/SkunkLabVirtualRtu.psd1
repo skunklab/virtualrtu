@@ -12,7 +12,7 @@
 RootModule = 'SkunkLabVirtualRtu.psm1'
 
 # Version number of this module.
-ModuleVersion = '3.1.6.1'
+ModuleVersion = '3.1.6.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

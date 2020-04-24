@@ -10,27 +10,10 @@ using VirtualRtu.Configuration;
 
 namespace VirtualRtu.Module
 {
-    internal class Program
+    public class Program
     {
         private static void Main(string[] args)
         {
-<<<<<<< HEAD
-=======
-            /*
-             *
-
-
-
-
-
-
-
-
-
-
-
-             */
->>>>>>> vnext
             Console.WriteLine("eeee e  eeee e     eeeee");
             Console.WriteLine("8    8  8    8     8   8");
             Console.WriteLine("8eee 8e 8eee 8e    8e  8");
